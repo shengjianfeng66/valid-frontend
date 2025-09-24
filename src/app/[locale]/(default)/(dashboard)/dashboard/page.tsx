@@ -29,14 +29,14 @@ export default function Page() {
             />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-8 p-4 relative overflow-hidden">
+        <div className="flex flex-1 flex-col gap-8 p-4">
           {/* AI对话框区域 */}
-          <div className="w-full relative z-10">
+          <div className="w-full">
             <AiChatBlock />
           </div>
           
           {/* Showcase列表区域 */}
-          <div className="w-full relative z-10">
+          <div className="w-full">
             <ShowcaseBlock />
           </div>
         </div>
