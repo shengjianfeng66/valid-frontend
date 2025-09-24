@@ -16,9 +16,9 @@ export default async function DefaultLayout({
 
   return (
     <>
-      {page.header && <Header header={page.header} />}
+      {/* {page.header && <Header header={page.header} />} */}
       <main className="overflow-x-hidden">{children}</main>
-      {page.footer && <Footer footer={page.footer} />}
+      {/* {page.footer && <Footer footer={page.footer} />} */}
       {/* <Feedback socialLinks={page.footer?.social?.items} /> */}
     </>
   );
