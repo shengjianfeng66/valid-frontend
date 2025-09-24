@@ -43,11 +43,11 @@ const data = {
       url: "#",
       icon: Trash2,
     },
-    {
-      title: "Help",
-      url: "#",
-      icon: MessageCircleQuestion,
-    },
+    // {
+    //   title: "Help",
+    //   url: "#",
+    //   icon: MessageCircleQuestion,
+    // },
     {
       title: "Settings",
       url: "#",

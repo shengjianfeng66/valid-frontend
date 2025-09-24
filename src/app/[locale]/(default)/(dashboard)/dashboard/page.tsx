@@ -1,5 +1,7 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { NavActions } from "@/components/sidebar/nav-actions"
+import { AiChatBlock } from "@/components/blocks/ai-chat-block"
+import { ShowcaseBlock } from "@/components/blocks/showcase-block"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,9 +29,16 @@ export default function Page() {
             />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 px-4 py-10">
-          <div className="bg-muted/50 mx-auto h-24 w-full max-w-3xl rounded-xl" />
-          <div className="bg-muted/50 mx-auto h-full w-full max-w-3xl rounded-xl" />
+        <div className="flex flex-1 flex-col gap-8 p-4 relative overflow-hidden">
+          {/* AI对话框区域 */}
+          <div className="w-full relative z-10">
+            <AiChatBlock />
+          </div>
+          
+          {/* Showcase列表区域 */}
+          <div className="w-full relative z-10">
+            <ShowcaseBlock />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

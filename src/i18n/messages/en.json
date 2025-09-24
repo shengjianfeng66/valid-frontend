@@ -132,5 +132,20 @@
     "contact_tip": "Other ways to contact us",
     "rating_tip": "How do you feel about ShipAny?",
     "placeholder": "Leave your words here..."
+  },
+  "aiChat": {
+    "title": "AI User Insights Platform",
+    "subtitle": "Understand Your Users in One Hour",
+    "description": "Let real people and simulated users experience your product and engage in conversations, supporting text, images, PDFs, and various formats.",
+    "placeholder": "Describe your business type, product features, and user personas. For example: My product is an e-commerce platform, and I want to know what users think about its features",
+    "startAnalysis": "Start Analysis",
+    "analyzing": "Analyzing..."
+  },
+  "showcase": {
+    "appStoreTitle": "APP Store Rankings",
+    "productHuntTitle": "Product Hunt Rankings",
+    "updateTime": "Updated",
+    "userLove": "User Favorite Features",
+    "mainIssues": "Main Issues"
   }
 }

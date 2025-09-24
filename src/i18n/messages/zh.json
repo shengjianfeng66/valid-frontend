@@ -132,5 +132,20 @@
     "contact_tip": "其他联系方式",
     "rating_tip": "您对 ShipAny 的看法如何？",
     "placeholder": "在这里留下您的反馈..."
+  },
+  "aiChat": {
+    "title": "AI 用户洞察平台",
+    "subtitle": "一小时了解你的用户",
+    "description": "让真人和模拟用户体验你的产品并与其对话，支持文字、图片、PDF等多种形式。",
+    "placeholder": "描述你的业务类型、产品功能和用户画像，例如：我的产品是电商平台，想知道用户对它的功能的看法",
+    "startAnalysis": "开始洞察",
+    "analyzing": "分析中..."
+  },
+  "showcase": {
+    "appStoreTitle": "APP Store 榜单",
+    "productHuntTitle": "Product Hunt 榜单",
+    "updateTime": "更新时间",
+    "userLove": "用户最爱功能",
+    "mainIssues": "主要槽点"
   }
 }
