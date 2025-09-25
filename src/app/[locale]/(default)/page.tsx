@@ -10,6 +10,8 @@ import Pricing from "@/components/blocks/pricing";
 import Showcase from "@/components/blocks/showcase";
 import Stats from "@/components/blocks/stats";
 import Testimonial from "@/components/blocks/testimonial";
+import Footer from "@/components/blocks/footer";
+import Header from "@/components/blocks/header";
 import { getLandingPage } from "@/services/page";
 import { setRequestLocale } from "next-intl/server";
 
@@ -48,6 +50,7 @@ export default async function LandingPage({
 
   return (
     <>
+      {page.header && <Header header={page.header} />}
       {page.hero && <Hero hero={page.hero} />}
       {page.branding && <Branding section={page.branding} />}
       {page.introduce && <Feature1 section={page.introduce} />}
@@ -60,6 +63,7 @@ export default async function LandingPage({
       {page.testimonial && <Testimonial section={page.testimonial} />}
       {page.faq && <FAQ section={page.faq} />}
       {page.cta && <CTA section={page.cta} />}
+      {page.footer && <Footer footer={page.footer} />}
     </>
   );
 }

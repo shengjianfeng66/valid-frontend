@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "ShipAny",
+      "title": "ValidFlow",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny"
+        "alt": "ValidFlow"
       },
       "url": "/"
     },
@@ -41,8 +41,8 @@
     },
     "buttons": [
       {
-        "title": "获取 ShipAny",
-        "url": "https://shipany.ai",
+        "title": "仪表盘",
+        "url": "/dashboard",
         "target": "_blank",
         "variant": "link",
         "icon": "RiArrowRightUpLine"
@@ -53,27 +53,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "几小时内快速构建 AI 创业项目，而不是几天",
-    "highlight_text": "快速构建",
-    "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板。<br/>通过丰富的模板和组件快速启动。",
+    "title": "AI时代的用户洞察",
+    "highlight_text": "用户洞察",
+    "description": "用户想要更快的马，我们给了他们汽车。<br/>我们的使命：为每一位AI时代的创新者提供产品直觉。",
     "announcement": {
       "label": "2025",
-      "title": "🎉 新年快乐",
+      "title": "🎉 早鸟优惠",
       "url": "/pricing"
     },
-    "tip": "🎁 2025年前五折优惠",
+    "tip": "在竞争激烈的AI产品市场中，理解用户是成功的关键",
     "buttons": [
       {
         "title": "立即开始",
         "icon": "RiFlashlightFill",
-        "url": "/pricing",
+        "url": "/dashboard",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "阅读文档",
+        "title": "联系我们",
         "icon": "RiBookOpenLine",
-        "url": "https://docs.shipany.ai",
+        "url": "https://docs.validflow.ai",
         "target": "_blank",
         "variant": "outline"
       }
@@ -82,7 +82,7 @@
     "show_badge": false
   },
   "branding": {
-    "title": "ShipAny 建立在巨人的肩膀上",
+    "title": "ValidFlow 建立在巨人的肩膀上",
     "items": [
       {
         "title": "Next.js",
@@ -123,56 +123,56 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "什么是 ShipAny",
+    "title": "什么是 ValidFlow",
     "label": "介绍",
-    "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板，内置多种模板和组件。",
+    "description": "ValidFlow 是AI时代的用户洞察平台。传统的A/B测试方法耗时、昂贵且难以执行。ValidFlow打破这些障碍，赋能创新者构建优秀产品。",
     "image": {
       "src": "/imgs/features/1.png"
     },
     "items": [
       {
-        "title": "即用型模板",
-        "description": "从数十个生产就绪的 AI SaaS 模板中选择，快速启动您的项目。",
-        "icon": "RiNextjsFill"
+        "title": "设计实验",
+        "description": "上传研究目标，AI自动生成专业的用户实验计划，支持自定义编辑。",
+        "icon": "RiFlaskLine"
       },
       {
-        "title": "基础设施配置",
-        "description": "立即获取内置最佳实践的可扩展基础设施。",
-        "icon": "RiDatabase2Line"
+        "title": "用户访谈",
+        "description": "AI进行深度访谈，与真实或模拟用户通过视频通话进行交流。",
+        "icon": "RiVideoLine"
       },
       {
-        "title": "快速部署",
-        "description": "在几小时内将您的 AI SaaS 应用部署到生产环境，而不是几天。",
-        "icon": "RiCloudyFill"
+        "title": "行为洞察",
+        "description": "记录用户产品使用行为，收集全面的访谈数据和真实反馈。",
+        "icon": "RiBarChartLine"
       }
     ]
   },
   "benefit": {
     "name": "benefit",
-    "title": "为什么选择 ShipAny",
-    "label": "优势",
-    "description": "获取启动 AI 创业所需的一切 - 从即用型模板到技术支持。",
+    "title": "我们能帮助您解决什么",
+    "label": "价值",
+    "description": "无论您面临什么用户洞察挑战，ValidFlow都能提供有效的解决方案。",
     "items": [
       {
-        "title": "完整框架",
-        "description": "基于 Next.js 构建，集成身份验证、支付和 AI 功能 - 一切开箱即用。",
-        "icon": "RiNextjsFill",
+        "title": "产品迭代",
+        "description": "通过快速用户反馈和需求验证，缩短产品开发周期。",
+        "icon": "RiRefreshLine",
         "image": {
           "src": "/imgs/features/2.png"
         }
       },
       {
-        "title": "丰富的模板库",
-        "description": "选择各种 AI SaaS 模板来启动您的项目 - 聊天机器人、图像生成等。",
-        "icon": "RiClapperboardAiLine",
+        "title": "提升营销",
+        "description": "更精准地定位客户群体，优化营销信息和渠道。",
+        "icon": "RiMegaphoneLine",
         "image": {
           "src": "/imgs/features/3.png"
         }
       },
       {
-        "title": "技术指导",
-        "description": "获得专门支持并加入我们的开发者社区，确保您成功启动。",
-        "icon": "RiCodeFill",
+        "title": "预算研究",
+        "description": "为资源受限的创新团队和专业人士提供强大、用户友好的工具。",
+        "icon": "RiMoneyDollarCircleLine",
         "image": {
           "src": "/imgs/features/4.png"
         }
@@ -181,8 +181,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "如何使用 ShipAny 启动项目",
-    "description": "通过三个简单步骤启动您的 AI SaaS 创业项目：",
+    "title": "如何使用 ValidFlow 获得用户洞察",
+    "description": "通过四个简单步骤获得深度用户洞察：",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -190,29 +190,29 @@
     "text_align": "center",
     "items": [
       {
-        "title": "获取 ShipAny",
-        "description": "一次性付款购买 ShipAny。查收邮件获取代码和文档。",
+        "title": "设计实验",
+        "description": "上传您的研究目标，AI自动生成专业的用户实验计划。",
         "image": {
           "src": "/imgs/features/5.png"
         }
       },
       {
-        "title": "开始您的项目",
-        "description": "阅读文档并克隆 ShipAny 代码。开始构建您的 AI SaaS 创业项目。",
+        "title": "执行访谈",
+        "description": "AI代理与真实或模拟用户进行深度访谈，收集真实反馈。",
         "image": {
           "src": "/imgs/features/6.png"
         }
       },
       {
-        "title": "定制您的项目",
-        "description": "使用您的数据和内容修改模板。满足特定的 AI 功能需求。",
+        "title": "智能分析",
+        "description": "AI结合多种推理方案智能分析回收的用户洞察数据",
         "image": {
           "src": "/imgs/features/7.png"
         }
       },
       {
-        "title": "部署到生产环境",
-        "description": "通过几个步骤将项目部署到生产环境，立即开始服务客户。",
+        "title": "产品决策",
+        "description": "AI执行定性和定量分析，提供可操作的产品优化建议。",
         "image": {
           "src": "/imgs/features/8.png"
         }
@@ -221,76 +221,74 @@
   },
   "feature": {
     "name": "feature",
-    "title": "ShipAny 核心功能",
-    "description": "快速高效启动 AI SaaS 创业所需的一切。",
+    "title": "ValidFlow 核心功能",
+    "description": "AI时代获得深度用户洞察所需的一切。",
     "items": [
       {
-        "title": "Next.js 模板",
-        "description": "生产就绪的 Next.js 模板，支持 SEO 友好结构和国际化。",
-        "icon": "RiNextjsFill"
+        "title": "设计实验",
+        "description": "上传研究目标，AI自动生成专业的用户实验计划，支持自定义编辑。",
+        "icon": "RiFlaskLine"
       },
       {
-        "title": "身份验证和支付",
-        "description": "集成 Google OAuth、一键登录和 Stripe 支付处理。",
-        "icon": "RiKey2Fill"
+        "title": "用户访谈",
+        "description": "AI进行深度访谈，与真实或模拟用户通过视频通话进行交流。",
+        "icon": "RiVideoLine"
       },
       {
-        "title": "数据基础设施",
-        "description": "内置 Supabase 集成，提供可靠和可扩展的数据存储。",
-        "icon": "RiDatabase2Line"
+        "title": "行为洞察",
+        "description": "记录用户产品使用行为，收集全面的访谈数据和真实反馈。",
+        "icon": "RiBarChartLine"
       },
       {
-        "title": "一键部署",
-        "description": "无缝部署到 Vercel 或 Cloudflare，自动化设置。",
-        "icon": "RiCloudy2Fill"
+        "title": "智能分析",
+        "description": "AI执行定性和定量用户数据分析，提供可操作的产品优化建议。",
+        "icon": "RiBrainLine"
       },
       {
-        "title": "业务分析",
-        "description": "集成 Google Analytics 和 Search Console 追踪增长。",
-        "icon": "RiBarChart2Line"
+        "title": "实时协作",
+        "description": "团队成员可以实时查看访谈进展，共同分析用户反馈。",
+        "icon": "RiTeamLine"
       },
       {
-        "title": "AI 就绪基础设施",
-        "description": "预配置 AI 集成，内置积分系统和 API 销售。",
-        "icon": "RiRobot2Line"
+        "title": "数据导出",
+        "description": "支持多种格式导出分析结果，便于进一步处理和分享。",
+        "icon": "RiDownloadLine"
       }
     ]
   },
   "stats": {
     "name": "stats",
-    "label": "统计",
-    "title": "用户喜爱 ShipAny",
-    "description": "因为它易于使用且快速发布。",
+    "label": "数据统计",
+    "title": "用户喜爱 ValidFlow",
+    "description": "数字说明一切，看看我们的成就。",
     "icon": "FaRegHeart",
     "items": [
       {
         "title": "信任",
         "label": "99+",
-        "description": "客户"
+        "description": "产品团队"
       },
       {
         "title": "内置",
-        "label": "20+",
-        "description": "组件"
+        "label": "1000+",
+        "description": "模拟用户"
       },
       {
-        "title": "快速发布",
-        "label": "5",
-        "description": "分钟"
+        "title": "洞察准确率",
+        "label": "95",
+        "description": "%"
       }
     ]
   },
   "testimonial": {
     "name": "testimonial",
-    "label": "用户评价",
-    "title": "用户如何评价 ShipAny",
-    "description": "听听使用 ShipAny 启动 AI 创业项目的开发者和创始人怎么说。",
-    "icon": "GoThumbsup",
+    "title": "客户评价",
+    "description": "看看我们的客户对 ValidFlow 的评价。",
     "items": [
       {
-        "title": "陈大卫",
-        "label": "AIWallpaper.shop 创始人",
-        "description": "ShipAny 为我们节省了数月的开发时间。我们仅用 2 天就启动了 AI 壁纸业务，一周内就获得了第一个付费客户！",
+        "title": "Sidrel Sun",
+        "label": "Dreamoo CEO",
+        "description": "这个平台为我提供了出色的Dreamoo2.0解决方案！",
         "image": {
           "src": "/imgs/users/1.png"
         }
@@ -298,23 +296,16 @@
       {
         "title": "金瑞秋",
         "label": "HeyBeauty.ai 技术总监",
-        "description": "预构建的 AI 基础设施是一个游戏规则改变者。我们无需担心架构 - 只需专注于 AI 美容技术并快速上线。",
+        "description": "有了它！我了解了我们产品海外用户的真实需求！",
         "image": {
           "src": "/imgs/users/2.png"
         }
       },
-      {
-        "title": "马库斯",
-        "label": "独立开发者",
-        "description": "作为独立开发者，ShipAny 给了我所需的一切 - 身份验证、支付、AI 集成和漂亮的 UI。一个周末就启动了我的 SaaS！",
-        "image": {
-          "src": "/imgs/users/3.png"
-        }
-      },
+      
       {
         "title": "索菲亚",
         "label": "Melodisco CEO",
-        "description": "这些模板可直接用于生产且高度可定制。我们用几小时而不是几个月就建立了 AI 音乐平台。上市时间令人难以置信！",
+        "description": "ValidFlow让我在短短一周内访谈了上千位用户！",
         "image": {
           "src": "/imgs/users/4.png"
         }
@@ -322,7 +313,7 @@
       {
         "title": "詹姆斯",
         "label": "GPTs.works 技术主管",
-        "description": "ShipAny 的基础设施非常稳固。我们从 0 扩展到 1 万用户都没碰后端。这是我们 AI 创业最好的投资。",
+        "description": "它让我意识到用户说的和他们想要的是不同的！",
         "image": {
           "src": "/imgs/users/5.png"
         }
@@ -330,7 +321,7 @@
       {
         "title": "张安娜",
         "label": "创业者",
-        "description": "从想法到上线只用了 3 天！ShipAny 的模板和部署工具让我们能够以令人难以置信的速度测试 AI 业务概念。",
+        "description": "从想法到上线只用了3天！ValidFlow飞速验证了我的AI业务概念。",
         "image": {
           "src": "/imgs/users/6.png"
         }
@@ -340,66 +331,60 @@
   "faq": {
     "name": "faq",
     "label": "常见问题",
-    "title": "关于 ShipAny 的常见问题",
+    "title": "关于 ValidFlow 的常见问题",
     "description": "还有其他问题？通过 Discord 或电子邮件联系我们。",
     "items": [
       {
-        "title": "ShipAny 究竟是什么，它是如何工作的？",
-        "description": "ShipAny 是一个专门为构建 AI SaaS 创业项目设计的综合性 NextJS 模板。它提供即用型模板、基础设施设置和部署工具，帮助您在几小时内而不是几天内启动 AI 业务。"
+        "title": "什么是 ValidFlow？",
+        "description": "ValidFlow 是一个AI驱动的用户洞察平台，帮助产品团队通过智能实验设计、用户访谈和行为分析获得深度用户洞察。"
       },
       {
-        "title": "使用 ShipAny 需要高级技术技能吗？",
-        "description": "虽然基本的编程知识会有帮助，但 ShipAny 设计得非常开发者友好。我们的模板和文档使您即使不是 AI 或云基础设施专家也能轻松入门。"
+        "title": "ValidFlow 如何进行用户访谈？",
+        "description": "我们的AI代理可以与真实用户或模拟用户进行深度访谈，通过视频通话收集真实反馈和行为数据。"
       },
       {
-        "title": "我可以用 ShipAny 构建什么类型的 AI SaaS？",
-        "description": "ShipAny 支持广泛的 AI 应用，从内容生成到数据分析工具。我们的模板涵盖流行用例，如 AI 聊天机器人、内容生成器、图像处理应用等。"
+        "title": "分析结果有多准确？",
+        "description": "我们的AI分析准确率达到95%，结合定性和定量分析方法，提供可操作的产品优化建议。"
       },
       {
-        "title": "使用 ShipAny 通常需要多长时间才能启动？",
-        "description": "使用 ShipAny，您可以在几小时内完成工作原型，并在几小时内完成生产就绪的应用。我们的一键部署和预配置基础设施显著缩短了传统的数月开发周期。"
+        "title": "适合什么规模的团队？",
+        "description": "ValidFlow 适合从独立开发者到大型产品团队的各种规模，我们提供灵活的协作功能。"
       },
       {
-        "title": "ShipAny 的基础设施包括什么？",
-        "description": "ShipAny 提供完整的基础设施栈，包括身份验证、数据库设置、API 集成、支付处理和可扩展的云部署。一切都按照行业最佳实践预先配置。"
+        "title": "数据安全如何保障？",
+        "description": "我们采用企业级安全标准，所有用户数据都经过加密处理，严格遵守数据隐私保护法规。"
       },
       {
         "title": "我可以自定义模板以匹配我的品牌吗？",
-        "description": "当然可以！所有 ShipAny 模板都完全可定制。您可以修改设计、功能和功能性以匹配您的品牌标识和特定业务需求，同时保持强大的底层基础设施。"
+        "description": "当然可以！所有 ValidFlow 模板都完全可定制。您可以修改设计、功能和功能性以匹配您的品牌标识和特定业务需求，同时保持强大的底层基础设施。"
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "启动您的第一个 AI SaaS 创业项目",
-    "description": "从这里开始，使用 ShipAny 启动。",
+    "title": "准备好开始了吗？",
+    "description": "立即体验 ValidFlow，获得AI时代的用户洞察能力。",
     "buttons": [
       {
-        "title": "获取 ShipAny",
-        "url": "https://shipany.ai",
+        "title": "立刻开始",
+        "url": "/dashboard",
         "target": "_blank",
         "icon": "GoArrowUpRight"
-      },
-      {
-        "title": "阅读文档",
-        "url": "https://docs.shipany.ai",
-        "target": "_blank",
-        "variant": "outline"
       }
     ]
   },
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "ShipAny",
-      "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板。通过丰富的模板和组件快速启动。",
+      "title": "ValidFlow",
+      "description": "AI时代的用户洞察平台",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny"
+        "alt": "ValidFlow"
       },
       "url": "/"
     },
-    "copyright": "© 2025 • ShipAny 保留所有权利。",
+    "copyright": "© 2025 • ValidFlow 保留所有权利。",
     "nav": {
       "items": [
         {
@@ -412,12 +397,12 @@
             },
             {
               "title": "案例展示",
-              "url": "/#showcase",
+              "url": "/showcase",
               "target": "_self"
             },
             {
               "title": "定价",
-              "url": "/#pricing",
+              "url": "/pricing",
               "target": "_self"
             }
           ]

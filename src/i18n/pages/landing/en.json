@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "ShipAny",
+      "title": "ValidFlow",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny"
+        "alt": "ValidFlow"
       },
       "url": "/"
     },
@@ -41,8 +41,8 @@
     },
     "buttons": [
       {
-        "title": "Get ShipAny",
-        "url": "https://shipany.ai",
+        "title": "Dashboard",
+        "url": "/dashboard",
         "target": "_blank",
         "variant": "link",
         "icon": "RiArrowRightUpLine"
@@ -53,27 +53,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "Ship Any AI Startups in hours, not days",
-    "highlight_text": "Ship Any",
-    "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups.<br/>Ship Fast with a variety of templates and components.",
+    "title": "User Insights for the AI Era",
+    "highlight_text": "User Insights",
+    "description": "Users wanted faster horses, we gave them cars.<br/>Our mission: Provide product intuition for every AI-era innovator.",
     "announcement": {
       "label": "2025",
-      "title": "🎉 Happy New Year",
+      "title": "🎉 Early Bird Discount",
       "url": "/pricing"
     },
-    "tip": "🎁 50% off before 2025",
+    "tip": "In the competitive AI product market, understanding users is the key to success",
     "buttons": [
       {
         "title": "Get Started",
         "icon": "RiFlashlightFill",
-        "url": "/pricing",
+        "url": "/dashboard",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "Read Document",
+        "title": "Contact Us",
         "icon": "RiBookOpenLine",
-        "url": "https://docs.shipany.ai",
+        "url": "https://docs.validflow.ai",
         "target": "_blank",
         "variant": "outline"
       }
@@ -82,7 +82,7 @@
     "show_badge": false
   },
   "branding": {
-    "title": "ShipAny is built on the shoulders of giants",
+    "title": "ValidFlow is built on the shoulders of giants",
     "items": [
       {
         "title": "Next.js",
@@ -123,56 +123,56 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "What is ShipAny",
-    "label": "Introduce",
-    "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups. Built in a variety of templates and components.",
+    "title": "What is ValidFlow",
+    "label": "Introduction",
+    "description": "ValidFlow is a user insights platform for the AI era. Traditional A/B testing methods are time-consuming, expensive, and difficult to execute. ValidFlow breaks down these barriers and empowers innovators to build excellent products.",
     "image": {
       "src": "/imgs/features/1.png"
     },
     "items": [
       {
-        "title": "Ready-to-use Templates",
-        "description": "Choose from dozens of production-ready AI SaaS templates to quickly start your project.",
-        "icon": "RiNextjsFill"
+        "title": "Design Experiments",
+        "description": "Upload research objectives, AI automatically generates professional user experiment plans with customizable editing support.",
+        "icon": "RiFlaskLine"
       },
       {
-        "title": "Infrastructure Setup",
-        "description": "Get instant access to scalable infrastructure with best practices built-in.",
-        "icon": "RiDatabase2Line"
+        "title": "User Interviews",
+        "description": "AI conducts in-depth interviews, communicating with real or simulated users through video calls.",
+        "icon": "RiVideoLine"
       },
       {
-        "title": "Quick Deployment",
-        "description": "Deploy your AI SaaS application to production in hours, not days.",
-        "icon": "RiCloudyFill"
+        "title": "Behavioral Insights",
+        "description": "Record user product usage behavior, collect comprehensive interview data and authentic feedback.",
+        "icon": "RiBarChartLine"
       }
     ]
   },
   "benefit": {
     "name": "benefit",
-    "title": "Why Choose ShipAny",
-    "label": "Benefits",
-    "description": "Get everything you need to launch your AI startup - from ready-to-use templates to technical support.",
+    "title": "What We Can Help You Solve",
+    "label": "Value",
+    "description": "Whatever user insight challenges you face, ValidFlow can provide effective solutions.",
     "items": [
       {
-        "title": "Complete Framework",
-        "description": "Built on Next.js with authentication, payments, and AI integration - everything works out of the box.",
-        "icon": "RiNextjsFill",
+        "title": "Product Iteration",
+        "description": "Shorten product development cycles through rapid user feedback and requirement validation.",
+        "icon": "RiRefreshLine",
         "image": {
           "src": "/imgs/features/2.png"
         }
       },
       {
-        "title": "Rich Templates Library",
-        "description": "Choose from various AI SaaS templates to kickstart your project - chatbots, image generation, and more.",
-        "icon": "RiClapperboardAiLine",
+        "title": "Enhanced Marketing",
+        "description": "More precisely target customer segments, optimize marketing messages and channels.",
+        "icon": "RiMegaphoneLine",
         "image": {
           "src": "/imgs/features/3.png"
         }
       },
       {
-        "title": "Technical Guidance",
-        "description": "Get dedicated support and join our developer community to ensure your successful launch.",
-        "icon": "RiCodeFill",
+        "title": "Budget Research",
+        "description": "Provide powerful, user-friendly tools for resource-constrained innovation teams and professionals.",
+        "icon": "RiMoneyDollarCircleLine",
         "image": {
           "src": "/imgs/features/4.png"
         }
@@ -181,8 +181,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "How to Launch with ShipAny",
-    "description": "Get your AI SaaS startup running in three simple steps:",
+    "title": "How to Gain User Insights with ValidFlow",
+    "description": "Gain deep user insights through four simple steps:",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -190,29 +190,29 @@
     "text_align": "center",
     "items": [
       {
-        "title": "Get ShipAny",
-        "description": "Buy ShipAny with a one-time payment. Check your email for the code and documentation.",
+        "title": "Design Experiments",
+        "description": "Upload your research objectives, AI automatically generates professional user experiment plans.",
         "image": {
           "src": "/imgs/features/5.png"
         }
       },
       {
-        "title": "Start Your Project",
-        "description": "Read the documentation and clone the code of ShipAny. Start building your AI SaaS startup.",
+        "title": "Conduct Interviews",
+        "description": "AI agents conduct in-depth interviews with real or simulated users, collecting authentic feedback.",
         "image": {
           "src": "/imgs/features/6.png"
         }
       },
       {
-        "title": "Customize Your Project",
-        "description": "Modify the template with your data and contents. Specific AI functionality needs.",
+        "title": "Intelligent Analysis",
+        "description": "AI intelligently analyzes collected user insight data using multiple reasoning approaches.",
         "image": {
           "src": "/imgs/features/7.png"
         }
       },
       {
-        "title": "Deploy to Production",
-        "description": "Deploy your project to production with a few steps and start serving customers immediately.",
+        "title": "Product Decisions",
+        "description": "AI performs qualitative and quantitative analysis, providing actionable product optimization recommendations.",
         "image": {
           "src": "/imgs/features/8.png"
         }
@@ -221,116 +221,107 @@
   },
   "feature": {
     "name": "feature",
-    "title": "Key Features of ShipAny",
-    "description": "Everything you need to launch your AI SaaS startup quickly and efficiently.",
+    "title": "ValidFlow Core Features",
+    "description": "Everything you need to gain deep user insights in the AI era.",
     "items": [
       {
-        "title": "Next.js Boilerplate",
-        "description": "Production-ready Next.js templates with SEO-friendly structure and i18n support.",
-        "icon": "RiNextjsFill"
+        "title": "Design Experiments",
+        "description": "Upload research objectives, AI automatically generates professional user experiment plans with customizable editing support.",
+        "icon": "RiFlaskLine"
       },
       {
-        "title": "Authentication & Payments",
-        "description": "Integrated Google OAuth, one-tap login, and Stripe payment processing.",
-        "icon": "RiKey2Fill"
+        "title": "User Interviews",
+        "description": "AI conducts in-depth interviews, communicating with real or simulated users through video calls.",
+        "icon": "RiVideoLine"
       },
       {
-        "title": "Data Infrastructure",
-        "description": "Built-in Supabase integration for reliable and scalable data storage.",
-        "icon": "RiDatabase2Line"
+        "title": "Behavioral Insights",
+        "description": "Record user product usage behavior, collect comprehensive interview data and authentic feedback.",
+        "icon": "RiBarChartLine"
       },
       {
-        "title": "One-Click Deployment",
-        "description": "Seamless deployment to Vercel or Cloudflare with automated setup.",
-        "icon": "RiCloudy2Fill"
+        "title": "Intelligent Analysis",
+        "description": "AI performs qualitative and quantitative user data analysis, providing actionable product optimization recommendations.",
+        "icon": "RiBrainLine"
       },
       {
-        "title": "Business Analytics",
-        "description": "Integrated Google Analytics and Search Console for tracking growth.",
-        "icon": "RiBarChart2Line"
+        "title": "Real-time Collaboration",
+        "description": "Team members can view interview progress in real-time and collaboratively analyze user feedback.",
+        "icon": "RiTeamLine"
       },
       {
-        "title": "AI-Ready Infrastructure",
-        "description": "Pre-configured AI integration with built-in credits system and API sales.",
-        "icon": "RiRobot2Line"
+        "title": "Data Export",
+        "description": "Support multiple format exports of analysis results for further processing and sharing.",
+        "icon": "RiDownloadLine"
       }
     ]
   },
   "stats": {
     "name": "stats",
-    "label": "Stats",
-    "title": "People Love ShipAny",
-    "description": "for it's easy to use and fast to ship.",
+    "label": "Statistics",
+    "title": "Users Love ValidFlow",
+    "description": "Numbers tell the story, see our achievements.",
     "icon": "FaRegHeart",
     "items": [
       {
         "title": "Trusted by",
         "label": "99+",
-        "description": "Customers"
+        "description": "Product Teams"
       },
       {
-        "title": "Built in",
-        "label": "20+",
-        "description": "Components"
+        "title": "Built-in",
+        "label": "1000+",
+        "description": "Simulated Users"
       },
       {
-        "title": "Ship Fast in",
-        "label": "5",
-        "description": "Minutes"
+        "title": "Insight Accuracy",
+        "label": "95",
+        "description": "%"
       }
     ]
   },
   "testimonial": {
     "name": "testimonial",
-    "label": "Testimonial",
-    "title": "What Users Say About ShipAny",
-    "description": "Hear from developers and founders who launched their AI startups with ShipAny.",
-    "icon": "GoThumbsup",
+    "title": "Customer Reviews",
+    "description": "See what our customers say about ValidFlow.",
     "items": [
       {
-        "title": "David Chen",
-        "label": "Founder of AIWallpaper.shop",
-        "description": "ShipAny saved us months of development time. We launched our AI wallpaper business in just 2 days and got our first paying customer within a week!",
+        "title": "Sidrel Sun",
+        "label": "Dreamoo CEO",
+        "description": "This platform provided me with an excellent Dreamoo2.0 solution!",
         "image": {
           "src": "/imgs/users/1.png"
         }
       },
       {
         "title": "Rachel Kim",
-        "label": "CTO at HeyBeauty.ai",
-        "description": "The pre-built AI infrastructure is a game-changer. We didn't have to worry about architecture - just focused on our AI beauty tech and went live fast.",
+        "label": "HeyBeauty.ai CTO",
+        "description": "With it! I understood the real needs of our overseas users!",
         "image": {
           "src": "/imgs/users/2.png"
         }
       },
-      {
-        "title": "Marcus Thompson",
-        "label": "Solo Developer",
-        "description": "As a solo developer, ShipAny gave me everything I needed - auth, payments, AI integration, and beautiful UI. Launched my SaaS in a weekend!",
-        "image": {
-          "src": "/imgs/users/3.png"
-        }
-      },
+      
       {
         "title": "Sofia Garcia",
-        "label": "CEO of Melodisco",
-        "description": "The templates are production-ready and highly customizable. We built our AI music platform in hours instead of months. Incredible time-to-market!",
+        "label": "Melodisco CEO",
+        "description": "ValidFlow allowed me to interview thousands of users in just one week!",
         "image": {
           "src": "/imgs/users/4.png"
         }
       },
       {
         "title": "James Wilson",
-        "label": "Tech Lead at GPTs.works",
-        "description": "ShipAny's infrastructure is rock-solid. We scaled from 0 to 10k users without touching the backend. Best investment for our AI startup.",
+        "label": "GPTs.works Tech Lead",
+        "description": "It made me realize that what users say and what they want are different!",
         "image": {
           "src": "/imgs/users/5.png"
         }
       },
       {
         "title": "Anna Zhang",
-        "label": "Startup Founder",
-        "description": "From idea to launch in 3 days! ShipAny's templates and deployment tools made it possible to test our AI business concept incredibly fast.",
+        "label": "Entrepreneur",
+        "description": "From idea to launch in just 3 days! ValidFlow rapidly validated my AI business concept.",
         "image": {
           "src": "/imgs/users/6.png"
         }
@@ -340,66 +331,60 @@
   "faq": {
     "name": "faq",
     "label": "FAQ",
-    "title": "Frequently Asked Questions About ShipAny",
-    "description": "Have another question? Contact us on Discord or by email.",
+    "title": "Frequently Asked Questions About ValidFlow",
+    "description": "Have other questions? Contact us through Discord or email.",
     "items": [
       {
-        "title": "What exactly is ShipAny and how does it work?",
-        "description": "ShipAny is a comprehensive NextJS boilerplate designed specifically for building AI SaaS startups. It provides ready-to-use templates, infrastructure setup, and deployment tools that help you launch your AI business in hours instead of days."
+        "title": "What is ValidFlow?",
+        "description": "ValidFlow is an AI-driven user insights platform that helps product teams gain deep user insights through intelligent experiment design, user interviews, and behavioral analysis."
       },
       {
-        "title": "Do I need advanced technical skills to use ShipAny?",
-        "description": "While basic programming knowledge is helpful, ShipAny is designed to be developer-friendly. Our templates and documentation make it easy to get started, even if you're not an expert in AI or cloud infrastructure."
+        "title": "How does ValidFlow conduct user interviews?",
+        "description": "Our AI agents can conduct in-depth interviews with real users or simulated users, collecting authentic feedback and behavioral data through video calls."
       },
       {
-        "title": "What types of AI SaaS can I build with ShipAny?",
-        "description": "ShipAny supports a wide range of AI applications, from content generation to data analysis tools. Our templates cover popular use cases like AI chatbots, content generators, image processing apps, and more."
+        "title": "How accurate are the analysis results?",
+        "description": "Our AI analysis accuracy reaches 95%, combining qualitative and quantitative analysis methods to provide actionable product optimization recommendations."
       },
       {
-        "title": "How long does it typically take to launch with ShipAny?",
-        "description": "With ShipAny, you can have a working prototype in hours and a production-ready application in hours. Our one-click deployment and pre-configured infrastructure significantly reduce the traditional months-long development cycle."
+        "title": "What team sizes is it suitable for?",
+        "description": "ValidFlow is suitable for various scales from independent developers to large product teams, and we provide flexible collaboration features."
       },
       {
-        "title": "What's included in the ShipAny infrastructure?",
-        "description": "ShipAny provides a complete infrastructure stack including authentication, database setup, API integration, payment processing, and scalable cloud deployment. Everything is pre-configured following industry best practices."
+        "title": "How is data security ensured?",
+        "description": "We adopt enterprise-level security standards, all user data is encrypted, and we strictly comply with data privacy protection regulations."
       },
       {
-        "title": "Can I customize the templates to match my brand?",
-        "description": "Absolutely! All ShipAny templates are fully customizable. You can modify the design, features, and functionality to match your brand identity and specific business requirements while maintaining the robust underlying infrastructure."
+        "title": "Can I customize templates to match my brand?",
+        "description": "Absolutely! All ValidFlow templates are fully customizable. You can modify design, features, and functionality to match your brand identity and specific business requirements while maintaining the powerful underlying infrastructure."
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "Ship your first AI SaaS Startup",
-    "description": "Start from here, ship with ShipAny.",
+    "title": "Ready to Get Started?",
+    "description": "Experience ValidFlow now and gain user insight capabilities for the AI era.",
     "buttons": [
       {
-        "title": "Get ShipAny",
-        "url": "https://shipany.ai",
+        "title": "Get Started Now",
+        "url": "/dashboard",
         "target": "_blank",
         "icon": "GoArrowUpRight"
-      },
-      {
-        "title": "Read Document",
-        "url": "https://docs.shipany.ai",
-        "target": "_blank",
-        "variant": "outline"
       }
     ]
   },
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "ShipAny",
-      "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups. Ship Fast with a variety of templates and components.",
+      "title": "ValidFlow",
+      "description": "User insights platform for the AI era",
       "logo": {
         "src": "/logo.png",
-        "alt": "ShipAny"
+        "alt": "ValidFlow"
       },
       "url": "/"
     },
-    "copyright": "© 2025 • ShipAny All rights reserved.",
+    "copyright": "© 2025 • ValidFlow All rights reserved.",
     "nav": {
       "items": [
         {
@@ -411,13 +396,13 @@
               "target": "_self"
             },
             {
-              "title": "Showcases",
-              "url": "/#showcase",
+              "title": "Showcase",
+              "url": "/showcase",
               "target": "_self"
             },
             {
               "title": "Pricing",
-              "url": "/#pricing",
+              "url": "/pricing",
               "target": "_self"
             }
           ]
@@ -426,7 +411,7 @@
           "title": "Resources",
           "children": [
             {
-              "title": "Documents",
+              "title": "Documentation",
               "url": "https://docs.shipany.ai",
               "target": "_blank"
             },
@@ -443,7 +428,7 @@
           ]
         },
         {
-          "title": "Friends",
+          "title": "Partners",
           "children": [
             {
               "title": "ThinkAny",
