@@ -27,9 +27,6 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
-          <div className="ml-auto px-3">
-            <NavActions />
-          </div>
         </header>
         <div className="flex flex-1 flex-col gap-8 p-4">
           {/* 用户访谈Card List */}

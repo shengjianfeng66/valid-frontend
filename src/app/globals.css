@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "./theme.css";
 
+@custom-variant dark (&:is(.dark *));
+
 @plugin "tailwindcss-animate";
 
 @layer base {
@@ -28,4 +30,19 @@ button {
 
 pre {
   @apply px-4;
+}
+
+@theme inline {
+
+  --color-destructive-foreground: var(--destructive-foreground);
+}
+
+:root {
+
+  --destructive-foreground: oklch(1 0 0);
+}
+
+.dark {
+
+  --destructive-foreground: oklch(1 0 0);
 }
