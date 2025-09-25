@@ -67,7 +67,7 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
                   "text-sm font-medium",
                   {
                     "text-[oklch(0.705_0.213_47.604)]": step.status === "completed",
-                    "text-[oklch(0.705_0.213_47.604)]": step.status === "current",
+                    "text-[oklch(0.705_0.213_47.600)]": step.status === "current",
                     "text-gray-500": step.status === "upcoming"
                   }
                 )}
