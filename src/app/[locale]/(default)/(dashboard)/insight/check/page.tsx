@@ -11,7 +11,8 @@ import ProcessSteps from "@/components/blocks/process-steps";
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState } from "react";
-import { FileText, Users, Clock } from "lucide-react";
+import { FileText, Users, Clock, ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SurveyData {
   surveyIntro: string;
@@ -277,6 +278,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 }
 
 export default function CheckPage() {
+  const router = useRouter();
   const [surveyData, setSurveyData] = useState<SurveyData>({
     surveyIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
     surveyTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
@@ -500,6 +502,17 @@ export default function CheckPage() {
             
             {/* 用户访谈大纲 */}
             <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
+            
+            {/* 下一步按钮 */}
+            <div className="flex justify-end mt-8">
+              <button
+                onClick={() => router.push('/insight/static')}
+                className="flex items-center gap-2 px-6 py-3 bg-[oklch(0.705_0.213_47.604)] text-white rounded-lg hover:bg-[oklch(0.685_0.213_47.604)] transition-colors font-medium"
+              >
+                下一步
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </SidebarInset>
         <CopilotSidebar

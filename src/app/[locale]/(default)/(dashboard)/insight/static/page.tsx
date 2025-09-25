@@ -1,7 +1,6 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { NavActions } from "@/components/sidebar/nav-actions"
-import { AiChatBlock } from "@/components/blocks/ai-chat-block"
-import { ShowcaseBlock } from "@/components/blocks/showcase-block"
+import { InterviewCardList } from "@/components/blocks/interview-card-list"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,16 +27,14 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
+          <div className="ml-auto px-3">
+            <NavActions />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-8 p-4">
-          {/* AI对话框区域 */}
+          {/* 用户访谈Card List */}
           <div className="w-full">
-            <AiChatBlock />
-          </div>
-          
-          {/* Showcase列表区域 */}
-          <div className="w-full">
-            <ShowcaseBlock />
+            <InterviewCardList />
           </div>
         </div>
       </SidebarInset>
