@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -18,16 +19,18 @@ const formatIcons = [
 export function AiChatBlock() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   const t = useTranslations("aiChat")
 
   const handleSubmit = async () => {
     if (!input.trim()) return
     
     setIsLoading(true)
-    // TODO: 实现AI对话逻辑
+    // 跳转到insight/add页面
     setTimeout(() => {
       setIsLoading(false)
-    }, 2000)
+      router.push('/insight/add')
+    }, 1000)
   }
 
   return (
