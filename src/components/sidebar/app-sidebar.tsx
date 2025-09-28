@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+
 import {
   AudioWaveform,
   Blocks,
@@ -48,11 +49,11 @@ const data = {
     //   url: "#",
     //   icon: MessageCircleQuestion,
     // },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-    }
+    // {
+    //   title: "Settings",
+    //   url: "#",
+    //   icon: Settings2,
+    // }
   ],
   favorites: [
     {
@@ -202,13 +203,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Vaildflow</span>
-                </div>
+              <a href="/" className="flex items-center gap-2">
+                <img 
+                  src="/logo.png" 
+                  alt="ValidFlow Logo" 
+                  className="w-8"
+                />
+                <span className="text-xl font-bold text-primary">ValidFlow</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -16,7 +16,11 @@ export default async function DefaultLayout({
 
   return (
     <>
-      {page.header && <Header header={page.header} />}
+      {page.header && (
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <Header header={page.header} />
+        </div>
+      )}
       <main className="overflow-x-hidden">{children}</main>
       {page.footer && <Footer footer={page.footer} />}
     </>
