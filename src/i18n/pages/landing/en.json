@@ -31,11 +31,6 @@
           "title": "Blog",
           "url": "/posts",
           "icon": "RiArticleLine"
-        },
-        {
-          "title": "Docs",
-          "url": "/docs",
-          "icon": "RiBookOpenLine"
         }
       ]
     },

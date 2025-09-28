@@ -31,11 +31,6 @@
           "title": "博客",
           "url": "/posts",
           "icon": "RiArticleLine"
-        },
-        {
-          "title": "文档",
-          "url": "/docs",
-          "icon": "RiBookOpenLine"
         }
       ]
     },

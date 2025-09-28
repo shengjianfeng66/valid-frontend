@@ -15,14 +15,14 @@ export default async function DefaultLayout({
   const page = await getLandingPage(locale);
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col" style={{ scrollbarGutter: 'stable' }}>
       {page.header && (
         <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <Header header={page.header} />
         </div>
       )}
-      <main className="overflow-x-hidden">{children}</main>
+      <main className="flex-1 overflow-x-hidden">{children}</main>
       {page.footer && <Footer footer={page.footer} />}
-    </>
+    </div>
   );
 }
