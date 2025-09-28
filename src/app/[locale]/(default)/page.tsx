@@ -1,6 +1,6 @@
 import { getLandingPage } from "@/services/page";
 import { setRequestLocale } from "next-intl/server";
-import LandingPageClient from "./landing-page-client";
+import HomePage from "./home-page";
 
 export const revalidate = 60;
 export const dynamic = "force-static";
@@ -35,5 +35,5 @@ export default async function LandingPage({
 
   const page = await getLandingPage(locale);
 
-  return <LandingPageClient page={page} />;
+  return <HomePage page={page} />;
 }

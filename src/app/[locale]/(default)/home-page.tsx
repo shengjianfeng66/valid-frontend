@@ -14,21 +14,19 @@ import Pricing from "@/components/blocks/pricing";
 import Showcase from "@/components/blocks/showcase";
 import Stats from "@/components/blocks/stats";
 import Testimonial from "@/components/blocks/testimonial";
-import Footer from "@/components/blocks/footer";
-import Header from "@/components/blocks/header";
 
-interface LandingPageClientProps {
+interface HomePageProps {
   page: any;
 }
 
-export default function LandingPageClient({ page }: LandingPageClientProps) {
+export default function HomePage({ page }: HomePageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ["start start", "end start"]
   });
 
-  // Create different parallax speeds for different sections
+  // Y-axis transforms for parallax effect
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -100]);
   const brandingY = useTransform(scrollYProgress, [0.1, 0.4], [0, -50]);
   const featureY = useTransform(scrollYProgress, [0.2, 0.6], [0, -80]);
@@ -42,8 +40,6 @@ export default function LandingPageClient({ page }: LandingPageClientProps) {
 
   return (
     <div ref={containerRef}>
-      {page.header && <Header header={page.header} />}
-      
       {page.hero && (
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity }}
@@ -179,17 +175,6 @@ export default function LandingPageClient({ page }: LandingPageClientProps) {
           viewport={{ once: true, margin: "-100px" }}
         >
           <CTA section={page.cta} />
-        </motion.div>
-      )}
-      
-      {page.footer && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          viewport={{ once: true }}
-        >
-          <Footer footer={page.footer} />
         </motion.div>
       )}
     </div>
