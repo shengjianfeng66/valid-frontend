@@ -12,7 +12,6 @@ const formatIcons = [
   { icon: FileText, label: "PDF文档" },
   { icon: AlignLeft, label: "长文本" },
   { icon: Globe, label: "网站" },
-  { icon: Youtube, label: "YouTube" },
   { icon: Image, label: "图片" },
 ]
 
@@ -24,7 +23,7 @@ export function AiChatBlock() {
 
   const handleSubmit = async () => {
     if (!input.trim()) return
-    
+
     setIsLoading(true)
     // 跳转到insight/add页面
     setTimeout(() => {
@@ -75,7 +74,7 @@ export function AiChatBlock() {
             className="min-h-[120px] resize-none border-2 border-gray-200 rounded-xl p-4 text-sm focus:border-gray-400 focus:ring-0"
           />
         </div>
-        
+
         <div className="flex justify-center">
           <Button
             onClick={handleSubmit}
