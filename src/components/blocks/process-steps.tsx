@@ -31,9 +31,15 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
     },
     {
       id: 3,
-      title: "确认计划",
-      description: "调研问卷与访谈大纲",
+      title: "调研问卷",
+      description: "问卷设计",
       status: currentStep > 3 ? "completed" : currentStep === 3 ? "current" : "upcoming"
+    },
+    {
+      id: 4,
+      title: "访谈大纲",
+      description: "访谈提纲",
+      status: currentStep > 4 ? "completed" : currentStep === 4 ? "current" : "upcoming"
     }
   ];
 
@@ -59,7 +65,7 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
                 step.id
               )}
             </div>
-            
+
             {/* Step Info */}
             <div className="mt-3 text-center">
               <div
@@ -80,7 +86,7 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
             </div>
           </div>
         ))}
-        
+
         {/* Connector Lines as background layer */}
         <div className="absolute top-5 left-6 right-6 flex items-center z-0">
           {steps.map((step, index) => (

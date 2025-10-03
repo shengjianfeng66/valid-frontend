@@ -7,15 +7,15 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { 
-  Stepper, 
-  StepperItem, 
-  StepperTrigger, 
-  StepperIndicator, 
-  StepperSeparator, 
-  StepperTitle, 
-  StepperDescription, 
-  StepperNav 
+import {
+  Stepper,
+  StepperItem,
+  StepperTrigger,
+  StepperIndicator,
+  StepperSeparator,
+  StepperTitle,
+  StepperDescription,
+  StepperNav
 } from "@/components/stepper";
 import { Check } from "lucide-react";
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
@@ -49,7 +49,7 @@ function InterviewStatsCard() {
         </div>
         <h2 className="text-lg font-semibold text-gray-900">访谈样本量</h2>
       </div>
-      
+
       <div className="space-y-3">
         <p className="text-gray-700">
           我们将为您邀请 <span className="text-blue-600 font-semibold">159</span> 位模拟用户，真实度约 <span className="text-blue-600 font-semibold">87%</span>，销后您也可以将 <span className="text-blue-600">访谈链接</span> 发送给真人用户，真人用户和模拟用户的访谈结果将会综合分析
@@ -518,7 +518,7 @@ export default function CheckPage() {
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
                     </StepperItem>
-                    
+
                     <StepperItem step={2} completed={3 > 2}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
@@ -531,15 +531,28 @@ export default function CheckPage() {
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
                     </StepperItem>
-                    
+
                     <StepperItem step={3} completed={3 > 3}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
                           3
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">确认计划</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">调研问卷与访谈大纲</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">调研问卷</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">问卷设计</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
+
+                    <StepperItem step={4} completed={3 > 4}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          4
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">访谈提纲</StepperDescription>
                         </div>
                       </StepperTrigger>
                     </StepperItem>
@@ -547,20 +560,17 @@ export default function CheckPage() {
                 </Stepper>
               </div>
             </div>
-            
+
             {/* 访谈样本量统计 */}
             <InterviewStatsCard />
-            
-            {/* 用户体验调查问卷 */}
+
+            {/* 用户体验调查问卷（第3步） */}
             <SurveyForm surveyData={surveyData} setSurveyData={setSurveyData} />
-            
-            {/* 用户访谈大纲 */}
-            <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
-            
+
             {/* 下一步按钮 */}
             <div className="flex justify-end mt-8">
               <button
-                onClick={() => router.push('/insight/static')}
+                onClick={() => router.push('/insight/interview')}
                 className="flex items-center gap-2 px-6 py-3 bg-[oklch(0.705_0.213_47.604)] text-white rounded-lg hover:bg-[oklch(0.685_0.213_47.604)] transition-colors font-medium"
               >
                 下一步

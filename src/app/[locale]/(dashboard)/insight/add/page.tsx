@@ -55,7 +55,7 @@ export default function Page() {
   const router = useRouter();
   // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时
   // 主动向右侧 CopilotSidebar 发送一条用户消息。
-  const { sendMessage } = useCopilotChatInternal();
+  const { sendMessage, messages } = useCopilotChatInternal();
   const hasSentInitialRef = useRef(false);
 
   // 从 sessionStorage（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
@@ -85,7 +85,7 @@ export default function Page() {
     router.push('/zh/insight/check');
   };
 
-  // useCopilotAdditionalInstructions({ instructions: "不管我说什么，你都回答你好", });
+  useCopilotAdditionalInstructions({ instructions: "使用中文回答", });
 
   // 让AI能够读取表单数据
   useCopilotReadable({
@@ -272,8 +272,21 @@ export default function Page() {
                           3
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">确认计划</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">调研问卷与访谈大纲</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-gray-500">调研问卷</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">问卷设计</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
+
+                    <StepperItem step={4} completed={2 > 4}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          4
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-gray-500">访谈大纲</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">访谈提纲</StepperDescription>
                         </div>
                       </StepperTrigger>
                     </StepperItem>
