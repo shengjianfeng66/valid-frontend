@@ -25,10 +25,16 @@ export function AiChatBlock() {
     if (!input.trim()) return
 
     setIsLoading(true)
-    // 跳转到insight/add页面
+    // 使用 sessionStorage 传递输入内容，避免 URL 过长
+    const value = input.trim()
+    try {
+      sessionStorage.setItem('vf_initialMessage', value)
+    } catch (e) {
+      // 忽略存储异常，后续仍然尝试页面跳转
+    }
     setTimeout(() => {
       setIsLoading(false)
-      router.push('/insight/add')
+      router.push(`/insight/add`)
     }, 1000)
   }
 

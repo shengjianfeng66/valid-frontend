@@ -14,11 +14,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FileText, Upload, Plus, ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Stepper, 
   StepperItem, 
@@ -41,6 +41,7 @@ interface FormData {
 }
 
 export default function Page() {
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState<FormData>({
     productName: "",
     businessType: "",
@@ -52,6 +53,33 @@ export default function Page() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时
+  // 主动向右侧 CopilotSidebar 发送一条用户消息。
+  const { sendMessage } = useCopilotChatInternal();
+  const hasSentInitialRef = useRef(false);
+
+  // 从 sessionStorage（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
+  useEffect(() => {
+    if (hasSentInitialRef.current) return;
+    // 1) 先尝试从 sessionStorage 读取
+    try {
+      const ss = sessionStorage.getItem('vf_initialMessage');
+      if (ss && ss.trim()) {
+        hasSentInitialRef.current = true;
+        sessionStorage.removeItem('vf_initialMessage');
+        void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: ss.trim() });
+        return;
+      }
+    } catch (e) {
+      // 忽略读取异常，继续使用 query 兜底
+    }
+    // 2) 兜底：从 URL query 读取（兼容历史行为）
+    const q = searchParams?.get('initialMessage')?.trim();
+    if (q && !hasSentInitialRef.current) {
+      hasSentInitialRef.current = true;
+      void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: q });
+    }
+  }, [searchParams, sendMessage]);
 
   const handleNextStep = () => {
     router.push('/zh/insight/check');
