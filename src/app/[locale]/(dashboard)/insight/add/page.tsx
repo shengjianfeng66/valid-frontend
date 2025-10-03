@@ -14,20 +14,20 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { useCopilotAction, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
 import { FileText, Upload, Plus, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { 
-  Stepper, 
-  StepperItem, 
-  StepperTrigger, 
-  StepperIndicator, 
-  StepperSeparator, 
-  StepperTitle, 
-  StepperDescription, 
-  StepperNav 
+import {
+  Stepper,
+  StepperItem,
+  StepperTrigger,
+  StepperIndicator,
+  StepperSeparator,
+  StepperTitle,
+  StepperDescription,
+  StepperNav
 } from "@/components/stepper";
 import { Check } from "lucide-react";
 
@@ -84,6 +84,8 @@ export default function Page() {
   const handleNextStep = () => {
     router.push('/zh/insight/check');
   };
+
+  // useCopilotAdditionalInstructions({ instructions: "不管我说什么，你都回答你好", });
 
   // 让AI能够读取表单数据
   useCopilotReadable({
@@ -194,7 +196,7 @@ export default function Page() {
     },
   });
 
-  // 填充示例数据
+  // // 填充示例数据
   useCopilotAction({
     name: "fillSampleData",
     description: "填充示例调研数据",
@@ -250,7 +252,7 @@ export default function Page() {
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
                     </StepperItem>
-                    
+
                     <StepperItem step={2} completed={2 > 2}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
@@ -263,7 +265,7 @@ export default function Page() {
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
                     </StepperItem>
-                    
+
                     <StepperItem step={3} completed={2 > 3}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
@@ -279,9 +281,9 @@ export default function Page() {
                 </Stepper>
               </div>
             </div>
-            
-            <SurveyForm 
-              formData={formData} 
+
+            <SurveyForm
+              formData={formData}
               setFormData={setFormData}
               fileInputRef={fileInputRef}
               onNextStep={handleNextStep}
@@ -427,7 +429,7 @@ function SurveyForm({ formData, setFormData, fileInputRef, onNextStep }: SurveyF
           <label className="block text-sm font-medium text-gray-700 mb-2">
             您的产品方案
           </label>
-          <div 
+          <div
             onClick={handleUploadClick}
             className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-orange-300 hover:bg-orange-50 transition-all cursor-pointer"
           >
@@ -462,7 +464,7 @@ function SurveyForm({ formData, setFormData, fileInputRef, onNextStep }: SurveyF
             </div>
           </div>
         </div>
-        
+
         {/* 下一步按钮 */}
         <div className="flex justify-end mt-8">
           <button
