@@ -3,23 +3,13 @@
 import * as React from "react"
 
 import {
-  AudioWaveform,
-  Blocks,
-  Calendar,
-  Command,
   Home,
-  Inbox,
-  MessageCircleQuestion,
-  Search,
-  Settings2,
-  Sparkles,
-  Trash2,
+  Settings,
+  ChevronRight,
+  FileText,
+  User,
 } from "lucide-react"
 
-import { NavFavorites } from "@/components/sidebar/nav-favorites"
-import { NavSecondary } from "@/components/sidebar/nav-secondary"
-import { NavUser } from "@/components/sidebar/nav-user"
-import { NavWorkspaces } from "@/components/sidebar/nav-workspaces"
 import {
   Sidebar,
   SidebarContent,
@@ -29,169 +19,26 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar"
+import { Switch } from "@/components/ui/switch"
 
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "杨昊霖",
+    email: "yanghaolin@example.com",
+    avatar: "/avatars/user.jpg",
+    points: 2300,
   },
-  navSecondary: [
+  recentItems: [
     {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
-    },
-    // {
-    //   title: "Help",
-    //   url: "#",
-    //   icon: MessageCircleQuestion,
-    // },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    // }
-  ],
-  favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
-    },
-  ],
-  workspaces: [
-    {
-      name: "Personal Life Management",
-      emoji: "🏠",
-      pages: [
-        {
-          name: "Daily Journal & Reflection",
-          url: "#",
-          emoji: "📔",
-        },
-        {
-          name: "Health & Wellness Tracker",
-          url: "#",
-          emoji: "🍏",
-        },
-        {
-          name: "Personal Growth & Learning Goals",
-          url: "#",
-          emoji: "🌟",
-        },
-      ],
-    },
-    {
-      name: "Professional Development",
-      emoji: "💼",
-      pages: [
-        {
-          name: "Career Objectives & Milestones",
-          url: "#",
-          emoji: "🎯",
-        },
-        {
-          name: "Skill Acquisition & Training Log",
-          url: "#",
-          emoji: "🧠",
-        },
-        {
-          name: "Networking Contacts & Events",
-          url: "#",
-          emoji: "🤝",
-        },
-      ],
-    },
-    {
-      name: "Creative Projects",
-      emoji: "🎨",
-      pages: [
-        {
-          name: "Writing Ideas & Story Outlines",
-          url: "#",
-          emoji: "✍️",
-        },
-        {
-          name: "Art & Design Portfolio",
-          url: "#",
-          emoji: "🖼️",
-        },
-        {
-          name: "Music Composition & Practice Log",
-          url: "#",
-          emoji: "🎵",
-        },
-      ],
-    },
-    {
-      name: "Home Management",
-      emoji: "🏡",
-      pages: [
-        {
-          name: "Household Budget & Expense Tracking",
-          url: "#",
-          emoji: "💰",
-        },
-        {
-          name: "Home Maintenance Schedule & Tasks",
-          url: "#",
-          emoji: "🔧",
-        },
-        {
-          name: "Family Calendar & Event Planning",
-          url: "#",
-          emoji: "📅",
-        },
-      ],
-    },
-    {
-      name: "Travel & Adventure",
-      emoji: "🧳",
-      pages: [
-        {
-          name: "Trip Planning & Itineraries",
-          url: "#",
-          emoji: "🗺️",
-        },
-        {
-          name: "Travel Bucket List & Inspiration",
-          url: "#",
-          emoji: "🌎",
-        },
-        {
-          name: "Travel Journal & Photo Gallery",
-          url: "#",
-          emoji: "📸",
-        },
-      ],
+      name: "模拟验证驱动的AI产品规划...",
+      size: "1.52 KB",
+      date: "24/03/2025",
+      icon: FileText,
     },
   ],
 }
@@ -204,9 +51,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/" className="flex items-center gap-2">
-                <img 
-                  src="/logo.png" 
-                  alt="ValidFlow Logo" 
+                <img
+                  src="/logo.png"
+                  alt="ValidFlow Logo"
                   className="w-8"
                 />
                 <span className="text-xl font-bold text-primary">ValidFlow</span>
@@ -215,14 +62,80 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavWorkspaces workspaces={data.workspaces} />
-        <NavFavorites favorites={data.favorites} />
+        {/* 首页导航 */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="bg-gray-100 text-gray-900" asChild>
+              <a href="/dashboard" className="flex items-center gap-2">
+                <Home className="w-4 h-4" />
+                <span>首页</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        {/* 最近使用 */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm font-medium text-gray-600">
+            最近使用
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {data.recentItems.map((item, index) => (
+                <SidebarMenuItem key={index}>
+                  <SidebarMenuButton className="bg-gray-100 text-gray-900" asChild>
+                    <a href="#" className="flex items-center gap-3 p-3">
+                      <item.icon className="w-4 h-4 text-gray-500" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">
+                          {item.name}
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                          <span>{item.size}</span>
+                          <span>{item.date}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter>
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-        <NavUser user={data.user} />
+        {/* 设置 */}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <a href="/settings" className="flex items-center gap-2">
+                <span>设置</span>
+                <ChevronRight className="w-4 h-4 ml-auto" />
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        {/* 用户信息 */}
+        <div className="flex items-center gap-3 p-3">
+          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-gray-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-gray-900 truncate">
+              {data.user.name}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">{data.user.points}</span>
+            <Switch />
+          </div>
+        </div>
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   )

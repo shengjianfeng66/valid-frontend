@@ -1,31 +1,7 @@
-import { getLandingPage } from "@/services/page";
+import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import HomePage from "./home-page";
 
-export const revalidate = 60;
-export const dynamic = "force-static";
-export const dynamicParams = true;
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  let canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}`;
-
-  if (locale !== "en") {
-    canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}`;
-  }
-
-  return {
-    alternates: {
-      canonical: canonicalUrl,
-    },
-  };
-}
-
-export default async function LandingPage({
+export default async function RootPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -33,7 +9,6 @@ export default async function LandingPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const page = await getLandingPage(locale);
-
-  return <HomePage page={page} />;
+  // 重定向到dashboard页面
+  redirect(`/${locale}/dashboard`);
 }
