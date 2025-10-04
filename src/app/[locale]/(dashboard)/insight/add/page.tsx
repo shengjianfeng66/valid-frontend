@@ -63,13 +63,30 @@ export default function Page() {
   // 从 sessionStorage（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
   useEffect(() => {
     if (hasSentInitialRef.current) return;
+
+    const sendInitialMessage = (message: string) => {
+      // 等待CopilotKit完全初始化
+      const checkAndSend = () => {
+        // 检查CopilotKit是否已经准备好
+        if (typeof sendMessage === 'function') {
+          hasSentInitialRef.current = true;
+          void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: message });
+        } else {
+          // 如果还没准备好，继续等待
+          setTimeout(checkAndSend, 100);
+        }
+      };
+
+      // 延迟一点时间再开始检查
+      setTimeout(checkAndSend, 500);
+    };
+
     // 1) 先尝试从 sessionStorage 读取
     try {
       const ss = sessionStorage.getItem('vf_initialMessage');
       if (ss && ss.trim()) {
-        hasSentInitialRef.current = true;
         sessionStorage.removeItem('vf_initialMessage');
-        void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: ss.trim() });
+        sendInitialMessage(ss.trim());
         return;
       }
     } catch (e) {
@@ -78,8 +95,7 @@ export default function Page() {
     // 2) 兜底：从 URL query 读取（兼容历史行为）
     const q = searchParams?.get('initialMessage')?.trim();
     if (q && !hasSentInitialRef.current) {
-      hasSentInitialRef.current = true;
-      void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: q });
+      sendInitialMessage(q);
     }
   }, [searchParams, sendMessage]);
 
