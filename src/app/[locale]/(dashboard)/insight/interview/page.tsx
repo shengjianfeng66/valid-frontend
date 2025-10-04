@@ -291,6 +291,7 @@ export default function InterviewPage() {
     const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
 
     // 邀请流程步骤数据
     const inviteSteps = [
@@ -309,7 +310,8 @@ export default function InterviewPage() {
     ];
 
     const realUsers = mockUsers.filter(user => user.isReal && false); // 临时设置为空来测试空状态
-    const simulatedUsers = mockUsers.filter(user => !user.isReal);
+    const originalSimulatedUsers = mockUsers.filter(user => !user.isReal);
+    const simulatedUsers = [...originalSimulatedUsers, ...addedSimulatedUsers];
 
     // 模拟用户池数据
     const simulatedUserPool = Array.from({ length: 16 }, (_, index) => ({
@@ -318,6 +320,8 @@ export default function InterviewPage() {
         age: 24,
         location: "杭州新一线",
         avatar: "😊",
+        status: "等待中", // 添加状态字段
+        isReal: false, // 标记为模拟用户
         attributes: {
             "性格": "ENTP",
             "国籍": "巴西",
@@ -370,6 +374,12 @@ export default function InterviewPage() {
     };
 
     const handleConfirmAdd = () => {
+        // 获取选中的用户数据
+        const selectedUserData = simulatedUserPool.filter(user => selectedUsers.includes(user.id));
+
+        // 将选中的用户添加到已添加列表中
+        setAddedSimulatedUsers(prev => [...prev, ...selectedUserData]);
+
         toast.success(`已添加 ${selectedUsers.length} 个模拟用户`, {
             description: "模拟用户已成功添加到访谈列表中"
         });
