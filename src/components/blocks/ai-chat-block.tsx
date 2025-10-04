@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,35 @@ type SenderProps = {
   onSubmit: () => void
   loading: boolean
   placeholder: string
+}
+
+// 允许的文件类型
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+  'image/bmp',
+  'image/tiff'
+]
+
+// 检查文件类型是否允许
+const isFileTypeAllowed = (file: File): boolean => {
+  return ALLOWED_FILE_TYPES.includes(file.type.toLowerCase())
+}
+
+// 获取文件类型错误信息
+const getFileTypeError = (file: File): string => {
+  if (file.type.startsWith('image/')) {
+    return `图片格式不支持，请使用 JPG、PNG、GIF、WebP、SVG、BMP、TIFF 格式`
+  } else if (file.type === 'application/pdf') {
+    return `文件类型不支持，请使用 PDF 或图片格式`
+  } else {
+    return `文件类型不支持，请使用 PDF 或图片格式`
+  }
 }
 
 // 临时组件定义
@@ -172,34 +201,74 @@ const Attachments = ({ ref, items, onChange, beforeUpload, placeholder, getDropC
 }
 
 // 临时 Sender 组件
-const Sender = ({ ref, header, prefix, value, onChange, onPasteFile, onSubmit, loading, placeholder }: SenderProps) => (
-  <div className="w-full">
-    {header}
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-      <div className="flex items-center gap-3">
-        {prefix}
-        <div className="flex-1 relative">
-          <textarea
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            className="w-full min-h-[40px] max-h-[120px] resize-none border-0 outline-none text-gray-900 placeholder-gray-500"
-            style={{
-              lineHeight: '24px',
-              fontSize: '16px'
-            }}
-            onPaste={(e) => {
-              const files = Array.from(e.clipboardData.files)
-              if (files.length > 0) {
-                onPasteFile(e, files)
-              }
-            }}
-          />
+const Sender = ({ ref, header, prefix, value, onChange, onPasteFile, onSubmit, loading, placeholder }: SenderProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // 自动调整高度
+  const adjustHeight = () => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      const scrollHeight = textarea.scrollHeight
+      const maxHeight = 120 // 最大高度 120px
+      const minHeight = 40  // 最小高度 40px
+      textarea.style.height = Math.min(Math.max(scrollHeight, minHeight), maxHeight) + 'px'
+    }
+  }
+
+  // 当值变化时调整高度
+  useEffect(() => {
+    adjustHeight()
+  }, [value])
+
+  return (
+    <div className="w-full">
+      {header}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col gap-3">
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              value={value}
+              onChange={(e) => {
+                onChange(e.target.value)
+                adjustHeight()
+              }}
+              placeholder={placeholder}
+              className="w-full min-h-[40px] max-h-[120px] resize-none border-0 outline-none text-gray-900 placeholder-gray-500 overflow-hidden"
+              style={{
+                lineHeight: '24px',
+                fontSize: '16px',
+                height: '40px'
+              }}
+              onPaste={(e) => {
+                const files = Array.from(e.clipboardData.files)
+                if (files.length > 0) {
+                  onPasteFile(e, files)
+                } else {
+                  // 处理粘贴的图片（从剪贴板）
+                  const items = Array.from(e.clipboardData.items)
+                  const imageItems = items.filter(item => item.type.startsWith('image/'))
+
+                  if (imageItems.length > 0) {
+                    // 检查是否超过最大数量限制
+                    if (onPasteFile) {
+                      const files = imageItems.map(item => item.getAsFile()).filter((file): file is File => file !== null)
+                      onPasteFile(e, files)
+                    }
+                  }
+                }
+              }}
+            />
+          </div>
+          <div className="flex justify-start">
+            {prefix}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 Sender.Header = ({ title, children, open, onOpenChange }: any) => (
   <div className={`mb-2 ${open ? 'block' : 'hidden'}`}>
@@ -328,14 +397,36 @@ export function AiChatBlock() {
                   type="text"
                   icon={<LinkOutlined />}
                   onClick={() => {
+                    // 检查是否超过最大数量限制
+                    if (items.length >= 3) {
+                      alert('最多只能上传3个文件')
+                      return
+                    }
+
                     // 直接触发文件选择对话框
                     const fileInput = document.createElement('input')
                     fileInput.type = 'file'
                     fileInput.multiple = true
+                    fileInput.accept = '.pdf,.jpg,.jpeg,.png,.gif,.webp,.svg,.bmp,.tiff'
                     fileInput.onchange = (e: any) => {
                       const files = Array.from(e.target.files || []) as File[]
                       if (files.length > 0) {
-                        const newItems = files.map((file: File) => ({
+                        // 检查文件类型
+                        const invalidFiles = files.filter(file => !isFileTypeAllowed(file))
+                        if (invalidFiles.length > 0) {
+                          alert(`以下文件类型不支持：\n${invalidFiles.map(f => f.name).join('\n')}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`)
+                          return
+                        }
+
+                        // 计算还能添加多少个文件
+                        const remainingSlots = 3 - items.length
+                        const filesToAdd = files.slice(0, remainingSlots)
+
+                        if (files.length > remainingSlots) {
+                          alert(`最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`)
+                        }
+
+                        const newItems = filesToAdd.map((file: File) => ({
                           uid: Math.random().toString(36).substr(2, 9),
                           name: file.name,
                           size: file.size,
@@ -354,9 +445,37 @@ export function AiChatBlock() {
               value={input}
               onChange={setInput}
               onPasteFile={(_, files) => {
-                for (const file of files) {
-                  attachmentsRef.current?.upload(file);
+                // 检查是否超过最大数量限制
+                if (items.length >= 3) {
+                  alert('最多只能上传3个文件')
+                  return
                 }
+
+                // 检查文件类型
+                const invalidFiles = files.filter(file => !isFileTypeAllowed(file))
+                if (invalidFiles.length > 0) {
+                  alert(`以下文件类型不支持：\n${invalidFiles.map(f => f.name || '未知文件').join('\n')}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`)
+                  return
+                }
+
+                // 计算还能添加多少个文件
+                const remainingSlots = 3 - items.length
+                const filesToAdd = files.slice(0, remainingSlots)
+
+                if (files.length > remainingSlots) {
+                  alert(`最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`)
+                }
+
+                // 处理粘贴的文件（包括图片）
+                const newItems = filesToAdd.map((file: File) => ({
+                  uid: Math.random().toString(36).substr(2, 9),
+                  name: file.name || `粘贴文件_${Date.now()}.${file.type.split('/')[1]}`,
+                  size: file.size,
+                  type: file.type,
+                  url: URL.createObjectURL(file),
+                  status: 'done'
+                }))
+                setItems(prev => [...prev, ...newItems])
                 setOpen(true);
               }}
               onSubmit={() => {
