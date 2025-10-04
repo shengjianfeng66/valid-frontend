@@ -13,6 +13,7 @@ export default async function RootLayout({
   const locale = await getLocale();
   setRequestLocale(locale);
 
+
   const webUrl = process.env.NEXT_PUBLIC_WEB_URL || "";
   const googleAdsenseCode = process.env.NEXT_PUBLIC_GOOGLE_ADCODE || "";
 
