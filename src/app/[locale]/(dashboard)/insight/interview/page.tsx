@@ -304,7 +304,7 @@ export default function InterviewPage() {
 
                     {/* 真人用户区域 */}
                     <div ref={realUsersRef} className="bg-white rounded-lg shadow-sm">
-                        <CardHeader className="border-b border-gray-200">
+                        <CardHeader className="border-b border-gray-200 pt-8">
                             <CardTitle className="flex items-center gap-2">
                                 <Users className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
                                 真人用户 ({realUsers.length}人)
@@ -321,7 +321,7 @@ export default function InterviewPage() {
 
                     {/* 模拟用户区域 */}
                     <div ref={simulatedUsersRef} className="bg-white rounded-lg shadow-sm">
-                        <CardHeader className="border-b border-gray-200">
+                        <CardHeader className="border-b border-gray-200 pt-8">
                             <CardTitle className="flex items-center gap-2">
                                 <Bot className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
                                 模拟用户 ({simulatedUsers.length}人)
