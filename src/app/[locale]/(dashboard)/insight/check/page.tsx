@@ -21,8 +21,14 @@ import { Check } from "lucide-react";
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState } from "react";
-import { FileText, Users, Clock, ArrowRight } from "lucide-react";
+import { FileText, ArrowRight, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SurveyData {
   surveyIntro: string;
@@ -35,33 +41,11 @@ interface SurveyData {
   interviewIntro: string;
   interviewTargetUsers: string;
   interviewQuestions: {
-    page1: { q1: string; q2: string };
+    page1: string[];
+    page2: string[];
   };
 }
 
-// 访谈样本量统计卡片
-function InterviewStatsCard() {
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-          <Users className="w-5 h-5 text-gray-600" />
-        </div>
-        <h2 className="text-lg font-semibold text-gray-900">访谈样本量</h2>
-      </div>
-
-      <div className="space-y-3">
-        <p className="text-gray-700">
-          我们将为您邀请 <span className="text-blue-600 font-semibold">159</span> 位模拟用户，真实度约 <span className="text-blue-600 font-semibold">87%</span>，销后您也可以将 <span className="text-blue-600">访谈链接</span> 发送给真人用户，真人用户和模拟用户的访谈结果将会综合分析
-        </p>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <Clock className="w-4 h-4" />
-          <span>约耗时 <span className="text-blue-600">15,900</span> 秒</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // 用户体验调查问卷组件
 interface SurveyFormProps {
@@ -206,11 +190,37 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleQuestionChange = (page: string, questionNumber: string, value: string) => {
+  const handleQuestionChange = (section: string, questionIndex: number, value: string) => {
     setSurveyData(prev => {
       const newData = { ...prev };
-      if (newData.interviewQuestions[page as keyof typeof newData.interviewQuestions]) {
-        newData.interviewQuestions[page as keyof typeof newData.interviewQuestions][questionNumber as 'q1' | 'q2'] = value;
+      if (newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]) {
+        const questions = [...newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]];
+        questions[questionIndex] = value;
+        newData.interviewQuestions[section as keyof typeof newData.interviewQuestions] = questions;
+      }
+      return newData;
+    });
+  };
+
+  const addQuestion = (section: string) => {
+    setSurveyData(prev => {
+      const newData = { ...prev };
+      if (newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]) {
+        const questions = [...newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]];
+        questions.push("");
+        newData.interviewQuestions[section as keyof typeof newData.interviewQuestions] = questions;
+      }
+      return newData;
+    });
+  };
+
+  const removeQuestion = (section: string, questionIndex: number) => {
+    setSurveyData(prev => {
+      const newData = { ...prev };
+      if (newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]) {
+        const questions = [...newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]];
+        questions.splice(questionIndex, 1);
+        newData.interviewQuestions[section as keyof typeof newData.interviewQuestions] = questions;
       }
       return newData;
     });
@@ -219,19 +229,30 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm p-8">
       {/* 标题 */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-            <FileText className="w-5 h-5 text-purple-600" />
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-900">Dreamoo 用户访谈大纲</h2>
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+          <FileText className="w-5 h-5 text-purple-600" />
         </div>
-        <a href="#" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-          关于个性化追问
-        </a>
+        <h2 className="text-2xl font-semibold text-gray-900">Dreamoo 用户访谈大纲</h2>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="text-blue-600 hover:text-blue-700 text-sm font-medium underline cursor-pointer">
+                个性化追问
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">
+                AI 用户研究专家会基于用户的回答进行个性化追问，<br />
+                发掘用户行为背后的真实需求，<br />
+                提供更深入的洞察分析
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* 引言 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -240,46 +261,82 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
           <textarea
             value={surveyData.interviewIntro}
             onChange={(e) => handleInputChange('interviewIntro', e.target.value)}
-            rows={4}
+            rows={6}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
+            placeholder="欢迎您参加 Dreamoo 用户访谈。本次访谈的目的是了解您使用 Dreamoo 记录梦境的体验，包括使用习惯、满意的地方以及希望改进的地方，以帮助我们优化产品。访谈预计需要约10分钟，您的信息将被严格保密，仅用于产品优化。没有标准答案，您的真实感受最有价值。如果您准备好了，我们将开始访谈。"
           />
         </div>
 
-        {/* 目标用户 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户/核心用户群体？
-          </label>
-          <input
-            type="text"
-            value={surveyData.interviewTargetUsers}
-            onChange={(e) => handleInputChange('interviewTargetUsers', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-          />
-        </div>
-
-        {/* 第1页：使用动机 */}
+        {/* 一、用户基础画像层 */}
         <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">第1页：使用动机</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-6">一、用户基础画像层：了解"谁"在使用产品</h3>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
-              <input
-                type="text"
-                value={surveyData.interviewQuestions.page1.q1}
-                onChange={(e) => handleQuestionChange('page1', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2.</label>
-              <input
-                type="text"
-                value={surveyData.interviewQuestions.page1.q2}
-                onChange={(e) => handleQuestionChange('page1', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-              />
-            </div>
+            {surveyData.interviewQuestions.page1.map((question, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={question}
+                  onChange={(e) => handleQuestionChange('page1', index, e.target.value)}
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  placeholder={index === 0 ? "你希望我怎么称呼你?你今年多大了?" :
+                    index === 1 ? "你目前在哪个城市?从事什么工作?月收入大概在什么区间?" :
+                      index === 2 ? "你的最高学历是?" :
+                        index === 3 ? "你平时睡眠质量怎么样?一般几点睡觉,睡多久?" :
+                          index === 4 ? "你平时会记录什么生活内容?(比如日记、笔记、工作记录等)" :
+                            index === 5 ? "你用过AI相关的产品吗?比如AI绘画、AI写作这类工具?" : "请输入问题..."}
+                />
+                <button
+                  onClick={() => removeQuestion('page1', index)}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => addQuestion('page1')}
+              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              添加问题
+            </button>
+          </div>
+        </div>
+
+        {/* 二、用户行为习惯层 */}
+        <div className="border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-6">二、用户行为习惯层：了解用户"在什么情况下、如何做某件事"</h3>
+          <div className="space-y-4">
+            {surveyData.interviewQuestions.page2.map((question, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={question}
+                  onChange={(e) => handleQuestionChange('page2', index, e.target.value)}
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  placeholder={index === 0 ? "你多久会做一次让你印象深刻的梦?醒来后通常会做什么?" :
+                    index === 1 ? "你现在有记录梦境的习惯吗?如果有,用什么方式记录?(备忘录/日记本/语音/不记录)" :
+                      index === 2 ? "你一般在什么时候会回想或谈论自己的梦?(早上醒来/和朋友聊天/睡前)" : "请输入问题..."}
+                />
+                <button
+                  onClick={() => removeQuestion('page2', index)}
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => addQuestion('page2')}
+              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              添加问题
+            </button>
           </div>
         </div>
       </div>
@@ -306,13 +363,22 @@ export default function CheckPage() {
         q2: "请根据使用体验，在1（非常不满意）到5（非常满意）之间评分："
       }
     },
-    interviewIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
+    interviewIntro: "欢迎您参加 Dreamoo 用户访谈。本次访谈的目的是了解您使用 Dreamoo 记录梦境的体验，包括使用习惯、满意的地方以及希望改进的地方，以帮助我们优化产品。访谈预计需要约10分钟，您的信息将被严格保密，仅用于产品优化。没有标准答案，您的真实感受最有价值。如果您准备好了，我们将开始访谈。",
     interviewTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
     interviewQuestions: {
-      page1: {
-        q1: "您记录梦境的主要动机是什么？【必答】",
-        q2: "请根据您的真实感受，在1（非常不同意）到5（非常同意）之间评分："
-      }
+      page1: [
+        "你希望我怎么称呼你?你今年多大了?",
+        "你目前在哪个城市?从事什么工作?月收入大概在什么区间?",
+        "你的最高学历是?",
+        "你平时睡眠质量怎么样?一般几点睡觉,睡多久?",
+        "你平时会记录什么生活内容?(比如日记、笔记、工作记录等)",
+        "你用过AI相关的产品吗?比如AI绘画、AI写作这类工具?"
+      ],
+      page2: [
+        "你多久会做一次让你印象深刻的梦?醒来后通常会做什么?",
+        "你现在有记录梦境的习惯吗?如果有,用什么方式记录?(备忘录/日记本/语音/不记录)",
+        "你一般在什么时候会回想或谈论自己的梦?(早上醒来/和朋友聊天/睡前)"
+      ]
     }
   });
 
@@ -414,7 +480,12 @@ export default function CheckPage() {
         if (type === "survey" && newData.surveyQuestions[page as keyof typeof newData.surveyQuestions]) {
           newData.surveyQuestions[page as keyof typeof newData.surveyQuestions][questionNumber as 'q1' | 'q2'] = content;
         } else if (type === "interview" && newData.interviewQuestions[page as keyof typeof newData.interviewQuestions]) {
-          newData.interviewQuestions[page as keyof typeof newData.interviewQuestions][questionNumber as 'q1' | 'q2'] = content;
+          const questions = [...newData.interviewQuestions[page as keyof typeof newData.interviewQuestions]];
+          const questionIndex = questionNumber === 'q1' ? 0 : 1;
+          if (questionIndex < questions.length) {
+            questions[questionIndex] = content;
+            newData.interviewQuestions[page as keyof typeof newData.interviewQuestions] = questions;
+          }
         }
         return newData;
       });
@@ -438,7 +509,8 @@ export default function CheckPage() {
         interviewIntro: "",
         interviewTargetUsers: "",
         interviewQuestions: {
-          page1: { q1: "", q2: "" }
+          page1: [],
+          page2: []
         }
       });
     },
@@ -470,10 +542,19 @@ export default function CheckPage() {
         interviewIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
         interviewTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
         interviewQuestions: {
-          page1: {
-            q1: "您记录梦境的主要动机是什么？【必答】",
-            q2: "请根据您的真实感受，在1（非常不同意）到5（非常同意）之间评分："
-          }
+          page1: [
+            "你希望我怎么称呼你?你今年多大了?",
+            "你目前在哪个城市?从事什么工作?月收入大概在什么区间?",
+            "你的最高学历是?",
+            "你平时睡眠质量怎么样?一般几点睡觉,睡多久?",
+            "你平时会记录什么生活内容?(比如日记、笔记、工作记录等)",
+            "你用过AI相关的产品吗?比如AI绘画、AI写作这类工具?"
+          ],
+          page2: [
+            "你多久会做一次让你印象深刻的梦?醒来后通常会做什么?",
+            "你现在有记录梦境的习惯吗?如果有,用什么方式记录?(备忘录/日记本/语音/不记录)",
+            "你一般在什么时候会回想或谈论自己的梦?(早上醒来/和朋友聊天/睡前)"
+          ]
         }
       });
     },
@@ -504,55 +585,42 @@ export default function CheckPage() {
             {/* 流程状态栏 */}
             <div className="bg-white rounded-lg shadow-sm px-0 py-6 mb-6">
               <div className="px-6">
-                <Stepper value={3} className="w-full">
+                <Stepper value={2} className="w-full">
                   <StepperNav className="flex justify-between items-center">
-                    <StepperItem step={1} completed={3 > 1}>
-                      <StepperTrigger className="flex flex-col items-center gap-3">
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
-                          <Check className="w-5 h-5" />
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">创建项目</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">介绍您的产品</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                      <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
-                    </StepperItem>
-
-                    <StepperItem step={2} completed={3 > 2}>
+                    <StepperItem step={1} completed={2 > 1}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
                           <Check className="w-5 h-5" />
                         </StepperIndicator>
                         <div className="text-center">
                           <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">用户调研核心</StepperDescription>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
                     </StepperItem>
 
-                    <StepperItem step={3} completed={3 > 3}>
+                    <StepperItem step={2} completed={2 > 2}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
-                          3
+                          2
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">调研问卷</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">问卷设计</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
                     </StepperItem>
 
-                    <StepperItem step={4} completed={3 > 4}>
+                    <StepperItem step={3} completed={2 > 3}>
                       <StepperTrigger className="flex flex-col items-center gap-3">
                         <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                          4
+                          3
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">访谈提纲</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
                         </div>
                       </StepperTrigger>
                     </StepperItem>
@@ -561,11 +629,9 @@ export default function CheckPage() {
               </div>
             </div>
 
-            {/* 访谈样本量统计 */}
-            <InterviewStatsCard />
 
-            {/* 用户体验调查问卷（第3步） */}
-            <SurveyForm surveyData={surveyData} setSurveyData={setSurveyData} />
+            {/* 用户访谈大纲（第2步） */}
+            <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
 
             {/* 下一步按钮 */}
             <div className="flex justify-end mt-8">
