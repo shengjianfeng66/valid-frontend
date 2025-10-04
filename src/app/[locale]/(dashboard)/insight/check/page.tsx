@@ -583,90 +583,87 @@ export default function CheckPage() {
               />
             </div>
           </header>
-          <div className="flex flex-1 flex-col gap-8 p-4">
-            {/* 流程状态栏 */}
-            <div className="bg-white rounded-lg shadow-sm px-0 py-6 mb-6">
-              <div className="px-6">
-                <Stepper value={2} className="w-full">
-                  <StepperNav className="flex justify-between items-center">
-                    <StepperItem step={1} completed={2 > 1}>
-                      <StepperTrigger className="flex flex-col items-center gap-3">
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
-                          <Check className="w-5 h-5" />
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                      <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
-                    </StepperItem>
+          <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
+            {/* 顶部 - 流程状态栏 */}
+            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+              <Stepper value={2} className="w-full">
+                <StepperNav className="flex justify-between items-center">
+                  <StepperItem step={1} completed={2 > 1}>
+                    <StepperTrigger className="flex flex-col items-center gap-3">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
+                        <Check className="w-5 h-5" />
+                      </StepperIndicator>
+                      <div className="text-center">
+                        <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
+                        <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
+                      </div>
+                    </StepperTrigger>
+                    <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
+                  </StepperItem>
 
-                    <StepperItem step={2} completed={2 > 2}>
-                      <StepperTrigger className="flex flex-col items-center gap-3">
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
-                          2
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                    </StepperItem>
+                  <StepperItem step={2} completed={2 > 2}>
+                    <StepperTrigger className="flex flex-col items-center gap-3">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
+                        2
+                      </StepperIndicator>
+                      <div className="text-center">
+                        <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
+                        <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
+                      </div>
+                    </StepperTrigger>
+                    <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                  </StepperItem>
 
-                    <StepperItem step={3} completed={2 > 3}>
-                      <StepperTrigger className="flex flex-col items-center gap-3">
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                          3
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                    </StepperItem>
-                  </StepperNav>
-                </Stepper>
-              </div>
+                  <StepperItem step={3} completed={2 > 3}>
+                    <StepperTrigger className="flex flex-col items-center gap-3">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                        3
+                      </StepperIndicator>
+                      <div className="text-center">
+                        <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
+                        <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
+                      </div>
+                    </StepperTrigger>
+                  </StepperItem>
+                </StepperNav>
+              </Stepper>
             </div>
 
-
-            {/* 用户访谈大纲（第2步） */}
-            <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
+            {/* 中间内容区 */}
+            <div className="bg-white rounded-lg shadow-sm flex-1 p-6">
+              <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
+            </div>
 
             {/* 底部导航 */}
-            <Card className="bg-gray-50 border-0 rounded-2xl">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      下一步预览
-                    </h3>
-                    <p className="text-gray-600">
-                      将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => router.push('/insight/add')}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      上一步
-                    </Button>
-                    <Button
-                      onClick={() => router.push('/insight/interview')}
-                      className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
-                    >
-                      邀请参与者
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
+            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    下一步预览
+                  </h3>
+                  <p className="text-gray-600">
+                    将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push('/insight/add')}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    上一步
+                  </Button>
+                  <Button
+                    onClick={() => router.push('/insight/interview')}
+                    className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
+                  >
+                    邀请参与者
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </SidebarInset>
         <CopilotSidebar
