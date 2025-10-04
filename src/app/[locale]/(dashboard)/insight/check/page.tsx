@@ -348,6 +348,19 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
 export default function CheckPage() {
   const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(2);
+
+  // 处理步骤导航 - 只能返回不能往前跳
+  const handleStepNavigation = (targetStep: number) => {
+    if (targetStep < currentStep) {
+      setCurrentStep(targetStep);
+      // 根据步骤导航到对应页面
+      if (targetStep === 1) {
+        router.push('/insight/add');
+      }
+    }
+  };
+
   const [surveyData, setSurveyData] = useState<SurveyData>({
     surveyIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
     surveyTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
@@ -586,10 +599,14 @@ export default function CheckPage() {
           <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
             {/* 顶部 - 流程状态栏 */}
             <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-              <Stepper value={2} className="w-full">
+              <Stepper value={currentStep} className="w-full">
                 <StepperNav className="flex justify-between items-center">
-                  <StepperItem step={1} completed={2 > 1}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
+                  <StepperItem step={1} completed={currentStep > 1}>
+                    <StepperTrigger
+                      className="flex flex-col items-center gap-3"
+                      canNavigate={1 < currentStep}
+                      onClick={() => handleStepNavigation(1)}
+                    >
                       <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
                         <Check className="w-5 h-5" />
                       </StepperIndicator>
@@ -601,8 +618,12 @@ export default function CheckPage() {
                     <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
                   </StepperItem>
 
-                  <StepperItem step={2} completed={2 > 2}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
+                  <StepperItem step={2} completed={currentStep > 2}>
+                    <StepperTrigger
+                      className="flex flex-col items-center gap-3"
+                      canNavigate={2 < currentStep}
+                      onClick={() => handleStepNavigation(2)}
+                    >
                       <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
                         2
                       </StepperIndicator>
@@ -614,8 +635,12 @@ export default function CheckPage() {
                     <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
                   </StepperItem>
 
-                  <StepperItem step={3} completed={2 > 3}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
+                  <StepperItem step={3} completed={currentStep > 3}>
+                    <StepperTrigger
+                      className="flex flex-col items-center gap-3"
+                      canNavigate={3 < currentStep}
+                      onClick={() => handleStepNavigation(3)}
+                    >
                       <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
                         3
                       </StepperIndicator>
@@ -648,14 +673,17 @@ export default function CheckPage() {
                 <div className="flex items-center gap-4">
                   <Button
                     variant="outline"
-                    onClick={() => router.push('/insight/add')}
+                    onClick={() => handleStepNavigation(1)}
                     className="flex items-center gap-2"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     上一步
                   </Button>
                   <Button
-                    onClick={() => router.push('/insight/interview')}
+                    onClick={() => {
+                      setCurrentStep(3);
+                      router.push('/insight/interview');
+                    }}
                     className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
                   >
                     邀请参与者

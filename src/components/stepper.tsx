@@ -184,9 +184,10 @@ function StepperItem({
 
 interface StepperTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
+  canNavigate?: boolean;
 }
 
-function StepperTrigger({ asChild = false, className, children, tabIndex, ...props }: StepperTriggerProps) {
+function StepperTrigger({ asChild = false, className, children, tabIndex, canNavigate = true, ...props }: StepperTriggerProps) {
   const { state, isLoading } = useStepItem();
   const stepperCtx = useStepper();
   const { setActiveStep, activeStep, registerTrigger, triggerNodes, focusNext, focusPrev, focusFirst, focusLast } =
@@ -261,9 +262,9 @@ function StepperTrigger({ asChild = false, className, children, tabIndex, ...pro
         'cursor-pointer focus-visible:border-ring focus-visible:ring-ring/50 inline-flex items-center gap-3 rounded-full outline-none focus-visible:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-60',
         className,
       )}
-      onClick={() => setActiveStep(step)}
+      onClick={() => canNavigate && setActiveStep(step)}
       onKeyDown={handleKeyDown}
-      disabled={isDisabled}
+      disabled={isDisabled || !canNavigate}
       {...props}
     >
       {children}
@@ -286,14 +287,14 @@ function StepperIndicator({ children, className }: React.ComponentProps<'div'>) 
     >
       <div className="absolute">
         {indicators &&
-        ((isLoading && indicators.loading) ||
-          (state === 'completed' && indicators.completed) ||
-          (state === 'active' && indicators.active) ||
-          (state === 'inactive' && indicators.inactive))
-          ? (isLoading && indicators.loading) ||
+          ((isLoading && indicators.loading) ||
             (state === 'completed' && indicators.completed) ||
             (state === 'active' && indicators.active) ||
-            (state === 'inactive' && indicators.inactive)
+            (state === 'inactive' && indicators.inactive))
+          ? (isLoading && indicators.loading) ||
+          (state === 'completed' && indicators.completed) ||
+          (state === 'active' && indicators.active) ||
+          (state === 'inactive' && indicators.inactive)
           : children}
       </div>
     </div>
