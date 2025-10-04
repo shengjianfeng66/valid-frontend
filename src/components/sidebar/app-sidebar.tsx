@@ -81,18 +81,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel className="text-sm font-medium text-gray-600">
             最近使用
           </SidebarGroupLabel>
-          <SidebarGroupContent>
+          <SidebarGroupContent className="p-2">
             <SidebarMenu>
               {data.recentItems.map((item, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton className="bg-gray-100 text-gray-900" asChild>
-                    <a href="#" className="flex items-center gap-3 p-3">
+                  <SidebarMenuButton className="text-gray-900" asChild>
+                    <a href="#" className="flex items-center gap-3 px-3 py-6">
                       <item.icon className="w-4 h-4 text-gray-500" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
+                        <div className="text-sm font-medium truncate leading-5">
                           {item.name}
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
                           <span>{item.size}</span>
                           <span>{item.date}</span>
                         </div>
