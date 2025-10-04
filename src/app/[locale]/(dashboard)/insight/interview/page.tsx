@@ -89,7 +89,14 @@ const mockUsers = [
         location: "南京新一线",
         avatar: "😊",
         status: "视频通话中",
-        tags: ["品质生活", "细致", "文艺青年", "社交达人"],
+        attributes: {
+            "性格": "ENTP",
+            "国籍": "中国",
+            "职业": "设计师",
+            "月入": "15000",
+            "教育": "本科",
+            "婚恋": "未婚"
+        },
         isReal: false
     },
     {
@@ -99,7 +106,14 @@ const mockUsers = [
         location: "成都新一线",
         avatar: "🙂",
         status: "准备中",
-        tags: ["游戏爱好者", "科技控", "夜猫子", "创新思维"],
+        attributes: {
+            "性格": "INTJ",
+            "国籍": "中国",
+            "职业": "程序员",
+            "月入": "20000",
+            "教育": "硕士",
+            "婚恋": "已婚"
+        },
         isReal: false
     },
     {
@@ -109,7 +123,14 @@ const mockUsers = [
         location: "武汉新一线",
         avatar: "😍",
         status: "已完成",
-        tags: ["美食达人", "旅行爱好者", "摄影师", "生活记录者"],
+        attributes: {
+            "性格": "ESFP",
+            "国籍": "中国",
+            "职业": "摄影师",
+            "月入": "12000",
+            "教育": "本科",
+            "婚恋": "未婚"
+        },
         isReal: false
     },
     {
@@ -119,7 +140,14 @@ const mockUsers = [
         location: "西安新一线",
         avatar: "🤓",
         status: "等待中",
-        tags: ["历史爱好者", "读书人", "传统文化", "深度思考"],
+        attributes: {
+            "性格": "ISTJ",
+            "国籍": "中国",
+            "职业": "教师",
+            "月入": "8000",
+            "教育": "博士",
+            "婚恋": "已婚"
+        },
         isReal: false
     },
     {
@@ -129,7 +157,14 @@ const mockUsers = [
         location: "青岛二线",
         avatar: "😋",
         status: "视频通话中",
-        tags: ["健身达人", "营养师", "早起族", "正能量"],
+        attributes: {
+            "性格": "ENFJ",
+            "国籍": "中国",
+            "职业": "营养师",
+            "月入": "10000",
+            "教育": "本科",
+            "婚恋": "未婚"
+        },
         isReal: false
     }
 ];
@@ -150,6 +185,51 @@ function UserCard({ user }: { user: any }) {
         }
     };
 
+    // 模拟用户使用新的卡片样式
+    if (!user.isReal) {
+        const attributes = user.attributes || {};
+        const attributeEntries = Object.entries(attributes);
+
+        return (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                {/* 用户基本信息 */}
+                <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">
+                        {user.avatar}
+                    </div>
+                    <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                            <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>
+                            <button className="text-gray-400 hover:text-gray-600">
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-2">男 {user.age}岁 {user.location}</p>
+
+                        {/* 状态标签 */}
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
+                            <div className="w-1.5 h-1.5 bg-current rounded-full"></div>
+                            {user.status}
+                        </span>
+                    </div>
+                </div>
+
+                {/* 属性标签网格 - 一行三个 */}
+                <div className="grid grid-cols-3 gap-2">
+                    {attributeEntries.slice(0, 6).map(([key, value], index) => (
+                        <div key={index} className="bg-gray-50 rounded-lg px-2 py-1.5 flex flex-col items-center">
+                            <span className="text-xs text-gray-600">{key}</span>
+                            <span className="text-xs font-medium text-gray-900">{String(value)}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // 真实用户保持原有样式
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4 mb-4">
@@ -159,11 +239,9 @@ function UserCard({ user }: { user: any }) {
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{user.name}</h3>
-                        {user.isReal && (
-                            <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
-                                真实用户
-                            </span>
-                        )}
+                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+                            真实用户
+                        </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span>{user.age}岁 · 男</span>
@@ -210,7 +288,9 @@ export default function InterviewPage() {
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [showInviteModal, setShowInviteModal] = useState(false);
+    const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
     // 邀请流程步骤数据
     const inviteSteps = [
@@ -230,6 +310,27 @@ export default function InterviewPage() {
 
     const realUsers = mockUsers.filter(user => user.isReal && false); // 临时设置为空来测试空状态
     const simulatedUsers = mockUsers.filter(user => !user.isReal);
+
+    // 模拟用户池数据
+    const simulatedUserPool = Array.from({ length: 16 }, (_, index) => ({
+        id: `pool-${index + 1}`,
+        name: "夏宇轩",
+        age: 24,
+        location: "杭州新一线",
+        avatar: "😊",
+        attributes: {
+            "性格": "ENTP",
+            "国籍": "巴西",
+            "人种": "黄种人",
+            "职业": "金融业",
+            "月入": "42000",
+            "教育": "本科毕业",
+            "婚恋": "未婚",
+            "子女": "无",
+            "住房": "有房无贷"
+        },
+        hobbies: ["摄影", "烘焙", "瑜伽", "钓鱼", "阅读", "编程"]
+    }));
 
     const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -258,6 +359,22 @@ export default function InterviewPage() {
 
     const prevStep = () => {
         setCurrentStep((prev) => (prev - 1 + inviteSteps.length) % inviteSteps.length);
+    };
+
+    const toggleUserSelection = (userId: string) => {
+        setSelectedUsers(prev =>
+            prev.includes(userId)
+                ? prev.filter(id => id !== userId)
+                : [...prev, userId]
+        );
+    };
+
+    const handleConfirmAdd = () => {
+        toast.success(`已添加 ${selectedUsers.length} 个模拟用户`, {
+            description: "模拟用户已成功添加到访谈列表中"
+        });
+        setShowSimulatedUserPool(false);
+        setSelectedUsers([]);
     };
 
     // 监听滚动显示回到顶部按钮
@@ -400,13 +517,21 @@ export default function InterviewPage() {
                     {/* 模拟用户区域 */}
                     <div ref={simulatedUsersRef} className="bg-white rounded-lg shadow-sm">
                         <CardHeader className="border-b border-gray-200 pt-8">
-                            <CardTitle className="flex items-center gap-2">
-                                <Bot className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
-                                模拟用户 ({simulatedUsers.length}人)
-                            </CardTitle>
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    <Bot className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
+                                    模拟用户 ({simulatedUsers.length}人)
+                                </CardTitle>
+                                <Button
+                                    onClick={() => setShowSimulatedUserPool(true)}
+                                    className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                >
+                                    +添加模拟用户
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {simulatedUsers.map((user) => (
                                     <UserCard key={user.id} user={user} />
                                 ))}
@@ -501,6 +626,93 @@ export default function InterviewPage() {
                             >
                                 <Copy className="w-5 h-5" />
                                 复制链接
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* 模拟用户池弹窗 */}
+                <Dialog open={showSimulatedUserPool} onOpenChange={setShowSimulatedUserPool}>
+                    <DialogContent className="max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-semibold text-gray-900 mb-2">
+                                模拟用户池
+                            </DialogTitle>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500 font-normal">
+                                    他们来自真人数据建模，可以达到真人85%的访谈效果
+                                </span>
+                                <button className="text-gray-400 hover:text-gray-600">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </DialogHeader>
+
+                        {/* 用户池网格 */}
+                        <div className="grid grid-cols-4 gap-4 py-6">
+                            {simulatedUserPool.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer relative"
+                                    onClick={() => toggleUserSelection(user.id)}
+                                >
+                                    {/* 选择指示器 */}
+                                    <div className="absolute top-2 right-2">
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedUsers.includes(user.id)
+                                            ? 'bg-green-500 border-green-500'
+                                            : 'bg-white border-gray-300'
+                                            }`}>
+                                            {selectedUsers.includes(user.id) && (
+                                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* 用户基本信息 */}
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">
+                                            {user.avatar}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>
+                                            </div>
+                                            <p className="text-xs text-gray-600 mb-2">男 {user.age}岁 {user.location}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* 属性标签网格 - 一行三个 */}
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {Object.entries(user.attributes).slice(0, 6).map(([key, value], index) => (
+                                            <div key={index} className="bg-gray-50 rounded-lg px-2 py-1.5 flex flex-col items-center">
+                                                <span className="text-xs text-gray-600">{key}</span>
+                                                <span className="text-xs font-medium text-gray-900">{String(value)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* 底部按钮 */}
+                        <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowSimulatedUserPool(false)}
+                                className="px-6"
+                            >
+                                取消
+                            </Button>
+                            <Button
+                                onClick={handleConfirmAdd}
+                                disabled={selectedUsers.length === 0}
+                                className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white px-6"
+                            >
+                                确认添加 {selectedUsers.length}
                             </Button>
                         </div>
                     </DialogContent>
