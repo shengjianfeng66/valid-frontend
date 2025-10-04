@@ -34,7 +34,7 @@ export function AiChatBlock() {
     }
     setTimeout(() => {
       setIsLoading(false)
-      router.push(`/insight/add`)
+      router.push(`/insight/goal`)
     }, 1000)
   }
 

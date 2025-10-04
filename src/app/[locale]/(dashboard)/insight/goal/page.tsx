@@ -325,7 +325,7 @@ export default function Page() {
                     上一步
                   </Button>
                   <Button
-                    onClick={() => router.push('/insight/check')}
+                    onClick={() => router.push('/insight/outline')}
                     className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
                   >
                     下一步
