@@ -21,7 +21,7 @@ import { Check } from "lucide-react";
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState } from "react";
-import { FileText, ArrowRight, Plus } from "lucide-react";
+import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   Tooltip,
@@ -29,6 +29,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface SurveyData {
   surveyIntro: string;
@@ -633,16 +635,38 @@ export default function CheckPage() {
             {/* 用户访谈大纲（第2步） */}
             <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
 
-            {/* 下一步按钮 */}
-            <div className="flex justify-end mt-8">
-              <button
-                onClick={() => router.push('/insight/interview')}
-                className="flex items-center gap-2 px-6 py-3 bg-[oklch(0.705_0.213_47.604)] text-white rounded-lg hover:bg-[oklch(0.685_0.213_47.604)] transition-colors font-medium"
-              >
-                下一步
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            {/* 底部导航 */}
+            <Card className="bg-gray-50 border-0 rounded-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      下一步预览
+                    </h3>
+                    <p className="text-gray-600">
+                      将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/insight/add')}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      上一步
+                    </Button>
+                    <Button
+                      onClick={() => router.push('/insight/interview')}
+                      className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
+                    >
+                      邀请参与者
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </SidebarInset>
         <CopilotSidebar

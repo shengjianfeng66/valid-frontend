@@ -17,8 +17,10 @@ import {
 import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
-import { FileText, Upload, Plus, ArrowRight } from "lucide-react";
+import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Stepper,
   StepperItem,
@@ -81,9 +83,6 @@ export default function Page() {
     }
   }, [searchParams, sendMessage]);
 
-  const handleNextStep = () => {
-    router.push('/zh/insight/check');
-  };
 
   useCopilotAdditionalInstructions({ instructions: "使用中文回答", });
 
@@ -286,8 +285,40 @@ export default function Page() {
               formData={formData}
               setFormData={setFormData}
               fileInputRef={fileInputRef}
-              onNextStep={handleNextStep}
             />
+
+            {/* 底部导航 */}
+            <Card className="bg-gray-50 border-0 rounded-2xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      下一步预览
+                    </h3>
+                    <p className="text-gray-600">
+                      将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/dashboard')}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      上一步
+                    </Button>
+                    <Button
+                      onClick={() => router.push('/insight/check')}
+                      className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
+                    >
+                      下一步
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </SidebarInset>
         <CopilotSidebar
@@ -307,10 +338,9 @@ interface SurveyFormProps {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   fileInputRef: React.RefObject<HTMLInputElement>;
-  onNextStep: () => void;
 }
 
-function SurveyForm({ formData, setFormData, fileInputRef, onNextStep }: SurveyFormProps) {
+function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -465,16 +495,6 @@ function SurveyForm({ formData, setFormData, fileInputRef, onNextStep }: SurveyF
           </div>
         </div>
 
-        {/* 下一步按钮 */}
-        <div className="flex justify-end mt-8">
-          <button
-            onClick={onNextStep}
-            className="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors"
-          >
-            下一步
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
       </div>
     </div>
   );
