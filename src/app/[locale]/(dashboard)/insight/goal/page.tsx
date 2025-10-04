@@ -55,6 +55,40 @@ export default function Page() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // 表单验证函数
+  const validateForm = () => {
+    const requiredFields = [
+      { key: 'productName', label: '产品名称' },
+      { key: 'businessType', label: '业务类型' },
+      { key: 'targetUsers', label: '目标用户群体' },
+      { key: 'userConcerns', label: '用户关心的方面' },
+      { key: 'coreFeatures', label: '核心功能模块' }
+    ];
+
+    const missingFields = requiredFields.filter(field => {
+      const value = formData[field.key as keyof FormData];
+      return !value || (typeof value === 'string' && value.trim() === '');
+    });
+
+    return missingFields;
+  };
+
+  // 检查表单是否有效
+  const isFormValid = () => {
+    return validateForm().length === 0;
+  };
+
+  // 处理下一步点击
+  const handleNext = () => {
+    const missingFields = validateForm();
+    if (missingFields.length > 0) {
+      const fieldNames = missingFields.map(field => field.label).join('、');
+      alert(`请填写以下必填项：${fieldNames}`);
+      return;
+    }
+    router.push('/insight/outline');
+  };
   // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时
   // 主动向右侧 CopilotSidebar 发送一条用户消息。
   const { sendMessage, messages } = useCopilotChatInternal();
@@ -325,8 +359,12 @@ export default function Page() {
                     上一步
                   </Button>
                   <Button
-                    onClick={() => router.push('/insight/outline')}
-                    className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
+                    onClick={handleNext}
+                    disabled={!isFormValid()}
+                    className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
+                      ? 'bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white'
+                      : 'bg-[oklch(0.705_0.213_47.604)]/80 text-white cursor-not-allowed hover:bg-[oklch(0.705_0.213_47.604)]/70'
+                      }`}
                   >
                     下一步
                     <ArrowRight className="w-4 h-4" />
@@ -397,7 +435,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的产品名称
+              您的产品名称 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -411,7 +449,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的业务类型
+              您的业务类型 <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -427,7 +465,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         {/* 目标用户群体 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户/核心用户群体？
+            目标用户/核心用户群体？ <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.targetUsers}
@@ -442,7 +480,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         {/* 用户关心的方面 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            您希望了解用户对Dreamoo APP的哪些方面？
+            您希望了解用户对Dreamoo APP的哪些方面？ <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.userConcerns}
@@ -457,7 +495,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         {/* 核心功能模块 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            您最关心的功能模块是什么？
+            您最关心的功能模块是什么？ <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.coreFeatures}
