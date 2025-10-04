@@ -17,10 +17,17 @@ import {
     StepperDescription,
     StepperNav
 } from "@/components/stepper";
-import { Check, Users, Bot, ArrowUp } from "lucide-react";
+import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 // 模拟用户数据
 const mockUsers = [
@@ -201,8 +208,26 @@ export default function InterviewPage() {
     const realUsersRef = useRef<HTMLDivElement>(null);
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [currentStep, setCurrentStep] = useState(0);
 
-    const realUsers = mockUsers.filter(user => user.isReal);
+    // 邀请流程步骤数据
+    const inviteSteps = [
+        {
+            title: "复制链接发送给真人用户",
+            description: "将邀请链接分享给目标用户群体"
+        },
+        {
+            title: "AI 用户研究员自动化完成用户访谈",
+            description: "AI自动进行深度用户访谈，收集一手数据"
+        },
+        {
+            title: "AI 用户研究员自动化完成数据清洗与分析",
+            description: "AI自动处理数据，生成深度洞察报告"
+        }
+    ];
+
+    const realUsers = mockUsers.filter(user => user.isReal && false); // 临时设置为空来测试空状态
     const simulatedUsers = mockUsers.filter(user => !user.isReal);
 
     const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
@@ -211,6 +236,20 @@ export default function InterviewPage() {
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCopyLink = () => {
+        // 这里可以复制实际的邀请链接
+        navigator.clipboard.writeText('https://validflow.com/invite/real-users');
+        // 可以添加toast提示复制成功
+    };
+
+    const nextStep = () => {
+        setCurrentStep((prev) => (prev + 1) % inviteSteps.length);
+    };
+
+    const prevStep = () => {
+        setCurrentStep((prev) => (prev - 1 + inviteSteps.length) % inviteSteps.length);
     };
 
     // 监听滚动显示回到顶部按钮
@@ -305,17 +344,43 @@ export default function InterviewPage() {
                     {/* 真人用户区域 */}
                     <div ref={realUsersRef} className="bg-white rounded-lg shadow-sm">
                         <CardHeader className="border-b border-gray-200 pt-8">
-                            <CardTitle className="flex items-center gap-2">
-                                <Users className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
-                                真人用户 ({realUsers.length}人)
-                            </CardTitle>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Users className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
+                                        真人用户 ({realUsers.length}人)
+                                    </CardTitle>
+                                    {realUsers.length === 0 && (
+                                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+                                            限时免费
+                                        </span>
+                                    )}
+                                </div>
+                                {realUsers.length === 0 && (
+                                    <Button
+                                        onClick={() => setShowInviteModal(true)}
+                                        className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                    >
+                                        +邀请真人用户
+                                    </Button>
+                                )}
+                            </div>
                         </CardHeader>
                         <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {realUsers.map((user) => (
-                                    <UserCard key={user.id} user={user} />
-                                ))}
-                            </div>
+                            {realUsers.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {realUsers.map((user) => (
+                                        <UserCard key={user.id} user={user} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-8 text-center">
+                                    <p className="text-gray-600 text-sm leading-relaxed">
+                                        Usight 自动化帮你访谈真人用户、回收一手数据、完成用户研究分析，
+                                        <span className="underline cursor-pointer hover:text-orange-600 text-orange-600">快去邀请吧</span>
+                                    </p>
+                                </div>
+                            )}
                         </CardContent>
                     </div>
 
@@ -346,6 +411,87 @@ export default function InterviewPage() {
                         </Button>
                     )}
                 </div>
+
+                {/* 邀请真人用户弹窗 */}
+                <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
+                    <DialogContent className="max-w-6xl w-full">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-semibold text-gray-900">
+                                邀请真人用户
+                            </DialogTitle>
+                            <DialogDescription className="text-gray-600 text-base leading-relaxed">
+                                复制链接发送给真人用户，AI 用户研究员自动化完成用户访谈，AI 用户研究员自动化完成数据清洗与分析
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {/* 轮播图区域 */}
+                        <div className="relative py-8">
+                            <div className="relative overflow-hidden rounded-lg">
+                                <div className="flex transition-transform duration-300 ease-in-out"
+                                    style={{ transform: `translateX(-${currentStep * 100}%)` }}>
+                                    {inviteSteps.map((step, index) => (
+                                        <div key={index} className="w-full flex-shrink-0">
+                                            <div className="text-center">
+                                                <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-6">
+                                                    <span className="text-gray-500 text-lg">步骤 {index + 1} 图片</span>
+                                                </div>
+                                                <h3 className="text-xl font-semibold text-gray-900 mb-3">{step.title}</h3>
+                                                <p className="text-gray-600 text-base leading-relaxed max-w-md mx-auto">
+                                                    {step.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 轮播控制按钮 */}
+                            <div className="flex items-center justify-between mt-6">
+                                <Button
+                                    onClick={prevStep}
+                                    variant="outline"
+                                    className="flex items-center gap-2"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                    上一步
+                                </Button>
+
+                                {/* 指示器 */}
+                                <div className="flex gap-2">
+                                    {inviteSteps.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentStep(index)}
+                                            className={`w-3 h-3 rounded-full transition-colors ${index === currentStep
+                                                ? 'bg-[oklch(0.705_0.213_47.604)]'
+                                                : 'bg-gray-300'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+
+                                <Button
+                                    onClick={nextStep}
+                                    variant="outline"
+                                    className="flex items-center gap-2"
+                                >
+                                    下一步
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center pt-6">
+                            <Button
+                                onClick={handleCopyLink}
+                                className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white px-12 py-3 rounded-lg flex items-center gap-2 text-lg"
+                            >
+                                <Copy className="w-5 h-5" />
+                                复制链接
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </SidebarInset>
         </SidebarProvider>
     );
