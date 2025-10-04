@@ -9,6 +9,7 @@ import {
   FileText,
   User,
 } from "lucide-react"
+import { useAppContext } from "@/contexts/app"
 
 import {
   Sidebar,
@@ -44,6 +45,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAppContext()
+
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
@@ -119,21 +122,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
 
-        {/* 用户信息 */}
-        <div className="flex items-center gap-3 p-3">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-gray-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-gray-900 truncate">
-              {data.user.name}
+        {/* 用户信息 - 仅显示已登录用户 */}
+        {user && (
+          <div className="flex items-center gap-3 p-3">
+            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+              <User className="w-4 h-4 text-gray-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-gray-900 truncate">
+                {user.name || user.email}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">2300</span>
+              <Switch />
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">{data.user.points}</span>
-            <Switch />
-          </div>
-        </div>
+        )}
       </SidebarFooter>
 
       <SidebarRail />

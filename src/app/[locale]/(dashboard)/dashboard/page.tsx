@@ -14,6 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import LocaleToggle from "@/components/locale/toggle"
+import SignToggle from "@/components/sign/toggle"
 
 export default function Page() {
   return (
@@ -28,13 +30,17 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
+          <div className="flex items-center gap-2 px-3">
+            <LocaleToggle />
+            <SignToggle />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-8 p-4">
           {/* AI对话框区域 */}
           <div className="w-full">
             <AiChatBlock />
           </div>
-          
+
           {/* Showcase列表区域 */}
           <div className="w-full">
             <ShowcaseBlock />
