@@ -28,6 +28,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 // 模拟用户数据
 const mockUsers = [
@@ -238,10 +239,17 @@ export default function InterviewPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleCopyLink = () => {
-        // 这里可以复制实际的邀请链接
-        navigator.clipboard.writeText('https://validflow.com/invite/real-users');
-        // 可以添加toast提示复制成功
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText('https://validflow.com/invite/real-users');
+            toast.success("复制成功", {
+                description: "邀请链接已复制到剪贴板",
+            });
+        } catch (err) {
+            toast.error("复制失败", {
+                description: "请手动复制链接",
+            });
+        }
     };
 
     const nextStep = () => {
@@ -377,7 +385,12 @@ export default function InterviewPage() {
                                 <div className="py-8 text-center">
                                     <p className="text-gray-600 text-sm leading-relaxed">
                                         Usight 自动化帮你访谈真人用户、回收一手数据、完成用户研究分析，
-                                        <span className="underline cursor-pointer hover:text-orange-600 text-orange-600">快去邀请吧</span>
+                                        <span
+                                            className="underline cursor-pointer hover:text-orange-600 text-orange-600"
+                                            onClick={() => setShowInviteModal(true)}
+                                        >
+                                            快去邀请吧
+                                        </span>
                                     </p>
                                 </div>
                             )}
