@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 首页导航 */}
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="bg-gray-100 text-gray-900" asChild>
+            <SidebarMenuButton className="bg-gray-100 text-gray-900 h-12" asChild>
               <a href="/dashboard" className="flex items-center gap-2">
                 <Home className="w-4 h-4" />
                 <span>首页</span>
@@ -78,6 +78,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
+        {/* 分割线 */}
+        <div className="border-t border-gray-200 my-4"></div>
 
         {/* 最近使用 */}
         <SidebarGroup>
