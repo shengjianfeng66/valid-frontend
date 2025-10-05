@@ -87,6 +87,24 @@ export default function Page() {
       alert(`请填写以下必填项：${fieldNames}`);
       return;
     }
+
+    // 将调研信息存储到 sessionStorage，供 outline 页面使用
+    const surveyInfo = {
+      productName: formData.productName,
+      businessType: formData.businessType,
+      targetUsers: formData.targetUsers,
+      userConcerns: formData.userConcerns,
+      coreFeatures: formData.coreFeatures,
+      hasProductSolution: !!formData.productSolution,
+      productSolutionName: formData.productSolution?.name || null,
+    };
+
+    try {
+      sessionStorage.setItem('vf_surveyInfo', JSON.stringify(surveyInfo));
+    } catch (e) {
+      console.warn('无法存储调研信息到 sessionStorage:', e);
+    }
+
     router.push('/insight/outline');
   };
   // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时

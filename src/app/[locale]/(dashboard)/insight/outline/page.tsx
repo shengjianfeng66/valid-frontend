@@ -18,9 +18,9 @@ import {
   StepperNav
 } from "@/components/stepper";
 import { Check } from "lucide-react";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -349,6 +349,63 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 export default function CheckPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(2);
+
+  // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时
+  // 主动向右侧 CopilotSidebar 发送一条用户消息。
+  const { sendMessage, messages } = useCopilotChatInternal();
+  const hasSentInitialRef = useRef(false);
+
+  // 从 sessionStorage 读取调研信息并发送给 copilot
+  useEffect(() => {
+    if (hasSentInitialRef.current) return;
+
+    const sendSurveyInfo = (surveyInfo: any) => {
+      // 等待CopilotKit完全初始化
+      const checkAndSend = () => {
+        // 检查CopilotKit是否已经准备好
+        if (typeof sendMessage === 'function') {
+          hasSentInitialRef.current = true;
+
+          // 构建发送给 copilot 的消息
+          const message = `基于以下调研信息，请帮我生成访谈大纲：
+
+产品名称：${surveyInfo.productName}
+业务类型：${surveyInfo.businessType}
+目标用户群体：${surveyInfo.targetUsers}
+用户关心的方面：${surveyInfo.userConcerns}
+核心功能模块：${surveyInfo.coreFeatures}
+${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolutionName}` : ''}
+
+请根据这些信息，生成专业的用户访谈大纲，包括：
+1. 访谈引言
+2. 用户基础画像层问题
+3. 用户行为习惯层问题
+
+请确保问题设计能够深度发掘用户需求，帮助优化产品。`;
+
+          void sendMessage({ id: `survey-${Date.now()}`, role: 'user', content: message });
+        } else {
+          // 如果还没准备好，继续等待
+          setTimeout(checkAndSend, 100);
+        }
+      };
+
+      // 延迟一点时间再开始检查
+      setTimeout(checkAndSend, 500);
+    };
+
+    // 从 sessionStorage 读取调研信息
+    try {
+      const surveyInfoStr = sessionStorage.getItem('vf_surveyInfo');
+      if (surveyInfoStr && surveyInfoStr.trim()) {
+        const surveyInfo = JSON.parse(surveyInfoStr);
+        sessionStorage.removeItem('vf_surveyInfo'); // 读取后删除，避免重复发送
+        sendSurveyInfo(surveyInfo);
+      }
+    } catch (e) {
+      console.warn('无法读取调研信息:', e);
+    }
+  }, [sendMessage]);
 
   // 处理步骤导航 - 只能返回不能往前跳
   const handleStepNavigation = (targetStep: number) => {
