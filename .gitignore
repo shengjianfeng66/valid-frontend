@@ -46,3 +46,4 @@ supabase
 .dev.vars*
 .source
 .cursor/mcp.json
+.nvmrc
