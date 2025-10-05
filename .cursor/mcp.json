@@ -1,3 +1,14 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "CopilotKit MCP": {
+      "url": "https://mcp.copilotkit.ai"
+    },
+    "supabase": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\" && nvm use 22 && SUPABASE_ACCESS_TOKEN=\"sb_secret_E3LMXVaZ3jNv9fEhySFNmg_2puz5-d8\" SUPABASE_URL=\"https://eixyepowkmnqofbgjaih.supabase.co\" npx -y @supabase/mcp-server-supabase@latest --project-ref=eixyepowkmnqofbgjaih"
+      ]
+    }
+  }
 }

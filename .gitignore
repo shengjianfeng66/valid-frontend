@@ -45,3 +45,4 @@ supabase
 .*next
 .dev.vars*
 .source
+.cursor/mcp.json
