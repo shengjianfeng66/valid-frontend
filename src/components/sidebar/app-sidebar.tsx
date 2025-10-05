@@ -10,6 +10,8 @@ import {
   User,
 } from "lucide-react"
 import { useAppContext } from "@/contexts/app"
+import { useDraft } from "@/contexts/draft"
+import { NavigationLink } from "@/components/ui/navigation-link"
 
 import {
   Sidebar,
@@ -46,6 +48,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAppContext()
+  const { hasDraft, clearDraft } = useDraft()
 
   return (
     <Sidebar className="border-r-0" {...props}>
@@ -53,14 +56,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/" className="flex items-center gap-2">
+              <NavigationLink
+                href="/dashboard"
+                hasDraft={hasDraft}
+                onLeave={clearDraft}
+                className="flex items-center gap-2"
+              >
                 <img
                   src="/logo.png"
                   alt="ValidFlow Logo"
                   className="w-8"
                 />
                 <span className="text-xl font-bold text-primary">ValidFlow</span>
-              </a>
+              </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -71,10 +79,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton className="bg-gray-100 text-gray-900 h-12" asChild>
-              <a href="/dashboard" className="flex items-center gap-2">
+              <NavigationLink
+                href="/dashboard"
+                hasDraft={hasDraft}
+                onLeave={clearDraft}
+                className="flex items-center gap-2"
+              >
                 <Home className="w-4 h-4" />
                 <span>首页</span>
-              </a>
+              </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -92,7 +105,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.recentItems.map((item, index) => (
                 <SidebarMenuItem key={index}>
                   <SidebarMenuButton className="text-gray-900" asChild>
-                    <a href="#" className="flex items-center gap-3 px-3 py-6">
+                    <NavigationLink
+                      href="#"
+                      hasDraft={hasDraft}
+                      onLeave={clearDraft}
+                      className="flex items-center gap-3 px-3 py-6"
+                    >
                       <item.icon className="w-4 h-4 text-gray-500" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium truncate leading-5">
@@ -103,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           <span>{item.date}</span>
                         </div>
                       </div>
-                    </a>
+                    </NavigationLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

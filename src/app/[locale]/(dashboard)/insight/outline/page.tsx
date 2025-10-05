@@ -23,6 +23,7 @@ import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } fr
 import { useState, useRef, useEffect } from "react";
 import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDraft } from "@/contexts/draft";
 import {
   Tooltip,
   TooltipContent,
@@ -348,12 +349,39 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
 export default function CheckPage() {
   const router = useRouter();
+  const { setHasDraft } = useDraft();
   const [currentStep, setCurrentStep] = useState(2);
 
   // 直接使用 CopilotKit 的内部聊天 hook，以便能够在页面加载时
   // 主动向右侧 CopilotSidebar 发送一条用户消息。
   const { sendMessage, messages } = useCopilotChatInternal();
   const hasSentInitialRef = useRef(false);
+
+  // 检测是否有草稿数据
+  useEffect(() => {
+    // 检查是否有调研信息（从 goal 页面传递过来的）
+    const hasSurveyInfo = () => {
+      try {
+        const surveyInfo = sessionStorage.getItem('vf_surveyInfo');
+        return surveyInfo && surveyInfo.trim() !== '';
+      } catch {
+        return false;
+      }
+    };
+
+    // 检查是否有访谈数据
+    const hasInterviewData = () => {
+      try {
+        const interviewData = sessionStorage.getItem('vf_interviewData');
+        return interviewData && interviewData.trim() !== '';
+      } catch {
+        return false;
+      }
+    };
+
+    const hasDraft = hasSurveyInfo() || hasInterviewData();
+    setHasDraft(!!hasDraft);
+  }, [setHasDraft]);
 
   // 从 sessionStorage 读取调研信息并发送给 copilot
   useEffect(() => {

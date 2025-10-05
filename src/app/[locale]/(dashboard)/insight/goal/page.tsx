@@ -19,6 +19,7 @@ import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } fr
 import { useState, useRef, useEffect } from "react";
 import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +45,7 @@ interface FormData {
 
 export default function Page() {
   const searchParams = useSearchParams();
+  const { setHasDraft } = useDraft();
   const [formData, setFormData] = useState<FormData>({
     productName: "",
     businessType: "",
@@ -55,6 +57,18 @@ export default function Page() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // 检测表单数据变化，更新草稿状态
+  useEffect(() => {
+    const hasFormData = formData.productName.trim() !== "" ||
+      formData.businessType.trim() !== "" ||
+      formData.targetUsers.trim() !== "" ||
+      formData.userConcerns.trim() !== "" ||
+      formData.coreFeatures.trim() !== "" ||
+      formData.productSolution !== null;
+
+    setHasDraft(hasFormData);
+  }, [formData, setHasDraft]);
 
   // 表单验证函数
   const validateForm = () => {
