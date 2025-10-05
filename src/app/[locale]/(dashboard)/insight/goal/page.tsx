@@ -279,7 +279,7 @@ export default function Page() {
   });
 
   return (
-    <div style={{ "--copilot-kit-primary-color": "oklch(0.705 0.213 47.604)" } as CopilotKitCSSProperties}>
+    <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -298,11 +298,11 @@ export default function Page() {
                 <StepperNav className="flex justify-between items-center">
                   <StepperItem step={1} completed={1 > 1}>
                     <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
                         1
                       </StepperIndicator>
                       <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
+                        <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
                         <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
                       </div>
                     </StepperTrigger>
@@ -370,8 +370,8 @@ export default function Page() {
                     onClick={handleNext}
                     disabled={!isFormValid()}
                     className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
-                      ? 'bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white'
-                      : 'bg-[oklch(0.705_0.213_47.604)]/80 text-white cursor-not-allowed hover:bg-[oklch(0.705_0.213_47.604)]/70'
+                      ? 'bg-primary hover:bg-primary/90 text-white'
+                      : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
                       }`}
                   >
                     下一步
@@ -443,8 +443,8 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
     <div className="bg-white rounded-lg shadow-sm p-8">
       {/* 表单标题 */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-          <FileText className="w-5 h-5 text-orange-600" />
+        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <FileText className="w-5 h-5 text-primary" />
         </div>
         <h1 className="text-2xl font-semibold text-gray-900">补充调研信息</h1>
       </div>
@@ -461,7 +461,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
               value={formData.productName}
               onChange={(e) => handleInputChange('productName', e.target.value)}
               placeholder="Dreamoo"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
             <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
           </div>
@@ -475,7 +475,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
               value={formData.businessType}
               onChange={(e) => handleInputChange('businessType', e.target.value)}
               placeholder="笔记APP、工具类、社交类"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
             <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
           </div>
@@ -491,7 +491,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
             onChange={(e) => handleInputChange('targetUsers', e.target.value)}
             placeholder="例如：年轻女性用户、下沉市场用户、重度购物用户等"
             rows={4}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
           <p className="text-xs text-gray-500 mt-1">请详细描述您的目标用户群体特征</p>
         </div>
@@ -506,7 +506,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
             onChange={(e) => handleInputChange('researchGoals', e.target.value)}
             placeholder="例如：了解用户使用习惯、验证产品功能需求、分析用户痛点等"
             rows={4}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
           <p className="text-xs text-gray-500 mt-1">请描述您希望通过调研了解什么</p>
         </div>
@@ -518,7 +518,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
           </label>
           <div
             onClick={handleUploadClick}
-            className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-orange-300 hover:bg-orange-50 transition-all cursor-pointer"
+            className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer"
           >
             <input
               ref={fileInputRef}
@@ -530,7 +530,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                 {formData.productSolution ? (
-                  <FileText className="w-6 h-6 text-orange-600" />
+                  <FileText className="w-6 h-6 text-primary" />
                 ) : (
                   <Plus className="w-6 h-6 text-gray-400" />
                 )}

@@ -90,7 +90,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
             value={surveyData.surveyIntro}
             onChange={(e) => handleInputChange('surveyIntro', e.target.value)}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
         </div>
 
@@ -103,7 +103,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
             type="text"
             value={surveyData.surveyTargetUsers}
             onChange={(e) => handleInputChange('surveyTargetUsers', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
           />
         </div>
 
@@ -117,7 +117,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page1.q1}
                 onChange={(e) => handleQuestionChange('page1', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
             <div>
@@ -126,7 +126,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page1.q2}
                 onChange={(e) => handleQuestionChange('page1', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
           </div>
@@ -142,7 +142,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page2.q1}
                 onChange={(e) => handleQuestionChange('page2', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
             <div>
@@ -151,7 +151,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page2.q2}
                 onChange={(e) => handleQuestionChange('page2', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
           </div>
@@ -167,7 +167,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page3.q1}
                 onChange={(e) => handleQuestionChange('page3', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
             <div>
@@ -176,7 +176,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
                 type="text"
                 value={surveyData.surveyQuestions.page3.q2}
                 onChange={(e) => handleQuestionChange('page3', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
             value={surveyData.interviewIntro}
             onChange={(e) => handleInputChange('interviewIntro', e.target.value)}
             rows={6}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
             placeholder="欢迎您参加 Dreamoo 用户访谈。本次访谈的目的是了解您使用 Dreamoo 记录梦境的体验，包括使用习惯、满意的地方以及希望改进的地方，以帮助我们优化产品。访谈预计需要约10分钟，您的信息将被严格保密，仅用于产品优化。没有标准答案，您的真实感受最有价值。如果您准备好了，我们将开始访谈。"
           />
         </div>
@@ -279,7 +279,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
                   type="text"
                   value={question}
                   onChange={(e) => handleQuestionChange('page1', index, e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   placeholder={index === 0 ? "你希望我怎么称呼你?你今年多大了?" :
                     index === 1 ? "你目前在哪个城市?从事什么工作?月收入大概在什么区间?" :
                       index === 2 ? "你的最高学历是?" :
@@ -299,7 +299,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
             ))}
             <button
               onClick={() => addQuestion('page1')}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
               添加问题
@@ -317,7 +317,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
                   type="text"
                   value={question}
                   onChange={(e) => handleQuestionChange('page2', index, e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                   placeholder={index === 0 ? "你多久会做一次让你印象深刻的梦?醒来后通常会做什么?" :
                     index === 1 ? "你现在有记录梦境的习惯吗?如果有,用什么方式记录?(备忘录/日记本/语音/不记录)" :
                       index === 2 ? "你一般在什么时候会回想或谈论自己的梦?(早上醒来/和朋友聊天/睡前)" : "请输入问题..."}
@@ -334,7 +334,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
             ))}
             <button
               onClick={() => addQuestion('page2')}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
               添加问题
@@ -668,7 +668,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   });
 
   return (
-    <div style={{ "--copilot-kit-primary-color": "oklch(0.705 0.213 47.604)" } as CopilotKitCSSProperties}>
+    <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -691,15 +691,15 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       canNavigate={1 < currentStep}
                       onClick={() => handleStepNavigation(1)}
                     >
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-primary text-white">
                         <Check className="w-5 h-5" />
                       </StepperIndicator>
                       <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
+                        <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
                         <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
                       </div>
                     </StepperTrigger>
-                    <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
+                    <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
                   </StepperItem>
 
                   <StepperItem step={2} completed={currentStep > 2}>
@@ -708,11 +708,11 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       canNavigate={2 < currentStep}
                       onClick={() => handleStepNavigation(2)}
                     >
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
+                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
                         2
                       </StepperIndicator>
                       <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
+                        <StepperTitle className="text-sm font-medium text-primary">访谈大纲</StepperTitle>
                         <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
                       </div>
                     </StepperTrigger>
@@ -768,7 +768,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       setCurrentStep(3);
                       router.push('/insight/interview');
                     }}
-                    className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white flex items-center gap-2"
+                    className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
                   >
                     邀请参与者
                     <ArrowRight className="w-4 h-4" />

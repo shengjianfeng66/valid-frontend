@@ -222,14 +222,14 @@ function UserCard({ user }: UserCardProps) {
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       {/* 头像和基本信息 */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-2xl">
+        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl">
           {user.avatar}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-semibold text-gray-900">{user.name}</h3>
             {user.isReal && (
-              <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
                 真实用户
               </span>
             )}
@@ -274,7 +274,7 @@ function UserCard({ user }: UserCardProps) {
           <Phone className="w-4 h-4" />
           语音
         </button>
-        <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors text-sm">
+        <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm">
           <Video className="w-4 h-4" />
           视频
         </button>
@@ -285,7 +285,7 @@ function UserCard({ user }: UserCardProps) {
 
 export function InterviewCardList() {
   const [activeTab, setActiveTab] = useState<"real" | "simulated">("real");
-  
+
   const realUsers = mockUsers.filter(user => user.isReal);
   const simulatedUsers = mockUsers.filter(user => !user.isReal);
   const currentUsers = activeTab === "real" ? realUsers : simulatedUsers;
@@ -326,7 +326,7 @@ export function InterviewCardList() {
               重置筛选
             </button>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium">
+          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium">
             <UserPlus className="w-4 h-4" />
             邀请真人用户
           </button>
@@ -338,21 +338,19 @@ export function InterviewCardList() {
         <div className="flex">
           <button
             onClick={() => setActiveTab("real")}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "real"
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "real"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
+              }`}
           >
             真人用户 ({realUsers.length}人)
           </button>
           <button
             onClick={() => setActiveTab("simulated")}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "simulated"
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "simulated"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
+              }`}
           >
             模拟用户 ({simulatedUsers.length}人)
           </button>

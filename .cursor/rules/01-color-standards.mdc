@@ -1,0 +1,59 @@
+---
+description: Color Standards - UI color usage standards and best practices
+alwaysApply: true
+---
+
+# Color Standards
+
+## 颜色使用规范
+
+### ✅ **优先使用主题变量**：
+
+#### **主要颜色**：
+- `bg-primary` - 主色调背景
+- `text-primary` - 主色调文字
+- `border-primary` - 主色调边框
+- `ring-primary` - 主色调焦点环
+
+#### **透明度变体**：
+- `bg-primary/10` - 10%透明度背景
+- `bg-primary/20` - 20%透明度背景
+- `bg-primary/90` - 90%透明度背景
+- `hover:bg-primary/90` - 悬停状态
+
+#### **状态颜色**：
+- `bg-secondary` - 次要背景
+- `text-secondary` - 次要文字
+- `bg-muted` - 静音背景
+- `text-muted` - 静音文字
+- `bg-destructive` - 危险背景
+- `text-destructive` - 危险文字
+
+### ❌ **避免硬编码**：
+- 不使用 `bg-[#8B5CF6]` 这样的固定颜色
+- 不使用 `text-orange-500` 这样的 Tailwind 固定颜色
+- 不使用 `border-[oklch(0.6_0.2_300)]` 这样的硬编码值
+
+### 📝 **开发规范**：
+
+1. **新组件开发**：优先使用主题变量
+2. **样式修改**：检查是否可以使用主题变量
+3. **颜色调整**：通过修改 `src/app/theme.css` 统一调整
+4. **一致性检查**：确保新元素与现有设计保持一致
+
+### 🎯 **目标**：
+- **统一性**：所有元素使用相同的颜色系统
+- **可维护性**：颜色修改只需要改主题文件
+- **扩展性**：支持明暗模式切换
+- **一致性**：新功能与现有设计风格统一
+
+## 主题文件位置
+- 主主题文件：`src/app/theme.css`
+- 全局样式：`src/app/globals.css`
+
+## 检查清单
+在添加新元素或修改样式时，请确保：
+- [ ] 使用主题变量而不是硬编码颜色
+- [ ] 检查是否有遗漏的硬编码颜色值
+- [ ] 确保新元素与现有设计风格一致
+- [ ] 支持明暗模式切换

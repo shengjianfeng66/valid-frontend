@@ -53,8 +53,8 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
               className={cn(
                 "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all",
                 {
-                  "bg-[oklch(0.705_0.213_47.604)] text-white": step.status === "completed",
-                  "bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]": step.status === "current",
+                  "bg-primary text-white": step.status === "completed",
+                  "bg-gray-200 text-gray-700 border-2 border-dashed border-primary": step.status === "current",
                   "bg-gray-200 text-gray-500": step.status === "upcoming"
                 }
               )}
@@ -72,7 +72,7 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
                 className={cn(
                   "text-sm font-medium",
                   {
-                    "text-[oklch(0.705_0.213_47.604)]": step.status === "completed",
+                    "text-primary": step.status === "completed",
                     "text-[oklch(0.705_0.213_47.600)]": step.status === "current",
                     "text-gray-500": step.status === "upcoming"
                   }
@@ -96,7 +96,7 @@ export default function ProcessSteps({ currentStep = 2, className }: ProcessStep
                   className={cn(
                     "h-0.5 transition-all",
                     {
-                      "bg-[oklch(0.705_0.213_47.604)]": step.status === "completed" || steps[index + 1].status === "completed" || step.status === "current",
+                      "bg-primary": step.status === "completed" || steps[index + 1].status === "completed" || step.status === "current",
                       "bg-gray-200": step.status === "upcoming" && steps[index + 1].status === "upcoming"
                     }
                   )}

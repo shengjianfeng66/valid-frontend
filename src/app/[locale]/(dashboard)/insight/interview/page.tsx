@@ -232,13 +232,13 @@ function UserCard({ user }: { user: any }) {
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl">
                     {user.avatar}
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{user.name}</h3>
-                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
                             真实用户
                         </span>
                     </div>
@@ -274,7 +274,7 @@ function UserCard({ user }: { user: any }) {
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
                     语音
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors text-sm">
+                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm">
                     视频
                 </button>
             </div>
@@ -415,37 +415,37 @@ export default function InterviewPage() {
                             <StepperNav className="flex justify-between items-center">
                                 <StepperItem step={1} completed={3 > 1}>
                                     <StepperTrigger className="flex flex-col items-center gap-3">
-                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
+                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-primary text-white">
                                             <Check className="w-5 h-5" />
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">制定目标</StepperTitle>
+                                            <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
                                             <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
                                         </div>
                                     </StepperTrigger>
-                                    <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
+                                    <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
                                 </StepperItem>
 
                                 <StepperItem step={2} completed={3 > 2}>
                                     <StepperTrigger className="flex flex-col items-center gap-3">
-                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-[oklch(0.705_0.213_47.604)] text-white">
+                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-primary text-white">
                                             <Check className="w-5 h-5" />
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">访谈大纲</StepperTitle>
+                                            <StepperTitle className="text-sm font-medium text-primary">访谈大纲</StepperTitle>
                                             <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
                                         </div>
                                     </StepperTrigger>
-                                    <StepperSeparator className="mx-4 flex-1 bg-[oklch(0.705_0.213_47.604)] h-0.5" />
+                                    <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
                                 </StepperItem>
 
                                 <StepperItem step={3} completed={3 > 3}>
                                     <StepperTrigger className="flex flex-col items-center gap-3">
-                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-[oklch(0.705_0.213_47.604)]">
+                                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
                                             3
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-[oklch(0.705_0.213_47.604)]">寻找参与者</StepperTitle>
+                                            <StepperTitle className="text-sm font-medium text-primary">寻找参与者</StepperTitle>
                                             <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
                                         </div>
                                     </StepperTrigger>
@@ -459,14 +459,14 @@ export default function InterviewPage() {
                         <div className="flex gap-4">
                             <Button
                                 onClick={() => scrollToSection(realUsersRef)}
-                                className="flex items-center gap-2 bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
                             >
                                 <Users className="w-4 h-4" />
                                 真人用户 ({realUsers.length}人)
                             </Button>
                             <Button
                                 onClick={() => scrollToSection(simulatedUsersRef)}
-                                className="flex items-center gap-2 bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
                             >
                                 <Bot className="w-4 h-4" />
                                 模拟用户 ({simulatedUsers.length}人)
@@ -480,11 +480,11 @@ export default function InterviewPage() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <CardTitle className="flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
+                                        <Users className="w-5 h-5 text-primary" />
                                         真人用户 ({realUsers.length}人)
                                     </CardTitle>
                                     {realUsers.length === 0 && (
-                                        <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+                                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
                                             限时免费
                                         </span>
                                     )}
@@ -492,7 +492,7 @@ export default function InterviewPage() {
                                 {realUsers.length === 0 && (
                                     <Button
                                         onClick={() => setShowInviteModal(true)}
-                                        className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                        className="bg-primary hover:bg-primary/90 text-white"
                                     >
                                         +邀请真人用户
                                     </Button>
@@ -511,7 +511,7 @@ export default function InterviewPage() {
                                     <p className="text-gray-600 text-sm leading-relaxed">
                                         Usight 自动化帮你访谈真人用户、回收一手数据、完成用户研究分析，
                                         <span
-                                            className="underline cursor-pointer hover:text-orange-600 text-orange-600"
+                                            className="underline cursor-pointer hover:text-primary text-primary"
                                             onClick={() => setShowInviteModal(true)}
                                         >
                                             快去邀请吧
@@ -527,12 +527,12 @@ export default function InterviewPage() {
                         <CardHeader className="border-b border-gray-200 pt-8">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="flex items-center gap-2">
-                                    <Bot className="w-5 h-5 text-[oklch(0.705_0.213_47.604)]" />
+                                    <Bot className="w-5 h-5 text-primary" />
                                     模拟用户 ({simulatedUsers.length}人)
                                 </CardTitle>
                                 <Button
                                     onClick={() => setShowSimulatedUserPool(true)}
-                                    className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white"
+                                    className="bg-primary hover:bg-primary/90 text-white"
                                 >
                                     +添加模拟用户
                                 </Button>
@@ -551,7 +551,7 @@ export default function InterviewPage() {
                     {showScrollTop && (
                         <Button
                             onClick={scrollToTop}
-                            className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white shadow-lg z-50"
+                            className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg z-50"
                         >
                             <ArrowUp className="w-5 h-5" />
                         </Button>
@@ -609,7 +609,7 @@ export default function InterviewPage() {
                                             key={index}
                                             onClick={() => setCurrentStep(index)}
                                             className={`w-3 h-3 rounded-full transition-colors ${index === currentStep
-                                                ? 'bg-[oklch(0.705_0.213_47.604)]'
+                                                ? 'bg-primary'
                                                 : 'bg-gray-300'
                                                 }`}
                                         />
@@ -630,7 +630,7 @@ export default function InterviewPage() {
                         <div className="flex justify-center pt-6">
                             <Button
                                 onClick={handleCopyLink}
-                                className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white px-12 py-3 rounded-lg flex items-center gap-2 text-lg"
+                                className="bg-primary hover:bg-primary/90 text-white px-12 py-3 rounded-lg flex items-center gap-2 text-lg"
                             >
                                 <Copy className="w-5 h-5" />
                                 复制链接
@@ -718,7 +718,7 @@ export default function InterviewPage() {
                             <Button
                                 onClick={handleConfirmAdd}
                                 disabled={selectedUsers.length === 0}
-                                className="bg-[oklch(0.705_0.213_47.604)] hover:bg-[oklch(0.685_0.213_47.604)] text-white px-6"
+                                className="bg-primary hover:bg-primary/90 text-white px-6"
                             >
                                 确认添加 {selectedUsers.length}
                             </Button>
