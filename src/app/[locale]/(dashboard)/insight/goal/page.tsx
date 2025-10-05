@@ -52,10 +52,35 @@ export default function Page() {
     productSolution: null,
   });
 
+  // 从 sessionStorage 恢复表单数据
+  useEffect(() => {
+    try {
+      const savedData = sessionStorage.getItem('vf_goalFormData');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+
+        // 处理文件数据恢复
+        if (parsedData.productSolution) {
+          // 创建一个模拟的 File 对象，用于显示文件信息
+          const fileInfo = parsedData.productSolution;
+          const mockFile = new File([''], fileInfo.name, {
+            type: fileInfo.type,
+            lastModified: fileInfo.lastModified
+          });
+          parsedData.productSolution = mockFile;
+        }
+
+        setFormData(parsedData);
+      }
+    } catch (e) {
+      console.warn('无法从 sessionStorage 恢复表单数据:', e);
+    }
+  }, []);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // 检测表单数据变化，更新草稿状态
+  // 检测表单数据变化，更新草稿状态并保存到 sessionStorage
   useEffect(() => {
     const hasFormData = formData.productName.trim() !== "" ||
       formData.businessType.trim() !== "" ||
@@ -64,6 +89,23 @@ export default function Page() {
       formData.productSolution !== null;
 
     setHasDraft(hasFormData);
+
+    // 保存表单数据到 sessionStorage
+    try {
+      // 处理文件数据，转换为可序列化的格式
+      const serializableData = {
+        ...formData,
+        productSolution: formData.productSolution ? {
+          name: formData.productSolution.name,
+          size: formData.productSolution.size,
+          type: formData.productSolution.type,
+          lastModified: formData.productSolution.lastModified
+        } : null
+      };
+      sessionStorage.setItem('vf_goalFormData', JSON.stringify(serializableData));
+    } catch (e) {
+      console.warn('无法保存表单数据到 sessionStorage:', e);
+    }
   }, [formData, setHasDraft]);
 
   // 表单验证函数
