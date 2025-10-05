@@ -52,58 +52,11 @@ export default function Page() {
     productSolution: null,
   });
 
-  // 从 sessionStorage 恢复表单数据
-  useEffect(() => {
-    try {
-      const savedData = sessionStorage.getItem('vf_goalFormData');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-
-        // 处理文件数据恢复
-        if (parsedData.productSolution && parsedData.productSolution.content) {
-          // 从 base64 内容重建真正的 File 对象
-          const fileInfo = parsedData.productSolution;
-          try {
-            // 将 base64 转换为 Blob
-            const byteCharacters = atob(fileInfo.content.split(',')[1]);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: fileInfo.type });
-
-            // 创建真正的 File 对象
-            const realFile = new File([blob], fileInfo.name, {
-              type: fileInfo.type,
-              lastModified: fileInfo.lastModified
-            });
-
-            // 将 base64 内容附加到文件对象
-            Object.assign(realFile, { _content: fileInfo.content });
-            parsedData.productSolution = realFile;
-          } catch (e) {
-            console.warn('无法恢复文件内容:', e);
-            // 如果恢复失败，创建一个基本的文件对象
-            const basicFile = new File([''], fileInfo.name, {
-              type: fileInfo.type,
-              lastModified: fileInfo.lastModified
-            });
-            parsedData.productSolution = basicFile;
-          }
-        }
-
-        setFormData(parsedData);
-      }
-    } catch (e) {
-      console.warn('无法从 sessionStorage 恢复表单数据:', e);
-    }
-  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // 检测表单数据变化，更新草稿状态并保存到 sessionStorage
+  // 检测表单数据变化，更新草稿状态
   useEffect(() => {
     const hasFormData = formData.productName.trim() !== "" ||
       formData.businessType.trim() !== "" ||
@@ -112,25 +65,6 @@ export default function Page() {
       formData.productSolution !== null;
 
     setHasDraft(hasFormData);
-
-    // 保存表单数据到 sessionStorage
-    try {
-      // 处理文件数据，转换为可序列化的格式
-      const serializableData = {
-        ...formData,
-        productSolution: formData.productSolution ? {
-          name: formData.productSolution.name,
-          size: formData.productSolution.size,
-          type: formData.productSolution.type,
-          lastModified: formData.productSolution.lastModified,
-          // 将文件内容转换为 base64 保存
-          content: formData.productSolution._content || null
-        } : null
-      };
-      sessionStorage.setItem('vf_goalFormData', JSON.stringify(serializableData));
-    } catch (e) {
-      console.warn('无法保存表单数据到 sessionStorage:', e);
-    }
   }, [formData, setHasDraft]);
 
   // 表单验证函数

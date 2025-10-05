@@ -24,7 +24,7 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
             if (isInCreationFlow) {
                 // 检查是否有表单数据
                 const hasFormData = checkFormData();
-                setHasDraft(hasFormData);
+                setHasDraft(!!hasFormData);
             } else {
                 setHasDraft(false);
             }
@@ -44,12 +44,7 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
     };
 
     const clearDraft = () => {
-        try {
-            sessionStorage.removeItem('vf_surveyInfo');
-            setHasDraft(false);
-        } catch {
-            // 忽略错误
-        }
+        setHasDraft(false);
     };
 
     return (

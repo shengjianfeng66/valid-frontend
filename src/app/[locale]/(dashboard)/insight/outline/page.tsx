@@ -437,13 +437,6 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 处理步骤导航 - 只能返回不能往前跳
   const handleStepNavigation = (targetStep: number) => {
     if (targetStep < currentStep) {
-      // 保存当前的调研数据到 sessionStorage
-      try {
-        sessionStorage.setItem('vf_outlineFormData', JSON.stringify(surveyData));
-      } catch (e) {
-        console.warn('无法保存调研数据到 sessionStorage:', e);
-      }
-
       setCurrentStep(targetStep);
       // 根据步骤导航到对应页面
       if (targetStep === 1) {
@@ -488,18 +481,6 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
     }
   });
 
-  // 从 sessionStorage 恢复调研数据
-  useEffect(() => {
-    try {
-      const savedData = sessionStorage.getItem('vf_outlineFormData');
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        setSurveyData(parsedData);
-      }
-    } catch (e) {
-      console.warn('无法从 sessionStorage 恢复调研数据:', e);
-    }
-  }, []);
 
   // 让AI能够读取所有表单数据
   useCopilotReadable({
