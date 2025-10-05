@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
@@ -38,8 +37,7 @@ interface FormData {
   productName: string;
   businessType: string;
   targetUsers: string;
-  userConcerns: string;
-  coreFeatures: string;
+  researchGoals: string;
   productSolution: File | null;
 }
 
@@ -50,8 +48,7 @@ export default function Page() {
     productName: "",
     businessType: "",
     targetUsers: "",
-    userConcerns: "",
-    coreFeatures: "",
+    researchGoals: "",
     productSolution: null,
   });
 
@@ -63,8 +60,7 @@ export default function Page() {
     const hasFormData = formData.productName.trim() !== "" ||
       formData.businessType.trim() !== "" ||
       formData.targetUsers.trim() !== "" ||
-      formData.userConcerns.trim() !== "" ||
-      formData.coreFeatures.trim() !== "" ||
+      formData.researchGoals.trim() !== "" ||
       formData.productSolution !== null;
 
     setHasDraft(hasFormData);
@@ -75,9 +71,8 @@ export default function Page() {
     const requiredFields = [
       { key: 'productName', label: '产品名称' },
       { key: 'businessType', label: '业务类型' },
-      { key: 'targetUsers', label: '目标用户群体' },
-      { key: 'userConcerns', label: '用户关心的方面' },
-      { key: 'coreFeatures', label: '核心功能模块' }
+      { key: 'targetUsers', label: '目标用户画像' },
+      { key: 'researchGoals', label: '调研目标' }
     ];
 
     const missingFields = requiredFields.filter(field => {
@@ -107,8 +102,7 @@ export default function Page() {
       productName: formData.productName,
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
-      userConcerns: formData.userConcerns,
-      coreFeatures: formData.coreFeatures,
+      researchGoals: formData.researchGoals,
       hasProductSolution: !!formData.productSolution,
       productSolutionName: formData.productSolution?.name || null,
     };
@@ -170,13 +164,12 @@ export default function Page() {
 
   // 让AI能够读取表单数据
   useCopilotReadable({
-    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户群体、用户关心的方面、核心功能模块和产品方案文件",
+    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标和产品方案文件",
     value: {
       productName: formData.productName,
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
-      userConcerns: formData.userConcerns,
-      coreFeatures: formData.coreFeatures,
+      researchGoals: formData.researchGoals,
       hasProductSolution: !!formData.productSolution,
       productSolutionName: formData.productSolution?.name || null,
     },
@@ -227,33 +220,18 @@ export default function Page() {
     },
   });
 
-  // 更新用户关心的方面
+  // 更新调研目标
   useCopilotAction({
-    name: "updateUserConcerns",
-    description: "更新用户希望了解的产品方面",
+    name: "updateResearchGoals",
+    description: "更新调研目标",
     parameters: [{
-      name: "userConcerns",
+      name: "researchGoals",
       type: "string",
-      description: "用户关心的产品方面，如：为什么选择该产品、哪些功能困扰用户等",
+      description: "调研目标，如：了解用户使用习惯、验证产品功能需求、分析用户痛点等",
       required: true,
     }],
-    handler: ({ userConcerns }) => {
-      setFormData(prev => ({ ...prev, userConcerns }));
-    },
-  });
-
-  // 更新核心功能模块
-  useCopilotAction({
-    name: "updateCoreFeatures",
-    description: "更新最关心的功能模块字段",
-    parameters: [{
-      name: "coreFeatures",
-      type: "string",
-      description: "核心功能模块，如：笔记功能、记录流程、分享功能、社区浏览等",
-      required: true,
-    }],
-    handler: ({ coreFeatures }) => {
-      setFormData(prev => ({ ...prev, coreFeatures }));
+    handler: ({ researchGoals }) => {
+      setFormData(prev => ({ ...prev, researchGoals }));
     },
   });
 
@@ -267,8 +245,7 @@ export default function Page() {
         productName: "",
         businessType: "",
         targetUsers: "",
-        userConcerns: "",
-        coreFeatures: "",
+        researchGoals: "",
         productSolution: null,
       });
       if (fileInputRef.current) {
@@ -286,9 +263,8 @@ export default function Page() {
       setFormData({
         productName: "Dreamoo",
         businessType: "笔记APP、工具类、社交类",
-        targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n如果有特定关注的用户群体，请详细描述",
-        userConcerns: "用户为什么选择Dreamoo而不是其他平台？哪些功能让用户感到困扰？用户的记录梦境过程是怎样的？\n\n这将帮助我们确定访谈的重点方向",
-        coreFeatures: "笔记功能、记录流程、分享功能、社区浏览等\n\n可以填写多个功能，用逗号分隔",
+        targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
+        researchGoals: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
         productSolution: null,
       });
     },
@@ -308,7 +284,6 @@ export default function Page() {
         <SidebarInset>
           <header className="flex h-14 shrink-0 items-center gap-2">
             <div className="flex flex-1 items-center gap-2 px-3">
-              <SidebarTrigger />
               <Separator
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4"
@@ -494,10 +469,10 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
           </div>
         </div>
 
-        {/* 目标用户群体 */}
+        {/* 目标用户画像 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户/核心用户群体？ <span className="text-red-500">*</span>
+            目标用户画像 <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.targetUsers}
@@ -506,43 +481,28 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">如果有特定关注的用户群体，请详细描述</p>
+          <p className="text-xs text-gray-500 mt-1">请详细描述您的目标用户群体特征</p>
         </div>
 
-        {/* 用户关心的方面 */}
+        {/* 调研目标 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            您希望了解用户对Dreamoo APP的哪些方面？ <span className="text-red-500">*</span>
+            调研目标 <span className="text-red-500">*</span>
           </label>
           <textarea
-            value={formData.userConcerns}
-            onChange={(e) => handleInputChange('userConcerns', e.target.value)}
-            placeholder="例如：用户为什么选择 Dreamoo 而不是其他平台？哪些功能让用户感到困扰？用户的记录梦境过程是怎样的？"
+            value={formData.researchGoals}
+            onChange={(e) => handleInputChange('researchGoals', e.target.value)}
+            placeholder="例如：了解用户使用习惯、验证产品功能需求、分析用户痛点等"
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
-        </div>
-
-        {/* 核心功能模块 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            您最关心的功能模块是什么？ <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            value={formData.coreFeatures}
-            onChange={(e) => handleInputChange('coreFeatures', e.target.value)}
-            placeholder="例如：笔记功能、记录流程、分享功能、社区浏览等"
-            rows={4}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all resize-none"
-          />
-          <p className="text-xs text-gray-500 mt-1">可以填写多个功能，用逗号分隔</p>
+          <p className="text-xs text-gray-500 mt-1">请描述您希望通过调研了解什么</p>
         </div>
 
         {/* 产品方案文件上传 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            您的产品方案
+            产品方案文件
           </label>
           <div
             onClick={handleUploadClick}
