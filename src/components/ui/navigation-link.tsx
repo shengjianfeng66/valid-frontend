@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useTranslations } from "next-intl";
 
 interface NavigationLinkProps {
     href: string;
@@ -19,6 +20,7 @@ export function NavigationLink({
     hasDraft = false,
     onLeave,
 }: NavigationLinkProps) {
+    const t = useTranslations();
     const [showConfirm, setShowConfirm] = React.useState(false);
     const router = useRouter();
 
@@ -48,10 +50,10 @@ export function NavigationLink({
                 open={showConfirm}
                 onOpenChange={setShowConfirm}
                 onConfirm={handleConfirm}
-                title="确认离开"
-                description="离开页面将不会保存草稿"
-                confirmText="确定离开"
-                cancelText="取消"
+                title={t('confirmLeave.title')}
+                description={t('confirmLeave.description')}
+                confirmText={t('confirmLeave.confirmText')}
+                cancelText={t('confirmLeave.cancelText')}
             />
         </>
     );

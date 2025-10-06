@@ -22,7 +22,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     <NextThemesProvider
       attribute="class"
       defaultTheme={process.env.NEXT_PUBLIC_DEFAULT_THEME || "system"}
-      enableSystem
+      // enableSystem
       disableTransitionOnChange
     >
       {children}

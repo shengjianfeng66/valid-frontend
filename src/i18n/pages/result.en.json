@@ -1,0 +1,61 @@
+{
+    "title": "Research Report Preview",
+    "badge": "Latest Report",
+    "description": "Gain deep insights into user behavior, needs, and pain points through AI-powered user research. Below is a comprehensive report generated from recent interviews and data analysis.",
+    "overview": "Data Overview",
+    "cards": {
+        "totalInterviews": "Total Interviews",
+        "thisMonth": "This Month",
+        "totalInterviewsDesc": "Completed user interviews",
+        "totalInterviewsTip": "12% increase from last month",
+        "satisfaction": "User Satisfaction",
+        "upTrend": "Upward Trend",
+        "satisfactionDesc": "Average satisfaction score",
+        "satisfactionTip": "Based on user feedback",
+        "insights": "Key Insights",
+        "actionable": "Actionable",
+        "insightsDesc": "AI-extracted insights",
+        "insightsTip": "Validated and prioritized",
+        "completion": "Completion Rate",
+        "average": "Average",
+        "completionDesc": "Interview completion rate",
+        "completionTip": "High-quality data collection"
+    },
+    "charts": {
+        "title": "Interview & Insights Trends",
+        "description": "Track your user research activities over time",
+        "interviews": "Interviews",
+        "insights": "Insights"
+    },
+    "keyInsights": {
+        "title": "Key Insights",
+        "userNeeds": {
+            "title": "User Needs",
+            "description": "Features users care about most",
+            "point1": "Users expect faster product iteration cycles and want to see their feedback implemented quickly",
+            "point2": "78% of users need more intuitive data visualization interfaces to understand research results",
+            "point3": "Team collaboration features are essential for medium to large teams, requiring real-time collaboration support"
+        },
+        "recommendations": {
+            "title": "Recommendations",
+            "description": "Product improvement suggestions based on data analysis",
+            "point1": "Optimize AI interview process to reduce average interview time to 15 minutes to improve completion rate",
+            "point2": "Add custom report template functionality to meet specific needs of different industries",
+            "point3": "Improve mobile experience as 67% of users want to view reports on mobile devices"
+        },
+        "painPoints": {
+            "title": "Pain Points",
+            "description": "Main issues users encounter during usage",
+            "point1": "Some users report a steep learning curve on first use, requiring better onboarding process",
+            "point2": "Data export format options are limited, users want support for more formats",
+            "point3": "Interview AI response speed is slow during peak hours, affecting user experience"
+        },
+        "opportunities": {
+            "title": "Growth Opportunities",
+            "description": "Potential product development directions and market opportunities",
+            "point1": "Education sector shows strong demand for user research tools, could develop specialized education version",
+            "point2": "Users show high interest in integrations with third-party tools (such as Slack, Notion)",
+            "point3": "Enterprise customers willing to pay premium for advanced analysis features and customization services"
+        }
+    }
+}

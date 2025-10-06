@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/navigation"
 import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
+import { useFormStore } from "@/stores/form-store"
 // 临时类型定义，直到安装 Ant Design 依赖
 type AttachmentsProps = {
   items: any[]
@@ -277,11 +278,11 @@ Sender.Header = ({ title, children, open, onOpenChange }: any) => (
 )
 
 const formatIcons = [
-  { icon: MessageSquare, label: "一句话" },
-  { icon: FileText, label: "PDF文档" },
-  { icon: AlignLeft, label: "长文本" },
-  { icon: Globe, label: "网站" },
-  { icon: Image, label: "图片" },
+  { icon: MessageSquare, label: "sentence" },
+  { icon: FileText, label: "pdf" },
+  { icon: AlignLeft, label: "longText" },
+  { icon: Globe, label: "website" },
+  { icon: Image, label: "image" },
 ]
 
 export function AiChatBlock() {
@@ -290,7 +291,8 @@ export function AiChatBlock() {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<any[]>([])
   const router = useRouter()
-  const t = useTranslations("aiChat")
+  const t = useTranslations('aiChat')
+  const { setAttachments, setInitialMessage } = useFormStore()
 
   const attachmentsRef = useRef<any>(null)
   const senderRef = useRef<any>(null)
@@ -300,23 +302,25 @@ export function AiChatBlock() {
     if (!messageToSend) return
 
     setIsLoading(true)
-    // 使用 sessionStorage 传递输入内容，避免 URL 过长
+
+    // 使用 Zustand store 存储数据
     const value = messageToSend.trim()
-    try {
-      sessionStorage.setItem('vf_initialMessage', value)
-      // 存储附件信息
-      if (items.length > 0) {
-        const attachmentInfo = items.map((item: any) => ({
-          name: item.name,
-          size: item.size,
-          type: item.type,
-          url: item.url
-        }))
-        sessionStorage.setItem('vf_attachments', JSON.stringify(attachmentInfo))
-      }
-    } catch (e) {
-      // 忽略存储异常，后续仍然尝试页面跳转
+    setInitialMessage(value)
+
+    // 存储附件信息到 store（包括原始文件对象）
+    if (items.length > 0) {
+      const attachmentInfo = items.map((item: any) => ({
+        name: item.name,
+        size: item.size,
+        type: item.type,
+        url: item.url,
+        originFileObj: item.originFileObj || item  // 保存原始文件对象
+      }))
+      setAttachments(attachmentInfo)
+    } else {
+      setAttachments([])
     }
+
     setTimeout(() => {
       setIsLoading(false)
       router.push(`/insight/goal`)
@@ -349,7 +353,7 @@ export function AiChatBlock() {
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
                 <Icon className="w-5 h-5 text-gray-600" />
               </div>
-              <span className="text-xs text-gray-500">{item.label}</span>
+              <span className="text-xs text-gray-500">{t(`formatIcons.${item.label}`)}</span>
             </div>
           )
         })}
@@ -432,7 +436,8 @@ export function AiChatBlock() {
                           size: file.size,
                           type: file.type,
                           url: URL.createObjectURL(file),
-                          status: 'done'
+                          status: 'done',
+                          originFileObj: file  // ✅ 保存原始文件对象
                         }))
                         setItems(prev => [...prev, ...newItems])
                         setOpen(true) // 显示附件区域
@@ -473,7 +478,8 @@ export function AiChatBlock() {
                   size: file.size,
                   type: file.type,
                   url: URL.createObjectURL(file),
-                  status: 'done'
+                  status: 'done',
+                  originFileObj: file  // ✅ 保存原始文件对象
                 }))
                 setItems(prev => [...prev, ...newItems])
                 setOpen(true);

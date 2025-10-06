@@ -1,0 +1,75 @@
+{
+    "title": "Complete Research Information",
+    "steps": {
+        "step1": {
+            "title": "Set Goals",
+            "description": "Understand your product and users"
+        },
+        "step2": {
+            "title": "Interview Outline",
+            "description": "Deep dive into user needs"
+        },
+        "step3": {
+            "title": "Find Participants",
+            "description": "Invite real and simulated users for interviews"
+        }
+    },
+    "form": {
+        "productName": {
+            "label": "Your Product Name",
+            "placeholder": "Dreamoo",
+            "help": "This will help us determine the focus direction of the interview"
+        },
+        "businessType": {
+            "label": "Your Business Type",
+            "placeholder": "Note-taking APP, Tools, Social",
+            "help": "This will help us determine the focus direction of the interview"
+        },
+        "targetUsers": {
+            "label": "Target User Profile",
+            "placeholder": "e.g.: Young female users, down-market users, heavy shopping users, etc.",
+            "help": "Please describe in detail the characteristics of your target user group"
+        },
+        "researchGoals": {
+            "label": "Research Goals",
+            "placeholder": "e.g.: Understand user habits, validate product feature requirements, analyze user pain points, etc.",
+            "help": "Please describe what you hope to learn through research"
+        },
+        "productSolution": {
+            "label": "Product Solution File",
+            "uploadText": "Click or drag files here to upload",
+            "uploadHelp": "Only pdf, png, jpg can be uploaded, and the size does not exceed 100MB",
+            "changeText": "Click to change file"
+        }
+    },
+    "validation": {
+        "required": "Please fill in the following required fields: {fields}",
+        "fields": {
+            "productName": "Product Name",
+            "businessType": "Business Type",
+            "targetUsers": "Target User Profile",
+            "researchGoals": "Research Goals"
+        }
+    },
+    "fileUpload": {
+        "invalidType": "Only PDF, PNG, JPG format files are supported",
+        "tooLarge": "File size cannot exceed 100MB"
+    },
+    "nextPreview": "Next Step Preview",
+    "nextDescription": "Based on product information and interview goals, generate interview outlines for target users to deeply explore user needs",
+    "previous": "Previous",
+    "next": "Next",
+    "copilot": {
+        "title": "AI Research Assistant",
+        "initial": "👋 Hello! I'm your AI research assistant.\n\nI can help you:\n\n• 📝 Fill and modify form content\n• 🔄 Clear or reset forms\n• 💡 Automatically supplement related content based on product information\n• 📋 Provide research question suggestions\n\nPlease tell me what help you need!",
+        "suggestions": "Provide the following suggestions to users: 1. Help me fill in research information for a note-taking APP 2. Clear current form 3. Auto-fill related information based on product name"
+    },
+    "actions": {
+        "updateProductName": "Update product name",
+        "updateBusinessType": "Update business type",
+        "updateTargetUsers": "Update target users/core user group field",
+        "updateResearchGoals": "Update research goals",
+        "clearForm": "Clear all form fields",
+        "fillSampleData": "Fill sample research data"
+    }
+}

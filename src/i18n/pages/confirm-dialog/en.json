@@ -1,0 +1,8 @@
+{
+    "confirmLeave": {
+        "title": "Confirm Leave",
+        "description": "Leaving the page will not save the draft",
+        "confirmText": "Confirm Leave",
+        "cancelText": "Cancel"
+    }
+}

@@ -46,3 +46,31 @@ pre {
 
   --destructive-foreground: oklch(1 0 0);
 }
+
+/* 隐藏 CopilotKit 的点赞点踩按钮 */
+
+/* 针对 CopilotKit 消息控制按钮的隐藏 */
+.copilotKitMessageControlButton[aria-label="Thumbs up"],
+.copilotKitMessageControlButton[aria-label="Thumbs down"],
+.copilotKitMessageControlButton[title="Thumbs up"],
+.copilotKitMessageControlButton[title="Thumbs down"] {
+  display: none !important;
+}
+
+/* 通用的点赞点踩按钮隐藏 */
+button[aria-label="Thumbs up"],
+button[aria-label="Thumbs down"],
+button[title="Thumbs up"],
+button[title="Thumbs down"] {
+  display: none !important;
+}
+
+/* 隐藏滚动条 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

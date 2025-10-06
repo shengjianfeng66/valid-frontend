@@ -12,6 +12,8 @@ import {
 import { useAppContext } from "@/contexts/app"
 import { useDraft } from "@/contexts/draft"
 import { NavigationLink } from "@/components/ui/navigation-link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 import {
   Sidebar,
@@ -47,6 +49,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const t = useTranslations()
   const { user } = useAppContext()
   const { hasDraft, clearDraft } = useDraft()
 
@@ -86,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 className="flex items-center gap-2"
               >
                 <Home className="w-4 h-4" />
-                <span>首页</span>
+                <span>{t('navigation.home')}</span>
               </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -98,7 +101,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 最近使用 */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-gray-600">
-            最近使用
+            {t('recentItems.title')}
           </SidebarGroupLabel>
           <SidebarGroupContent className="p-2">
             <SidebarMenu>
@@ -132,16 +135,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarFooter>
         {/* 设置 */}
-        <SidebarMenu>
+        {/* <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="/settings" className="flex items-center gap-2">
-                <span>设置</span>
+              <Link href="/settings" className="flex items-center gap-2">
+                <span>{t('navigation.settings')}</span>
                 <ChevronRight className="w-4 h-4 ml-auto" />
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> */}
 
         {/* 用户信息 - 仅显示已登录用户 */}
         {user && (
@@ -155,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">2300</span>
+              <span className="text-sm text-gray-600">2300 {t('user.points')}</span>
               <Switch />
             </div>
           </div>

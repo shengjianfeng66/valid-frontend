@@ -1,0 +1,74 @@
+{
+    "title": "Interview Outline",
+    "steps": {
+        "step1": {
+            "title": "Set Goals",
+            "description": "Understand your product and users"
+        },
+        "step2": {
+            "title": "Interview Outline",
+            "description": "Deep dive into user needs"
+        },
+        "step3": {
+            "title": "Find Participants",
+            "description": "Invite real and simulated users for interviews"
+        }
+    },
+    "survey": {
+        "title": "User Experience Survey",
+        "intro": {
+            "label": "Introduction"
+        },
+        "targetUsers": {
+            "label": "Target Users/Core User Group?"
+        },
+        "pages": {
+            "page1": {
+                "title": "Page 1: Usage Motivation"
+            },
+            "page2": {
+                "title": "Page 2: Usage Frequency"
+            },
+            "page3": {
+                "title": "Page 3: Satisfaction"
+            }
+        }
+    },
+    "interview": {
+        "title": "User Interview Outline",
+        "intro": {
+            "label": "Introduction"
+        },
+        "targetUsers": {
+            "label": "Target Users/Core User Group?"
+        },
+        "pages": {
+            "page1": {
+                "title": "Page 1: User Profile Questions"
+            },
+            "page2": {
+                "title": "Page 2: User Behavior Questions"
+            }
+        },
+        "questionLimit": {
+            "warning": "It is not recommended to exceed 20 questions for each in-depth interview"
+        }
+    },
+    "nextPreview": "Next Step Preview",
+    "nextDescription": "Based on your interview goals, find the most suitable users for personalized in-depth interviews",
+    "previous": "Previous",
+    "next": "Invite Participants",
+    "copilot": {
+        "title": "AI Research Assistant",
+        "initial": "👋 Hello! I'm your AI research assistant.\n\nI can help you:\n\n• 📝 Optimize survey and interview questions\n• 🔄 Clear or reset all forms\n• 💡 Generate professional questions based on product features\n• 📋 Provide research methodology suggestions\n\nPlease tell me what help you need!",
+        "suggestions": "Provide the following suggestions to users: 1. Help me optimize survey question design 2. Clear all form content 3. Auto-generate interview questions based on product features 4. Fill sample data"
+    },
+    "actions": {
+        "updateSurveyIntro": "Update user experience survey introduction content",
+        "updateInterviewIntro": "Update user interview outline introduction content",
+        "updateTargetUsers": "Update target users/core user group",
+        "updateQuestions": "Update survey or interview outline question content",
+        "clearAllForms": "Clear all form content",
+        "fillSampleData": "Fill sample research data"
+    }
+}

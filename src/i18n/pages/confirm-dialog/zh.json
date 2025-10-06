@@ -1,0 +1,8 @@
+{
+    "confirmLeave": {
+        "title": "确认离开",
+        "description": "离开页面将不会保存草稿",
+        "confirmText": "确定离开",
+        "cancelText": "取消"
+    }
+}

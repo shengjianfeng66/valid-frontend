@@ -1,0 +1,74 @@
+{
+    "title": "访谈大纲",
+    "steps": {
+        "step1": {
+            "title": "制定目标",
+            "description": "了解你的产品和用户"
+        },
+        "step2": {
+            "title": "访谈大纲",
+            "description": "深度发掘用户需求"
+        },
+        "step3": {
+            "title": "寻找参与者",
+            "description": "邀请真人和模拟用户访谈"
+        }
+    },
+    "survey": {
+        "title": "用户体验调查问卷",
+        "intro": {
+            "label": "引言"
+        },
+        "targetUsers": {
+            "label": "目标用户/核心用户群体？"
+        },
+        "pages": {
+            "page1": {
+                "title": "第1页：使用动机"
+            },
+            "page2": {
+                "title": "第2页：使用频率"
+            },
+            "page3": {
+                "title": "第3页：满意度"
+            }
+        }
+    },
+    "interview": {
+        "title": "用户访谈大纲",
+        "intro": {
+            "label": "引言"
+        },
+        "targetUsers": {
+            "label": "目标用户/核心用户群体？"
+        },
+        "pages": {
+            "page1": {
+                "title": "第1页：用户基础画像层问题"
+            },
+            "page2": {
+                "title": "第2页：用户行为习惯层问题"
+            }
+        },
+        "questionLimit": {
+            "warning": "每次深度访谈不建议超过 20 个问题"
+        }
+    },
+    "nextPreview": "下一步预览",
+    "nextDescription": "将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈",
+    "previous": "上一步",
+    "next": "邀请参与者",
+    "copilot": {
+        "title": "AI 调研助手",
+        "initial": "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 优化调查问卷和访谈问题\n• 🔄 清空或重置所有表单\n• 💡 根据产品特性生成专业问题\n• 📋 提供调研方法建议\n\n请告诉我你需要什么帮助！",
+        "suggestions": "为用户提供以下建议：1. 帮我优化调查问卷的问题设计 2. 清空所有表单内容 3. 根据产品特性自动生成访谈问题 4. 填充示例数据"
+    },
+    "actions": {
+        "updateSurveyIntro": "更新用户体验调查问卷的引言内容",
+        "updateInterviewIntro": "更新用户访谈大纲的引言内容",
+        "updateTargetUsers": "更新目标用户/核心用户群体",
+        "updateQuestions": "更新调查问卷或访谈大纲的问题内容",
+        "clearAllForms": "清空所有表单内容",
+        "fillSampleData": "填充示例调研数据"
+    }
+}

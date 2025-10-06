@@ -16,11 +16,14 @@ import {
 import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
-import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { FileText, Upload, Plus, ArrowRight, ArrowLeft, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useFormStore } from "@/stores/form-store";
 import {
   Stepper,
   StepperItem,
@@ -38,42 +41,96 @@ interface FormData {
   businessType: string;
   targetUsers: string;
   researchGoals: string;
-  productSolution: (File & { _content?: string }) | null;
+  productSolution: (File & { _content?: string })[];
 }
 
 export default function Page() {
+  const t = useTranslations('goal');
   const searchParams = useSearchParams();
   const { setHasDraft } = useDraft();
-  const [formData, setFormData] = useState<FormData>({
-    productName: "",
-    businessType: "",
-    targetUsers: "",
-    researchGoals: "",
-    productSolution: null,
-  });
-
+  const {
+    formData,
+    updateField,
+    hasData,
+    setFormData,
+    clearForm,
+    attachments,
+    initialMessage,
+    clearAttachments,
+    setInitialMessage
+  } = useFormStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   // 检测表单数据变化，更新草稿状态
   useEffect(() => {
-    const hasFormData = formData.productName.trim() !== "" ||
-      formData.businessType.trim() !== "" ||
-      formData.targetUsers.trim() !== "" ||
-      formData.researchGoals.trim() !== "" ||
-      formData.productSolution !== null;
+    setHasDraft(hasData());
+  }, [formData, setHasDraft, hasData]);
 
-    setHasDraft(hasFormData);
-  }, [formData, setHasDraft]);
+  // 同步 dashboard 上传的附件到产品方案文件（只在初始加载时同步一次）
+  const hasSyncedAttachmentsRef = useRef(false);
+
+  useEffect(() => {
+    // 只在初始加载时同步一次，之后不再重新同步
+    if (hasSyncedAttachmentsRef.current) return;
+    if (!attachments || attachments.length === 0) return;
+    if (formData.productSolution && formData.productSolution.length > 0) return; // 已有文件，不覆盖
+
+    // 将附件转换为产品方案文件
+    const convertAttachmentsToFiles = async () => {
+      const filePromises = attachments.map(async (item: any) => {
+        try {
+          let file: File;
+
+          // 优先使用原始文件对象
+          if (item.originFileObj) {
+            file = item.originFileObj;
+          } else if (item.url) {
+            // 备用方案：从 URL 获取文件
+            const response = await fetch(item.url);
+            const blob = await response.blob();
+            file = new File([blob], item.name, { type: item.type });
+          } else {
+            return null;
+          }
+
+          // 读取文件内容为 base64
+          return new Promise<File & { _content?: string }>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const content = e.target?.result as string;
+              const fileWithContent = Object.assign(file, { _content: content });
+              resolve(fileWithContent);
+            };
+            reader.readAsDataURL(file);
+          });
+        } catch (error) {
+          console.warn('无法转换附件:', item.name, error);
+          return null;
+        }
+      });
+
+      const files = await Promise.all(filePromises);
+      const validFiles = files.filter((f): f is File & { _content?: string } => f !== null);
+
+      if (validFiles.length > 0) {
+        // 只有在成功转换文件后才标记为已同步
+        hasSyncedAttachmentsRef.current = true;
+        updateField('productSolution', validFiles);
+      }
+    };
+
+    convertAttachmentsToFiles();
+  }, [attachments, formData.productSolution, updateField]);
 
   // 表单验证函数
   const validateForm = () => {
     const requiredFields = [
-      { key: 'productName', label: '产品名称' },
-      { key: 'businessType', label: '业务类型' },
-      { key: 'targetUsers', label: '目标用户画像' },
-      { key: 'researchGoals', label: '调研目标' }
+      { key: 'productName', label: t('validation.fields.productName') },
+      { key: 'businessType', label: t('validation.fields.businessType') },
+      { key: 'targetUsers', label: t('validation.fields.targetUsers') },
+      { key: 'researchGoals', label: t('validation.fields.researchGoals') }
     ];
 
     const missingFields = requiredFields.filter(field => {
@@ -94,7 +151,7 @@ export default function Page() {
     const missingFields = validateForm();
     if (missingFields.length > 0) {
       const fieldNames = missingFields.map(field => field.label).join('、');
-      alert(`请填写以下必填项：${fieldNames}`);
+      alert(t('validation.required', { fields: fieldNames }));
       return;
     }
 
@@ -104,8 +161,9 @@ export default function Page() {
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
       researchGoals: formData.researchGoals,
-      hasProductSolution: !!formData.productSolution,
-      productSolutionName: formData.productSolution?.name || null,
+      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
+      productSolutionNames: formData.productSolution?.map(file => file.name).join(', ') || null,
+      productSolutionCount: formData.productSolution?.length || 0,
     };
 
     try {
@@ -121,17 +179,30 @@ export default function Page() {
   const { sendMessage, messages } = useCopilotChatInternal();
   const hasSentInitialRef = useRef(false);
 
-  // 从 sessionStorage（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
+  // 从 Zustand store（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
   useEffect(() => {
     if (hasSentInitialRef.current) return;
 
-    const sendInitialMessage = (message: string) => {
+    const sendInitialMessageToChat = (message: string, attachmentsData?: any[]) => {
       // 等待CopilotKit完全初始化
       const checkAndSend = () => {
         // 检查CopilotKit是否已经准备好
         if (typeof sendMessage === 'function') {
           hasSentInitialRef.current = true;
-          void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: message });
+
+          // 如果有附件，将附件信息附加到消息中
+          let fullMessage = message;
+          if (attachmentsData && attachmentsData.length > 0) {
+            const attachmentInfo = attachmentsData.map((item: any) =>
+              `\n\n📎 附件: ${item.name} (${(item.size / 1024).toFixed(2)} KB, ${item.type})`
+            ).join('');
+            fullMessage = message + attachmentInfo + '\n\n请基于以上信息和附件内容，帮我分析并填写表单。';
+          }
+
+          void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: fullMessage });
+
+          // 发送后清理 store 中的 initialMessage（但保留 attachments）
+          setInitialMessage('');
         } else {
           // 如果还没准备好，继续等待
           setTimeout(checkAndSend, 100);
@@ -142,44 +213,55 @@ export default function Page() {
       setTimeout(checkAndSend, 500);
     };
 
-    // 1) 先尝试从 sessionStorage 读取
-    try {
-      const ss = sessionStorage.getItem('vf_initialMessage');
-      if (ss && ss.trim()) {
-        sessionStorage.removeItem('vf_initialMessage');
-        sendInitialMessage(ss.trim());
-        return;
-      }
-    } catch (e) {
-      // 忽略读取异常，继续使用 query 兜底
+    // 1) 优先从 Zustand store 读取
+    if (initialMessage && initialMessage.trim()) {
+      sendInitialMessageToChat(initialMessage.trim(), attachments);
+      return;
     }
+
     // 2) 兜底：从 URL query 读取（兼容历史行为）
     const q = searchParams?.get('initialMessage')?.trim();
     if (q && !hasSentInitialRef.current) {
-      sendInitialMessage(q);
+      sendInitialMessageToChat(q);
     }
-  }, [searchParams, sendMessage]);
+  }, [searchParams, sendMessage, initialMessage, attachments, setInitialMessage]);
 
 
   useCopilotAdditionalInstructions({ instructions: "使用中文回答", });
 
   // 让AI能够读取表单数据
   useCopilotReadable({
-    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标和产品方案文件",
+    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标、产品方案文件和用户上传的附件信息",
     value: {
       productName: formData.productName,
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
       researchGoals: formData.researchGoals,
-      hasProductSolution: !!formData.productSolution,
-      productSolutionName: formData.productSolution?.name || null,
+      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
+      productSolutionFiles: formData.productSolution && formData.productSolution.length > 0
+        ? formData.productSolution.map(file => ({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          sizeInKB: (file.size / 1024).toFixed(2)
+        }))
+        : null,
+      productSolutionCount: formData.productSolution?.length || 0,
+      attachments: attachments.length > 0 ? attachments.map((item: any) => ({
+        name: item.name,
+        size: item.size,
+        type: item.type,
+        sizeInKB: (item.size / 1024).toFixed(2)
+      })) : null,
+      hasAttachments: attachments.length > 0,
+      attachmentCount: attachments.length,
     },
   });
 
   // 更新产品名称
   useCopilotAction({
     name: "updateProductName",
-    description: "更新产品名称字段",
+    description: t('actions.updateProductName'),
     parameters: [{
       name: "productName",
       type: "string",
@@ -187,14 +269,14 @@ export default function Page() {
       required: true,
     }],
     handler: ({ productName }) => {
-      setFormData(prev => ({ ...prev, productName }));
+      updateField('productName', productName);
     },
   });
 
   // 更新业务类型
   useCopilotAction({
     name: "updateBusinessType",
-    description: "更新业务类型字段",
+    description: t('actions.updateBusinessType'),
     parameters: [{
       name: "businessType",
       type: "string",
@@ -202,14 +284,14 @@ export default function Page() {
       required: true,
     }],
     handler: ({ businessType }) => {
-      setFormData(prev => ({ ...prev, businessType }));
+      updateField('businessType', businessType);
     },
   });
 
   // 更新目标用户群体
   useCopilotAction({
     name: "updateTargetUsers",
-    description: "更新目标用户/核心用户群体字段",
+    description: t('actions.updateTargetUsers'),
     parameters: [{
       name: "targetUsers",
       type: "string",
@@ -217,14 +299,14 @@ export default function Page() {
       required: true,
     }],
     handler: ({ targetUsers }) => {
-      setFormData(prev => ({ ...prev, targetUsers }));
+      updateField('targetUsers', targetUsers);
     },
   });
 
   // 更新调研目标
   useCopilotAction({
     name: "updateResearchGoals",
-    description: "更新调研目标",
+    description: t('actions.updateResearchGoals'),
     parameters: [{
       name: "researchGoals",
       type: "string",
@@ -232,23 +314,17 @@ export default function Page() {
       required: true,
     }],
     handler: ({ researchGoals }) => {
-      setFormData(prev => ({ ...prev, researchGoals }));
+      updateField('researchGoals', researchGoals);
     },
   });
 
   // 清空表单
   useCopilotAction({
     name: "clearForm",
-    description: "清空所有表单字段",
+    description: t('actions.clearForm'),
     parameters: [],
     handler: () => {
-      setFormData({
-        productName: "",
-        businessType: "",
-        targetUsers: "",
-        researchGoals: "",
-        productSolution: null,
-      });
+      clearForm();
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -258,7 +334,7 @@ export default function Page() {
   // // 填充示例数据
   useCopilotAction({
     name: "fillSampleData",
-    description: "填充示例调研数据",
+    description: t('actions.fillSampleData'),
     parameters: [],
     handler: () => {
       setFormData({
@@ -266,14 +342,15 @@ export default function Page() {
         businessType: "笔记APP、工具类、社交类",
         targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
         researchGoals: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
-        productSolution: null,
+        // 不清空现有的产品方案文件
+        productSolution: formData.productSolution,
       });
     },
   });
 
   // 智能建议
   useCopilotChatSuggestions({
-    instructions: "为用户提供以下建议：1. 帮我填写一个笔记APP的调研信息 2. 清空当前表单 3. 根据产品名称自动填充相关信息",
+    instructions: t('copilot.suggestions'),
     minSuggestions: 3,
     maxSuggestions: 3,
   });
@@ -282,101 +359,96 @@ export default function Page() {
     <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-14 shrink-0 items-center gap-2">
-            <div className="flex flex-1 items-center gap-2 px-3">
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
-            </div>
-          </header>
-          <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
-            {/* 顶部 - 流程状态栏 */}
-            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-              <Stepper value={1} className="w-full">
-                <StepperNav className="flex justify-between items-center">
-                  <StepperItem step={1} completed={1 > 1}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
-                        1
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                    <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                  </StepperItem>
+        <SidebarInset className="flex flex-col h-screen">
+          <div className="flex flex-1 flex-col bg-gray-100 min-h-0">
+            {/* 可滚动区域 - 包含顶部和中间内容 */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+              {/* 顶部 - 流程状态栏 */}
+              <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+                <Stepper value={1} className="w-full">
+                  <StepperNav className="flex justify-between items-center">
+                    <StepperItem step={1} completed={1 > 1}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
+                          1
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step1.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step1.description')}</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
 
-                  <StepperItem step={2} completed={1 > 2}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                        2
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-gray-500">访谈大纲</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                    <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                  </StepperItem>
+                    <StepperItem step={2} completed={1 > 2}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          2
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step2.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step2.description')}</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
 
-                  <StepperItem step={3} completed={1 > 3}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                        3
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                  </StepperItem>
-                </StepperNav>
-              </Stepper>
-            </div>
+                    <StepperItem step={3} completed={1 > 3}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          3
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step3.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step3.description')}</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                    </StepperItem>
+                  </StepperNav>
+                </Stepper>
+              </div>
 
-            {/* 中间内容区 */}
-            <div className="bg-white rounded-lg shadow-sm flex-1 p-6">
-              <SurveyForm
-                formData={formData}
-                setFormData={setFormData}
-                fileInputRef={fileInputRef}
-              />
+              {/* 中间内容区 */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <SurveyForm
+                  fileInputRef={fileInputRef}
+                />
+              </div>
             </div>
 
-            {/* 底部导航 */}
-            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    下一步预览
-                  </h3>
-                  <p className="text-gray-600">
-                    将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => router.push('/dashboard')}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    上一步
-                  </Button>
-                  <Button
-                    onClick={handleNext}
-                    disabled={!isFormValid()}
-                    className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
-                      ? 'bg-primary hover:bg-primary/90 text-white'
-                      : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
-                      }`}
-                  >
-                    下一步
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
+            {/* 底部导航 - 吸底显示 */}
+            <div className="bg-gray-100 p-4 flex-shrink-0">
+              <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {t('nextPreview')}
+                    </h3>
+                    <p className="text-gray-600">
+                      {t('nextDescription')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/dashboard')}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      {t('previous')}
+                    </Button>
+                    <Button
+                      onClick={handleNext}
+                      disabled={!isFormValid()}
+                      className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
+                        ? 'bg-primary hover:bg-primary/90 text-white'
+                        : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
+                        }`}
+                    >
+                      {t('next')}
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -386,9 +458,10 @@ export default function Page() {
           clickOutsideToClose={false}
           defaultOpen={true}
           labels={{
-            title: "AI 调研助手",
-            initial: "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 填写和修改表单内容\n• 🔄 清空或重置表单\n• 💡 根据产品信息自动补充相关内容\n• 📋 提供调研问题建议\n\n请告诉我你需要什么帮助！"
+            title: t('copilot.title'),
+            initial: t('copilot.initial')
           }}
+          imageUploadsEnabled={true}
         />
       </SidebarProvider>
     </div>
@@ -396,43 +469,81 @@ export default function Page() {
 }
 
 interface SurveyFormProps {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   fileInputRef: React.RefObject<HTMLInputElement>;
 }
 
-function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
+function SurveyForm({ fileInputRef }: SurveyFormProps) {
+  const t = useTranslations('goal');
+  const { formData, updateField } = useFormStore();
+
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    updateField(field, value);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    if (file) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    const maxSize = 100 * 1024 * 1024; // 100MB
+
+    const validFiles: File[] = [];
+    const currentFiles = formData.productSolution || [];
+
+    // 验证所有文件
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
       // 检查文件类型
-      const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert('只支持 PDF、PNG、JPG 格式的文件');
-        return;
-      }
-      // 检查文件大小 (100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        alert('文件大小不能超过 100MB');
-        return;
+        alert(t('fileUpload.invalidType') + `: ${file.name}`);
+        continue;
       }
 
-      // 将文件内容转换为 base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        // 将 base64 内容附加到文件对象
-        const fileWithContent = Object.assign(file, { _content: content });
-        setFormData(prev => ({ ...prev, productSolution: fileWithContent }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setFormData(prev => ({ ...prev, productSolution: null }));
+      // 检查文件大小
+      if (file.size > maxSize) {
+        alert(t('fileUpload.tooLarge') + `: ${file.name}`);
+        continue;
+      }
+
+      validFiles.push(file);
     }
+
+    // 批量读取文件内容
+    if (validFiles.length > 0) {
+      const filePromises = validFiles.map((file) => {
+        return new Promise<File & { _content?: string }>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const content = e.target?.result as string;
+            const fileWithContent = Object.assign(file, { _content: content });
+            resolve(fileWithContent);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(filePromises).then((filesWithContent) => {
+        // 添加到现有文件列表
+        updateField('productSolution', [...currentFiles, ...filesWithContent]);
+      });
+    }
+
+    // 清空 input，允许重复上传相同文件
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    console.log('删除文件:', index, '当前文件数:', formData.productSolution?.length);
+    const currentFiles = formData.productSolution || [];
+    const newFiles = currentFiles.filter((_, i) => i !== index);
+    console.log('删除后文件数:', newFiles.length);
+
+    // 删除文件
+
+    updateField('productSolution', newFiles.length > 0 ? newFiles : []);
   };
 
   const handleUploadClick = () => {
@@ -446,7 +557,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
           <FileText className="w-5 h-5 text-primary" />
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900">补充调研信息</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
       </div>
 
       <div className="space-y-6">
@@ -454,68 +565,110 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的产品名称 <span className="text-red-500">*</span>
+              {t('form.productName.label')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.productName}
               onChange={(e) => handleInputChange('productName', e.target.value)}
-              placeholder="Dreamoo"
+              placeholder={t('form.productName.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
+            <p className="text-xs text-gray-500 mt-1">{t('form.productName.help')}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的业务类型 <span className="text-red-500">*</span>
+              {t('form.businessType.label')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.businessType}
               onChange={(e) => handleInputChange('businessType', e.target.value)}
-              placeholder="笔记APP、工具类、社交类"
+              placeholder={t('form.businessType.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
+            <p className="text-xs text-gray-500 mt-1">{t('form.businessType.help')}</p>
           </div>
         </div>
 
         {/* 目标用户画像 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户画像 <span className="text-red-500">*</span>
+            {t('form.targetUsers.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.targetUsers}
             onChange={(e) => handleInputChange('targetUsers', e.target.value)}
-            placeholder="例如：年轻女性用户、下沉市场用户、重度购物用户等"
+            placeholder={t('form.targetUsers.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">请详细描述您的目标用户群体特征</p>
+          <p className="text-xs text-gray-500 mt-1">{t('form.targetUsers.help')}</p>
         </div>
 
         {/* 调研目标 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            调研目标 <span className="text-red-500">*</span>
+            {t('form.researchGoals.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.researchGoals}
             onChange={(e) => handleInputChange('researchGoals', e.target.value)}
-            placeholder="例如：了解用户使用习惯、验证产品功能需求、分析用户痛点等"
+            placeholder={t('form.researchGoals.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">请描述您希望通过调研了解什么</p>
+          <p className="text-xs text-gray-500 mt-1">{t('form.researchGoals.help')}</p>
         </div>
 
         {/* 产品方案文件上传 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            产品方案文件
+            {t('form.productSolution.label')}
+            {formData.productSolution && formData.productSolution.length > 0 && (
+              <span className="ml-2 text-xs text-gray-500">
+                ({formData.productSolution.length} 个文件)
+              </span>
+            )}
           </label>
+
+          {/* 已上传文件列表 */}
+          {formData.productSolution && formData.productSolution.length > 0 && (
+            <div className="mb-3 space-y-2">
+              {formData.productSolution.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <FileText className="w-5 h-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRemoveFile(index);
+                    }}
+                    className="ml-2 p-1 hover:bg-red-100 rounded-full transition-colors group"
+                    title="删除文件"
+                  >
+                    <X className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 上传区域 */}
           <div
             onClick={handleUploadClick}
             className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer"
@@ -524,29 +677,23 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
               ref={fileInputRef}
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
+              multiple
               onChange={handleFileChange}
               className="hidden"
             />
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                {formData.productSolution ? (
-                  <FileText className="w-6 h-6 text-primary" />
-                ) : (
-                  <Plus className="w-6 h-6 text-gray-400" />
-                )}
+                <Plus className="w-6 h-6 text-gray-400" />
               </div>
               <div>
-                {formData.productSolution ? (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{formData.productSolution.name}</p>
-                    <p className="text-xs text-gray-500">点击更换文件</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">点击或拖拽文件到此上传</p>
-                    <p className="text-xs text-gray-500 mt-1">Only pdf, png, jpg can be uploaded, and the size does not exceed 100MB</p>
-                  </div>
-                )}
+                <p className="text-sm font-medium text-gray-700">
+                  {formData.productSolution && formData.productSolution.length > 0
+                    ? '继续添加文件'
+                    : t('form.productSolution.uploadText')}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {t('form.productSolution.uploadHelp')} • 支持批量上传
+                </p>
               </div>
             </div>
           </div>
@@ -556,3 +703,4 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
     </div>
   );
 }
+
