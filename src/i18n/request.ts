@@ -32,6 +32,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       .default;
     const dashboardMessages = (await import(`./pages/dashboard/${locale.toLowerCase()}.json`))
       .default;
+    const resultMessages = (await import(`./pages/result/${locale.toLowerCase()}.json`))
+      .default;
 
     // 深度合并函数
     const deepMerge = (target: any, ...sources: any[]): any => {
@@ -67,6 +69,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
           goal: goalMessages,
           outline: outlineMessages,
           interview: interviewMessages,
+          result: resultMessages,
         }
       ),
     };

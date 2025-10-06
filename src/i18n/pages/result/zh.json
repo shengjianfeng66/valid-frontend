@@ -1,0 +1,65 @@
+{
+  "title": "研究报告预览",
+  "badge": "最新报告",
+  "description": "通过AI驱动的用户洞察，深入了解用户行为、需求和痛点。以下是基于最近访谈和数据分析生成的综合报告。",
+  "breadcrumb": {
+    "home": "首页",
+    "report": "研究报告"
+  },
+  "overview": "数据概览",
+  "cards": {
+    "totalInterviews": "总访谈数",
+    "thisMonth": "本月",
+    "totalInterviewsDesc": "已完成的用户访谈",
+    "totalInterviewsTip": "比上月增长 12%",
+    "satisfaction": "用户满意度",
+    "upTrend": "上升趋势",
+    "satisfactionDesc": "平均满意度评分",
+    "satisfactionTip": "基于用户反馈计算",
+    "insights": "关键洞察",
+    "actionable": "可执行",
+    "insightsDesc": "AI提取的洞察",
+    "insightsTip": "已验证和优先排序",
+    "completion": "完成率",
+    "average": "平均值",
+    "completionDesc": "访谈完成率",
+    "completionTip": "高质量数据收集"
+  },
+  "charts": {
+    "title": "访谈与洞察趋势",
+    "description": "跟踪您的用户研究活动随时间的变化趋势",
+    "interviews": "访谈数",
+    "insights": "洞察数"
+  },
+  "keyInsights": {
+    "title": "关键洞察",
+    "userNeeds": {
+      "title": "用户需求",
+      "description": "用户最关心和需要的功能",
+      "point1": "用户期望更快速的产品迭代周期，希望能及时看到反馈被采纳",
+      "point2": "78%的用户需要更直观的数据可视化界面来理解研究结果",
+      "point3": "团队协作功能是中大型团队的核心需求，需要支持实时协作"
+    },
+    "recommendations": {
+      "title": "优化建议",
+      "description": "基于数据分析的产品改进建议",
+      "point1": "优化AI访谈流程，减少平均访谈时长至15分钟以提高完成率",
+      "point2": "增加自定义报告模板功能，满足不同行业的特定需求",
+      "point3": "改进移动端体验，67%的用户希望在移动设备上查看报告"
+    },
+    "painPoints": {
+      "title": "痛点分析",
+      "description": "用户在使用过程中遇到的主要问题",
+      "point1": "部分用户反馈初次使用时学习曲线较陡，需要更好的引导流程",
+      "point2": "数据导出格式选项不够丰富，用户希望支持更多格式",
+      "point3": "高峰期时访谈AI响应速度较慢，影响用户体验"
+    },
+    "opportunities": {
+      "title": "增长机会",
+      "description": "潜在的产品发展方向和市场机会",
+      "point1": "教育行业对用户研究工具需求强烈，可以开发专门的教育版本",
+      "point2": "用户对集成第三方工具（如Slack、Notion）表现出高度兴趣",
+      "point3": "企业客户愿意为高级分析功能和定制化服务支付更高费用"
+    }
+  }
+}
