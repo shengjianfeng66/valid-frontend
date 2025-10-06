@@ -331,10 +331,10 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {t('navigation.nextPreview')}
+                      {t('nextPreview')}
                     </h3>
                     <p className="text-gray-600">
-                      {t('navigation.nextDescription')}
+                      {t('nextDescription')}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -344,7 +344,7 @@ export default function Page() {
                       className="flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      {t('navigation.previous')}
+                      {t('previous')}
                     </Button>
                     <Button
                       onClick={handleNext}
@@ -354,7 +354,7 @@ export default function Page() {
                         : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
                         }`}
                     >
-                      {t('navigation.next')}
+                      {t('next')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>

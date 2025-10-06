@@ -55,12 +55,10 @@
         "invalidType": "Only PDF, PNG, JPG format files are supported",
         "tooLarge": "File size cannot exceed 100MB"
     },
-    "navigation": {
-        "nextPreview": "Next Step Preview",
-        "nextDescription": "Based on product information and interview goals, generate interview outlines for target users to deeply explore user needs",
-        "previous": "Previous",
-        "next": "Next"
-    },
+    "nextPreview": "Next Step Preview",
+    "nextDescription": "Based on product information and interview goals, generate interview outlines for target users to deeply explore user needs",
+    "previous": "Previous",
+    "next": "Next",
     "copilot": {
         "title": "AI Research Assistant",
         "initial": "👋 Hello! I'm your AI research assistant.\n\nI can help you:\n\n• 📝 Fill and modify form content\n• 🔄 Clear or reset forms\n• 💡 Automatically supplement related content based on product information\n• 📋 Provide research question suggestions\n\nPlease tell me what help you need!",

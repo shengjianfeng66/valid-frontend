@@ -51,12 +51,10 @@
             }
         }
     },
-    "navigation": {
-        "nextPreview": "Next Step Preview",
-        "nextDescription": "Based on your interview goals, find the most suitable users for personalized in-depth interviews",
-        "previous": "Previous",
-        "next": "Invite Participants"
-    },
+    "nextPreview": "Next Step Preview",
+    "nextDescription": "Based on your interview goals, find the most suitable users for personalized in-depth interviews",
+    "previous": "Previous",
+    "next": "Invite Participants",
     "copilot": {
         "title": "AI Research Assistant",
         "initial": "👋 Hello! I'm your AI research assistant.\n\nI can help you:\n\n• 📝 Optimize survey and interview questions\n• 🔄 Clear or reset all forms\n• 💡 Generate professional questions based on product features\n• 📋 Provide research methodology suggestions\n\nPlease tell me what help you need!",

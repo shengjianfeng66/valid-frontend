@@ -51,12 +51,10 @@
             }
         }
     },
-    "navigation": {
-        "nextPreview": "下一步预览",
-        "nextDescription": "将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈",
-        "previous": "上一步",
-        "next": "邀请参与者"
-    },
+    "nextPreview": "下一步预览",
+    "nextDescription": "将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈",
+    "previous": "上一步",
+    "next": "邀请参与者",
     "copilot": {
         "title": "AI 调研助手",
         "initial": "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 优化调查问卷和访谈问题\n• 🔄 清空或重置所有表单\n• 💡 根据产品特性生成专业问题\n• 📋 提供调研方法建议\n\n请告诉我你需要什么帮助！",

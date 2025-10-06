@@ -55,12 +55,10 @@
         "invalidType": "只支持 PDF、PNG、JPG 格式的文件",
         "tooLarge": "文件大小不能超过 100MB"
     },
-    "navigation": {
-        "nextPreview": "下一步预览",
-        "nextDescription": "将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求",
-        "previous": "上一步",
-        "next": "下一步"
-    },
+    "nextPreview": "下一步预览",
+    "nextDescription": "将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求",
+    "previous": "上一步",
+    "next": "下一步",
     "copilot": {
         "title": "AI 调研助手",
         "initial": "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 填写和修改表单内容\n• 🔄 清空或重置表单\n• 💡 根据产品信息自动补充相关内容\n• 📋 提供调研问题建议\n\n请告诉我你需要什么帮助！",
