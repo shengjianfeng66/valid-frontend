@@ -19,12 +19,13 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkDraft = () => {
             // 检查是否在创建流程页面
-            const isInCreationFlow = pathname?.includes('/insight/goal') || pathname?.includes('/insight/outline');
+            const isInCreationFlow = pathname?.includes('/insight/goal') ||
+                pathname?.includes('/insight/outline') ||
+                pathname?.includes('/insight/interview');
 
             if (isInCreationFlow) {
-                // 检查是否有表单数据
-                const hasFormData = checkFormData();
-                setHasDraft(!!hasFormData);
+                // 在创建流程页面时，总是显示确认弹窗
+                setHasDraft(true);
             } else {
                 setHasDraft(false);
             }

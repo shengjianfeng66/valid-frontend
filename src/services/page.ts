@@ -1,5 +1,13 @@
 import { LandingPage, PricingPage, ShowcasePage } from "@/types/pages/landing";
 
+interface DashboardConfig {
+  header: {
+    show_locale: boolean;
+    show_theme: boolean;
+    show_sign: boolean;
+  };
+}
+
 export async function getLandingPage(locale: string): Promise<LandingPage> {
   return (await getPage("landing", locale)) as LandingPage;
 }
@@ -10,6 +18,10 @@ export async function getPricingPage(locale: string): Promise<PricingPage> {
 
 export async function getShowcasePage(locale: string): Promise<ShowcasePage> {
   return (await getPage("showcase", locale)) as ShowcasePage;
+}
+
+export async function getDashboardConfig(locale: string): Promise<DashboardConfig> {
+  return (await getPage("dashboard", locale)) as DashboardConfig;
 }
 
 export async function getPage(

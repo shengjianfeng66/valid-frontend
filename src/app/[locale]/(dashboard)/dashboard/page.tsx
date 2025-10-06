@@ -15,8 +15,23 @@ import {
 } from "@/components/ui/sidebar"
 import LocaleToggle from "@/components/locale/toggle"
 import SignToggle from "@/components/sign/toggle"
+import ThemeToggle from "@/components/theme/toggle"
+import { getDashboardConfig } from "@/services/page"
 
-export default function Page() {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const config = await getDashboardConfig(locale);
+
+  const headerConfig = {
+    show_locale: config.header.show_locale,
+    show_theme: config.header.show_theme,
+    show_sign: config.header.show_sign
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -29,8 +44,9 @@ export default function Page() {
             />
           </div>
           <div className="flex items-center gap-2 px-3">
-            <LocaleToggle />
-            <SignToggle />
+            {headerConfig.show_locale && <LocaleToggle />}
+            {headerConfig.show_theme && <ThemeToggle />}
+            {headerConfig.show_sign && <SignToggle />}
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-8 p-4">
