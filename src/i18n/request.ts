@@ -26,6 +26,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       .default;
     const interviewMessages = (await import(`./pages/interview/${locale.toLowerCase()}.json`))
       .default;
+    const sidebarMessages = (await import(`./pages/sidebar/${locale.toLowerCase()}.json`))
+      .default;
 
     return {
       locale: locale,
@@ -34,6 +36,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
         ...goalMessages,
         ...outlineMessages,
         ...interviewMessages,
+        ...sidebarMessages,
       },
     };
   } catch (e) {

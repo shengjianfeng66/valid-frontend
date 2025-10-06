@@ -1,0 +1,14 @@
+{
+    "navigation": {
+        "home": "首页",
+        "settings": "设置"
+    },
+    "recentItems": {
+        "title": "最近使用",
+        "sampleItem": "模拟验证驱动的AI产品规划..."
+    },
+    "user": {
+        "points": "积分",
+        "switch": "切换"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "navigation": {
+        "home": "Home",
+        "settings": "Settings"
+    },
+    "recentItems": {
+        "title": "Recent Items",
+        "sampleItem": "AI Product Planning Driven by Simulation Validation..."
+    },
+    "user": {
+        "points": "Points",
+        "switch": "Switch"
+    }
+}
