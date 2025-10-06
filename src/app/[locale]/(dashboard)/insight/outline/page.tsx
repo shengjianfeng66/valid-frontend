@@ -57,7 +57,7 @@ interface SurveyFormProps {
 }
 
 function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
-  const t = useTranslations();
+  const t = useTranslations('outline');
   const handleInputChange = (field: keyof SurveyData, value: string) => {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
@@ -190,7 +190,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
 // 用户访谈大纲组件
 function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
-  const t = useTranslations();
+  const t = useTranslations('outline');
   const handleInputChange = (field: keyof SurveyData, value: string) => {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
@@ -350,7 +350,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 }
 
 export default function CheckPage() {
-  const t = useTranslations();
+  const t = useTranslations('outline');
   const router = useRouter();
   const { setHasDraft } = useDraft();
   const [currentStep, setCurrentStep] = useState(2);

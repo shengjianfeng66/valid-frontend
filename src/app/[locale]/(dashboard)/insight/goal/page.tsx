@@ -45,7 +45,7 @@ interface FormData {
 }
 
 export default function Page() {
-  const t = useTranslations();
+  const t = useTranslations('goal');
   const searchParams = useSearchParams();
   const { setHasDraft } = useDraft();
   const {
@@ -440,7 +440,7 @@ interface SurveyFormProps {
 }
 
 function SurveyForm({ fileInputRef }: SurveyFormProps) {
-  const t = useTranslations();
+  const t = useTranslations('goal');
   const { formData, updateField } = useFormStore();
 
   const handleInputChange = (field: keyof FormData, value: string) => {
