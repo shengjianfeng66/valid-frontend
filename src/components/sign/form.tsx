@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { signIn } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 
 export default function SignForm({
@@ -21,6 +21,25 @@ export default function SignForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const t = useTranslations();
+  const supabase = createClient();
+
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
+  const handleGitHubLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -40,7 +59,7 @@ export default function SignForm({
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn("google")}
+                  onClick={handleGoogleLogin}
                 >
                   <SiGoogle className="w-4 h-4" />
                   {t("sign_modal.google_sign_in")}
@@ -50,7 +69,7 @@ export default function SignForm({
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn("github")}
+                  onClick={handleGitHubLogin}
                 >
                   <SiGithub className="w-4 h-4" />
                   {t("sign_modal.github_sign_in")}

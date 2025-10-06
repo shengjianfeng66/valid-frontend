@@ -24,7 +24,7 @@ import { SiGithub, SiGmail, SiGoogle } from "react-icons/si";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { signIn } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { useAppContext } from "@/contexts/app";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useTranslations } from "next-intl";
@@ -74,6 +74,25 @@ export default function SignModal() {
 
 function ProfileForm({ className }: React.ComponentProps<"form">) {
   const t = useTranslations();
+  const supabase = createClient();
+
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
+  const handleGitHubLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
 
   return (
     <div className={cn("grid items-start gap-4", className)}>
@@ -94,9 +113,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
         <Button
           variant="outline"
           className="w-full flex items-center gap-2"
-          onClick={() => {
-            signIn("google");
-          }}
+          onClick={handleGoogleLogin}
         >
           <SiGoogle className="w-4 h-4" />
           {t("sign_modal.google_sign_in")}
@@ -107,9 +124,7 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
         <Button
           variant="outline"
           className="w-full flex items-center gap-2"
-          onClick={() => {
-            signIn("github");
-          }}
+          onClick={handleGitHubLogin}
         >
           <SiGithub className="w-4 h-4" />
           {t("sign_modal.github_sign_in")}

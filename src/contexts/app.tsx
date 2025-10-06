@@ -11,10 +11,11 @@ import { cacheGet, cacheRemove } from "@/lib/cache";
 
 import { CacheKey } from "@/services/constant";
 import { ContextValue } from "@/types/context";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import { User } from "@/types/user";
 import moment from "moment";
 import useOneTapLogin from "@/hooks/useOneTapLogin";
-import { useSession } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { isAuthEnabled, isGoogleOneTapEnabled } from "@/lib/auth";
 
 const AppContext = createContext({} as ContextValue);
@@ -26,7 +27,25 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     useOneTapLogin();
   }
 
-  const { data: session } = isAuthEnabled() ? useSession() : { data: null };
+  const supabase = createClient();
+  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
+
+  // 监听 Supabase Auth 状态变化
+  useEffect(() => {
+    if (!isAuthEnabled()) return;
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setSupabaseUser(user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSupabaseUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const [showSignModal, setShowSignModal] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
@@ -109,10 +128,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (session && session.user) {
+    if (supabaseUser) {
       fetchUserInfo();
     }
-  }, [session]);
+  }, [supabaseUser]);
 
   return (
     <AppContext.Provider

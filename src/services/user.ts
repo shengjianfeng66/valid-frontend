@@ -2,7 +2,7 @@ import { CreditsAmount, CreditsTransType } from "./credit";
 import { findUserByEmail, findUserByUuid, insertUser } from "@/models/user";
 
 import { User } from "@/types/user";
-import { auth } from "@/auth";
+import { createClient } from "@/lib/supabase/server";
 import { getIsoTimestr, getOneYearLaterTimestr } from "@/lib/time";
 import { getUserUuidByApiKey } from "@/models/apikey";
 import { headers } from "next/headers";
@@ -68,9 +68,14 @@ export async function getUserUuid() {
     }
   }
 
-  const session = await auth();
-  if (session && session.user && session.user.uuid) {
-    user_uuid = session.user.uuid;
+  // 使用 Supabase Auth
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user && user.id) {
+    user_uuid = user.id;
   }
 
   return user_uuid;
@@ -89,9 +94,14 @@ export async function getBearerToken() {
 export async function getUserEmail() {
   let user_email = "";
 
-  const session = await auth();
-  if (session && session.user && session.user.email) {
-    user_email = session.user.email;
+  // 使用 Supabase Auth
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user && user.email) {
+    user_email = user.email;
   }
 
   return user_email;

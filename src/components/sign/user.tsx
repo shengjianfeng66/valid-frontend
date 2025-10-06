@@ -13,12 +13,20 @@ import {
 
 import { Link } from "@/i18n/navigation";
 import { User } from "@/types/user";
-import { signOut } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "next-intl";
 import { NavItem } from "@/types/blocks/base";
+import { useRouter } from "next/navigation";
 
 export default function SignUser({ user }: { user: User }) {
   const t = useTranslations();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   const dropdownItems: NavItem[] = [
     {
@@ -39,7 +47,7 @@ export default function SignUser({ user }: { user: User }) {
 
   dropdownItems.push({
     title: t("user.sign_out"),
-    onClick: () => signOut(),
+    onClick: handleSignOut,
   });
 
   return (

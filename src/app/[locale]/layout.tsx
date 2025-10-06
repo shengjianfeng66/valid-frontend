@@ -6,7 +6,6 @@ import {
 import { AppContextProvider } from "@/contexts/app";
 import { DraftProvider } from "@/contexts/draft";
 import { Metadata } from "next";
-import { NextAuthSessionProvider } from "@/auth/session";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/providers/theme";
 
@@ -44,13 +43,11 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <NextAuthSessionProvider>
-        <AppContextProvider>
-          <DraftProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-          </DraftProvider>
-        </AppContextProvider>
-      </NextAuthSessionProvider>
+      <AppContextProvider>
+        <DraftProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </DraftProvider>
+      </AppContextProvider>
     </NextIntlClientProvider>
   );
 }

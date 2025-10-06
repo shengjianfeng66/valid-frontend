@@ -1,5 +1,5 @@
 import SignForm from "@/components/sign/form";
-import { auth } from "@/auth";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { isAuthEnabled } from "@/lib/auth";
 
@@ -13,8 +13,12 @@ export default async function SignInPage({
   }
 
   const { callbackUrl } = await searchParams;
-  const session = await auth();
-  if (session) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
     return redirect(callbackUrl || "/");
   }
 
