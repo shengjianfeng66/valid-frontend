@@ -812,20 +812,11 @@ export default function InterviewPage() {
                                 我们的AI用户研究员正在自动化完成用户访谈，请稍候...
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="flex justify-center py-6">
+                        <div className="flex justify-center py-2">
                             <LoadingAnimation
-                                width={200}
-                                height={200}
+                                width={250}
+                                height={250}
                             />
-                        </div>
-                        <div className="text-center">
-                            <Button
-                                variant="outline"
-                                onClick={() => setShowLoadingModal(false)}
-                                className="px-6"
-                            >
-                                取消
-                            </Button>
                         </div>
                     </DialogContent>
                 </Dialog>
