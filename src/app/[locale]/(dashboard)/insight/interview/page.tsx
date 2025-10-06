@@ -537,10 +537,15 @@ export default function InterviewPage() {
                         {/* 模拟用户区域 */}
                         <div ref={simulatedUsersRef} className="px-6 py-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                    <Bot className="w-5 h-5 text-primary" />
-                                    模拟用户 {simulatedUsers.length}
-                                </h3>
+                                <div className="flex items-center gap-3">
+                                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                        <Bot className="w-5 h-5 text-primary" />
+                                        模拟用户 {simulatedUsers.length}
+                                    </h3>
+                                    <span className="text-sm text-gray-600">
+                                        已匹配 {simulatedUsers.length} 位目标用户，他们来自真人数据建模，可以达到真人 85% 的访谈效果
+                                    </span>
+                                </div>
                                 <Button
                                     onClick={() => setShowSimulatedUserPool(true)}
                                     variant="outline"
@@ -548,17 +553,6 @@ export default function InterviewPage() {
                                 >
                                     +添加模拟用户
                                 </Button>
-                            </div>
-
-                            <div className="mb-4">
-                                <p className="text-sm text-gray-600">
-                                    已匹配 {simulatedUsers.length}位目标用户，他们来自真人数据建模，可以达到真人85%的访谈效果
-                                    <button className="text-gray-400 hover:text-gray-600 ml-1">
-                                        <svg className="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
