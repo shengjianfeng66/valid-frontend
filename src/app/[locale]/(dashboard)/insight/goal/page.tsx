@@ -16,7 +16,7 @@ import {
 import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable, useCopilotChatInternal } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
-import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
+import { FileText, Upload, Plus, ArrowRight, ArrowLeft, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -41,15 +41,24 @@ interface FormData {
   businessType: string;
   targetUsers: string;
   researchGoals: string;
-  productSolution: (File & { _content?: string }) | null;
+  productSolution: ((File & { _content?: string })[]) | null;
 }
 
 export default function Page() {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const { setHasDraft } = useDraft();
-  const { formData, updateField, hasData, setFormData, clearForm } = useFormStore();
-
+  const {
+    formData,
+    updateField,
+    hasData,
+    setFormData,
+    clearForm,
+    attachments,
+    initialMessage,
+    clearAttachments,
+    setInitialMessage
+  } = useFormStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -96,8 +105,9 @@ export default function Page() {
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
       researchGoals: formData.researchGoals,
-      hasProductSolution: !!formData.productSolution,
-      productSolutionName: formData.productSolution?.name || null,
+      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
+      productSolutionNames: formData.productSolution?.map(file => file.name).join(', ') || null,
+      productSolutionCount: formData.productSolution?.length || 0,
     };
 
     try {
@@ -113,17 +123,30 @@ export default function Page() {
   const { sendMessage, messages } = useCopilotChatInternal();
   const hasSentInitialRef = useRef(false);
 
-  // 从 sessionStorage（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
+  // 从 Zustand store（优先）或 query 中读取 initialMessage，并自动发送到右侧 Chat
   useEffect(() => {
     if (hasSentInitialRef.current) return;
 
-    const sendInitialMessage = (message: string) => {
+    const sendInitialMessageToChat = (message: string, attachmentsData?: any[]) => {
       // 等待CopilotKit完全初始化
       const checkAndSend = () => {
         // 检查CopilotKit是否已经准备好
         if (typeof sendMessage === 'function') {
           hasSentInitialRef.current = true;
-          void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: message });
+
+          // 如果有附件，将附件信息附加到消息中
+          let fullMessage = message;
+          if (attachmentsData && attachmentsData.length > 0) {
+            const attachmentInfo = attachmentsData.map((item: any) =>
+              `\n\n📎 附件: ${item.name} (${(item.size / 1024).toFixed(2)} KB, ${item.type})`
+            ).join('');
+            fullMessage = message + attachmentInfo + '\n\n请基于以上信息和附件内容，帮我分析并填写表单。';
+          }
+
+          void sendMessage({ id: `init-${Date.now()}`, role: 'user', content: fullMessage });
+
+          // 发送后清理 store 中的 initialMessage（但保留 attachments）
+          setInitialMessage('');
         } else {
           // 如果还没准备好，继续等待
           setTimeout(checkAndSend, 100);
@@ -134,37 +157,48 @@ export default function Page() {
       setTimeout(checkAndSend, 500);
     };
 
-    // 1) 先尝试从 sessionStorage 读取
-    try {
-      const ss = sessionStorage.getItem('vf_initialMessage');
-      if (ss && ss.trim()) {
-        sessionStorage.removeItem('vf_initialMessage');
-        sendInitialMessage(ss.trim());
-        return;
-      }
-    } catch (e) {
-      // 忽略读取异常，继续使用 query 兜底
+    // 1) 优先从 Zustand store 读取
+    if (initialMessage && initialMessage.trim()) {
+      sendInitialMessageToChat(initialMessage.trim(), attachments);
+      return;
     }
+
     // 2) 兜底：从 URL query 读取（兼容历史行为）
     const q = searchParams?.get('initialMessage')?.trim();
     if (q && !hasSentInitialRef.current) {
-      sendInitialMessage(q);
+      sendInitialMessageToChat(q);
     }
-  }, [searchParams, sendMessage]);
+  }, [searchParams, sendMessage, initialMessage, attachments, setInitialMessage]);
 
 
   useCopilotAdditionalInstructions({ instructions: "使用中文回答", });
 
   // 让AI能够读取表单数据
   useCopilotReadable({
-    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标和产品方案文件",
+    description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标、产品方案文件和用户上传的附件信息",
     value: {
       productName: formData.productName,
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
       researchGoals: formData.researchGoals,
-      hasProductSolution: !!formData.productSolution,
-      productSolutionName: formData.productSolution?.name || null,
+      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
+      productSolutionFiles: formData.productSolution && formData.productSolution.length > 0
+        ? formData.productSolution.map(file => ({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          sizeInKB: (file.size / 1024).toFixed(2)
+        }))
+        : null,
+      productSolutionCount: formData.productSolution?.length || 0,
+      attachments: attachments.length > 0 ? attachments.map((item: any) => ({
+        name: item.name,
+        size: item.size,
+        type: item.type,
+        sizeInKB: (item.size / 1024).toFixed(2)
+      })) : null,
+      hasAttachments: attachments.length > 0,
+      attachmentCount: attachments.length,
     },
   });
 
@@ -252,7 +286,7 @@ export default function Page() {
         businessType: "笔记APP、工具类、社交类",
         targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
         researchGoals: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
-        productSolution: null,
+        productSolution: [],
       });
     },
   });
@@ -319,6 +353,31 @@ export default function Page() {
 
               {/* 中间内容区 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
+                {/* 显示附件信息 */}
+                {attachments.length > 0 && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-sm font-semibold text-blue-900">
+                        已上传的附件 ({attachments.length})
+                      </h3>
+                    </div>
+                    <div className="space-y-2">
+                      {attachments.map((item: any, index: number) => (
+                        <div key={index} className="flex items-center gap-2 text-sm text-blue-800">
+                          <span>📎</span>
+                          <span className="font-medium">{item.name}</span>
+                          <span className="text-blue-600">({(item.size / 1024).toFixed(2)} KB)</span>
+                          <span className="text-blue-500">{item.type}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-blue-700 mt-2">
+                      💡 AI助手已收到这些附件信息，可以基于附件内容帮你分析和填写表单
+                    </p>
+                  </div>
+                )}
+
                 <SurveyForm
                   fileInputRef={fileInputRef}
                 />
@@ -389,32 +448,64 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    if (file) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    const maxSize = 100 * 1024 * 1024; // 100MB
+
+    const validFiles: File[] = [];
+    const currentFiles = formData.productSolution || [];
+
+    // 验证所有文件
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
       // 检查文件类型
-      const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert(t('fileUpload.invalidType'));
-        return;
-      }
-      // 检查文件大小 (100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        alert(t('fileUpload.tooLarge'));
-        return;
+        alert(t('fileUpload.invalidType') + `: ${file.name}`);
+        continue;
       }
 
-      // 将文件内容转换为 base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        // 将 base64 内容附加到文件对象
-        const fileWithContent = Object.assign(file, { _content: content });
-        updateField('productSolution', fileWithContent);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      updateField('productSolution', null);
+      // 检查文件大小
+      if (file.size > maxSize) {
+        alert(t('fileUpload.tooLarge') + `: ${file.name}`);
+        continue;
+      }
+
+      validFiles.push(file);
     }
+
+    // 批量读取文件内容
+    if (validFiles.length > 0) {
+      const filePromises = validFiles.map((file) => {
+        return new Promise<File & { _content?: string }>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const content = e.target?.result as string;
+            const fileWithContent = Object.assign(file, { _content: content });
+            resolve(fileWithContent);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(filePromises).then((filesWithContent) => {
+        // 添加到现有文件列表
+        updateField('productSolution', [...currentFiles, ...filesWithContent]);
+      });
+    }
+
+    // 清空 input，允许重复上传相同文件
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const currentFiles = formData.productSolution || [];
+    const newFiles = currentFiles.filter((_, i) => i !== index);
+    updateField('productSolution', newFiles.length > 0 ? newFiles : []);
   };
 
   const handleUploadClick = () => {
@@ -497,7 +588,45 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {t('form.productSolution.label')}
+            {formData.productSolution && formData.productSolution.length > 0 && (
+              <span className="ml-2 text-xs text-gray-500">
+                ({formData.productSolution.length} 个文件)
+              </span>
+            )}
           </label>
+
+          {/* 已上传文件列表 */}
+          {formData.productSolution && formData.productSolution.length > 0 && (
+            <div className="mb-3 space-y-2">
+              {formData.productSolution.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <FileText className="w-5 h-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveFile(index)}
+                    className="ml-2 p-1 hover:bg-red-100 rounded-full transition-colors group"
+                    title="删除文件"
+                  >
+                    <X className="w-4 h-4 text-gray-400 group-hover:text-red-600" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 上传区域 */}
           <div
             onClick={handleUploadClick}
             className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer"
@@ -506,29 +635,23 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
               ref={fileInputRef}
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"
+              multiple
               onChange={handleFileChange}
               className="hidden"
             />
             <div className="flex flex-col items-center gap-3">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                {formData.productSolution ? (
-                  <FileText className="w-6 h-6 text-primary" />
-                ) : (
-                  <Plus className="w-6 h-6 text-gray-400" />
-                )}
+                <Plus className="w-6 h-6 text-gray-400" />
               </div>
               <div>
-                {formData.productSolution ? (
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{formData.productSolution.name}</p>
-                    <p className="text-xs text-gray-500">{t('form.productSolution.changeText')}</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{t('form.productSolution.uploadText')}</p>
-                    <p className="text-xs text-gray-500 mt-1">{t('form.productSolution.uploadHelp')}</p>
-                  </div>
-                )}
+                <p className="text-sm font-medium text-gray-700">
+                  {formData.productSolution && formData.productSolution.length > 0
+                    ? '继续添加文件'
+                    : t('form.productSolution.uploadText')}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {t('form.productSolution.uploadHelp')} • 支持批量上传
+                </p>
               </div>
             </div>
           </div>
@@ -538,3 +661,4 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
     </div>
   );
 }
+

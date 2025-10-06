@@ -5,14 +5,29 @@ interface FormData {
     businessType: string;
     targetUsers: string;
     researchGoals: string;
-    productSolution: (File & { _content?: string }) | null;
+    productSolution: ((File & { _content?: string })[]) | null;
+}
+
+interface AttachmentItem {
+    name: string;
+    size: number;
+    type: string;
+    url?: string;
 }
 
 interface FormStore {
     formData: FormData;
+    attachments: AttachmentItem[];
+    initialMessage: string;
     setFormData: (data: Partial<FormData>) => void;
     updateField: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
+    setAttachments: (attachments: AttachmentItem[]) => void;
+    addAttachment: (attachment: AttachmentItem) => void;
+    removeAttachment: (index: number) => void;
+    clearAttachments: () => void;
+    setInitialMessage: (message: string) => void;
     clearForm: () => void;
+    clearAll: () => void;
     hasData: () => boolean;
 }
 
@@ -21,11 +36,13 @@ const initialFormData: FormData = {
     businessType: "",
     targetUsers: "",
     researchGoals: "",
-    productSolution: null,
+    productSolution: [],
 };
 
 export const useFormStore = create<FormStore>()((set, get) => ({
     formData: initialFormData,
+    attachments: [],
+    initialMessage: "",
 
     setFormData: (data) => {
         set((state) => ({
@@ -39,8 +56,40 @@ export const useFormStore = create<FormStore>()((set, get) => ({
         }));
     },
 
+    setAttachments: (attachments) => {
+        set({ attachments });
+    },
+
+    addAttachment: (attachment) => {
+        set((state) => ({
+            attachments: [...state.attachments, attachment]
+        }));
+    },
+
+    removeAttachment: (index) => {
+        set((state) => ({
+            attachments: state.attachments.filter((_, i) => i !== index)
+        }));
+    },
+
+    clearAttachments: () => {
+        set({ attachments: [] });
+    },
+
+    setInitialMessage: (message) => {
+        set({ initialMessage: message });
+    },
+
     clearForm: () => {
         set({ formData: initialFormData });
+    },
+
+    clearAll: () => {
+        set({
+            formData: initialFormData,
+            attachments: [],
+            initialMessage: ""
+        });
     },
 
     hasData: () => {
@@ -49,6 +98,6 @@ export const useFormStore = create<FormStore>()((set, get) => ({
             formData.businessType.trim() !== "" ||
             formData.targetUsers.trim() !== "" ||
             formData.researchGoals.trim() !== "" ||
-            formData.productSolution !== null;
+            (formData.productSolution && formData.productSolution.length > 0);
     }
 }));

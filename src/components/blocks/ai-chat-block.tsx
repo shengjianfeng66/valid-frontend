@@ -6,6 +6,7 @@ import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } f
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useTranslations } from "next-intl"
+import { useFormStore } from "@/stores/form-store"
 // 临时类型定义，直到安装 Ant Design 依赖
 type AttachmentsProps = {
   items: any[]
@@ -291,6 +292,7 @@ export function AiChatBlock() {
   const [items, setItems] = useState<any[]>([])
   const router = useRouter()
   const t = useTranslations('aiChat')
+  const { setAttachments, setInitialMessage } = useFormStore()
 
   const attachmentsRef = useRef<any>(null)
   const senderRef = useRef<any>(null)
@@ -300,23 +302,24 @@ export function AiChatBlock() {
     if (!messageToSend) return
 
     setIsLoading(true)
-    // 使用 sessionStorage 传递输入内容，避免 URL 过长
+
+    // 使用 Zustand store 存储数据
     const value = messageToSend.trim()
-    try {
-      sessionStorage.setItem('vf_initialMessage', value)
-      // 存储附件信息
-      if (items.length > 0) {
-        const attachmentInfo = items.map((item: any) => ({
-          name: item.name,
-          size: item.size,
-          type: item.type,
-          url: item.url
-        }))
-        sessionStorage.setItem('vf_attachments', JSON.stringify(attachmentInfo))
-      }
-    } catch (e) {
-      // 忽略存储异常，后续仍然尝试页面跳转
+    setInitialMessage(value)
+
+    // 存储附件信息到 store
+    if (items.length > 0) {
+      const attachmentInfo = items.map((item: any) => ({
+        name: item.name,
+        size: item.size,
+        type: item.type,
+        url: item.url
+      }))
+      setAttachments(attachmentInfo)
+    } else {
+      setAttachments([])
     }
+
     setTimeout(() => {
       setIsLoading(false)
       router.push(`/insight/goal`)
