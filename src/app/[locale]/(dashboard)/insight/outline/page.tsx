@@ -807,6 +807,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
             title: t('copilot.title'),
             initial: t('copilot.initial')
           }}
+          imageUploadsEnabled={true}
         />
       </SidebarProvider>
     </div>

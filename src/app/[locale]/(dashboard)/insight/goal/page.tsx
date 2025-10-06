@@ -461,6 +461,7 @@ export default function Page() {
             title: t('copilot.title'),
             initial: t('copilot.initial')
           }}
+          imageUploadsEnabled={true}
         />
       </SidebarProvider>
     </div>
