@@ -21,6 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useFormStore } from "@/stores/form-store";
 import {
   Stepper,
   StepperItem,
@@ -44,13 +45,7 @@ interface FormData {
 export default function Page() {
   const searchParams = useSearchParams();
   const { setHasDraft } = useDraft();
-  const [formData, setFormData] = useState<FormData>({
-    productName: "",
-    businessType: "",
-    targetUsers: "",
-    researchGoals: "",
-    productSolution: null,
-  });
+  const { formData, updateField, hasData, setFormData, clearForm } = useFormStore();
 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,14 +53,8 @@ export default function Page() {
 
   // 检测表单数据变化，更新草稿状态
   useEffect(() => {
-    const hasFormData = formData.productName.trim() !== "" ||
-      formData.businessType.trim() !== "" ||
-      formData.targetUsers.trim() !== "" ||
-      formData.researchGoals.trim() !== "" ||
-      formData.productSolution !== null;
-
-    setHasDraft(hasFormData);
-  }, [formData, setHasDraft]);
+    setHasDraft(hasData());
+  }, [formData, setHasDraft, hasData]);
 
   // 表单验证函数
   const validateForm = () => {
@@ -187,7 +176,7 @@ export default function Page() {
       required: true,
     }],
     handler: ({ productName }) => {
-      setFormData(prev => ({ ...prev, productName }));
+      updateField('productName', productName);
     },
   });
 
@@ -202,7 +191,7 @@ export default function Page() {
       required: true,
     }],
     handler: ({ businessType }) => {
-      setFormData(prev => ({ ...prev, businessType }));
+      updateField('businessType', businessType);
     },
   });
 
@@ -217,7 +206,7 @@ export default function Page() {
       required: true,
     }],
     handler: ({ targetUsers }) => {
-      setFormData(prev => ({ ...prev, targetUsers }));
+      updateField('targetUsers', targetUsers);
     },
   });
 
@@ -232,7 +221,7 @@ export default function Page() {
       required: true,
     }],
     handler: ({ researchGoals }) => {
-      setFormData(prev => ({ ...prev, researchGoals }));
+      updateField('researchGoals', researchGoals);
     },
   });
 
@@ -242,13 +231,7 @@ export default function Page() {
     description: "清空所有表单字段",
     parameters: [],
     handler: () => {
-      setFormData({
-        productName: "",
-        businessType: "",
-        targetUsers: "",
-        researchGoals: "",
-        productSolution: null,
-      });
+      clearForm();
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -340,8 +323,6 @@ export default function Page() {
             {/* 中间内容区 */}
             <div className="bg-white rounded-lg shadow-sm flex-1 p-6">
               <SurveyForm
-                formData={formData}
-                setFormData={setFormData}
                 fileInputRef={fileInputRef}
               />
             </div>
@@ -396,14 +377,14 @@ export default function Page() {
 }
 
 interface SurveyFormProps {
-  formData: FormData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   fileInputRef: React.RefObject<HTMLInputElement>;
 }
 
-function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
+function SurveyForm({ fileInputRef }: SurveyFormProps) {
+  const { formData, updateField } = useFormStore();
+
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    updateField(field, value);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -427,11 +408,11 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
         const content = e.target?.result as string;
         // 将 base64 内容附加到文件对象
         const fileWithContent = Object.assign(file, { _content: content });
-        setFormData(prev => ({ ...prev, productSolution: fileWithContent }));
+        updateField('productSolution', fileWithContent);
       };
       reader.readAsDataURL(file);
     } else {
-      setFormData(prev => ({ ...prev, productSolution: null }));
+      updateField('productSolution', null);
     }
   };
 
