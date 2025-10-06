@@ -24,6 +24,7 @@ import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
+import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
@@ -191,6 +192,14 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 // 用户访谈大纲组件
 function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
   const t = useTranslations('outline');
+
+  // 计算总问题数量
+  const getTotalQuestionCount = () => {
+    const page1Count = surveyData.interviewQuestions.page1.length;
+    const page2Count = surveyData.interviewQuestions.page2.length;
+    return page1Count + page2Count;
+  };
+
   const handleInputChange = (field: keyof SurveyData, value: string) => {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
@@ -208,6 +217,12 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
   };
 
   const addQuestion = (section: string) => {
+    // 检查总问题数量是否超过20个
+    if (getTotalQuestionCount() >= 20) {
+      toast.warning(t('interview.questionLimit.warning'));
+      return;
+    }
+
     setSurveyData(prev => {
       const newData = { ...prev };
       if (newData.interviewQuestions[section as keyof typeof newData.interviewQuestions]) {
@@ -302,7 +317,10 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
             ))}
             <button
               onClick={() => addQuestion('page1')}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+              className={`w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${getTotalQuestionCount() >= 20
+                ? 'border-gray-200 text-gray-400 cursor-pointer'
+                : 'border-gray-300 text-gray-500 hover:border-primary hover:text-primary'
+                }`}
             >
               <Plus className="w-4 h-4" />
               添加问题
@@ -337,7 +355,10 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
             ))}
             <button
               onClick={() => addQuestion('page2')}
-              className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+              className={`w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${getTotalQuestionCount() >= 20
+                ? 'border-gray-200 text-gray-400 cursor-pointer'
+                : 'border-gray-300 text-gray-500 hover:border-primary hover:text-primary'
+                }`}
             >
               <Plus className="w-4 h-4" />
               添加问题

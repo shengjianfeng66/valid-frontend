@@ -49,6 +49,9 @@
             "page2": {
                 "title": "第2页：用户行为习惯层问题"
             }
+        },
+        "questionLimit": {
+            "warning": "每次深度访谈不建议超过 20 个问题"
         }
     },
     "nextPreview": "下一步预览",

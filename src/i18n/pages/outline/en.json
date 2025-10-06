@@ -49,6 +49,9 @@
             "page2": {
                 "title": "Page 2: User Behavior Questions"
             }
+        },
+        "questionLimit": {
+            "warning": "It is not recommended to exceed 20 questions for each in-depth interview"
         }
     },
     "nextPreview": "Next Step Preview",
