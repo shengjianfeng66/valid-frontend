@@ -31,7 +31,11 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // 离开创建流程页面时，清空表单数据
                 setHasDraft(false);
-                clearForm();
+                // 只有在真正离开创建流程时才清空表单
+                // 避免从 dashboard 跳转到 goal 时清空数据
+                if (pathname && !pathname.includes('/insight/')) {
+                    clearForm();
+                }
             }
         };
 

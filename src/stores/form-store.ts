@@ -5,7 +5,7 @@ interface FormData {
     businessType: string;
     targetUsers: string;
     researchGoals: string;
-    productSolution: ((File & { _content?: string })[]) | null;
+    productSolution: (File & { _content?: string })[];
 }
 
 interface AttachmentItem {
@@ -99,6 +99,6 @@ export const useFormStore = create<FormStore>()((set, get) => ({
             formData.businessType.trim() !== "" ||
             formData.targetUsers.trim() !== "" ||
             formData.researchGoals.trim() !== "" ||
-            (formData.productSolution !== null && formData.productSolution.length > 0);
+            formData.productSolution.length > 0;
     }
 }));

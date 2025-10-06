@@ -41,7 +41,7 @@ interface FormData {
   businessType: string;
   targetUsers: string;
   researchGoals: string;
-  productSolution: ((File & { _content?: string })[]) | null;
+  productSolution: (File & { _content?: string })[];
 }
 
 export default function Page() {
@@ -68,14 +68,14 @@ export default function Page() {
     setHasDraft(hasData());
   }, [formData, setHasDraft, hasData]);
 
-  // 同步 dashboard 上传的附件到产品方案文件
+  // 同步 dashboard 上传的附件到产品方案文件（只在初始加载时同步一次）
   const hasSyncedAttachmentsRef = useRef(false);
+
   useEffect(() => {
+    // 只在初始加载时同步一次，之后不再重新同步
     if (hasSyncedAttachmentsRef.current) return;
     if (!attachments || attachments.length === 0) return;
     if (formData.productSolution && formData.productSolution.length > 0) return; // 已有文件，不覆盖
-
-    hasSyncedAttachmentsRef.current = true;
 
     // 将附件转换为产品方案文件
     const convertAttachmentsToFiles = async () => {
@@ -115,6 +115,8 @@ export default function Page() {
       const validFiles = files.filter((f): f is File & { _content?: string } => f !== null);
 
       if (validFiles.length > 0) {
+        // 只有在成功转换文件后才标记为已同步
+        hasSyncedAttachmentsRef.current = true;
         updateField('productSolution', validFiles);
       }
     };
@@ -340,7 +342,8 @@ export default function Page() {
         businessType: "笔记APP、工具类、社交类",
         targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
         researchGoals: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
-        productSolution: [],
+        // 不清空现有的产品方案文件
+        productSolution: formData.productSolution,
       });
     },
   });
@@ -532,8 +535,13 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
   };
 
   const handleRemoveFile = (index: number) => {
+    console.log('删除文件:', index, '当前文件数:', formData.productSolution?.length);
     const currentFiles = formData.productSolution || [];
     const newFiles = currentFiles.filter((_, i) => i !== index);
+    console.log('删除后文件数:', newFiles.length);
+
+    // 删除文件
+
     updateField('productSolution', newFiles.length > 0 ? newFiles : []);
   };
 
@@ -644,7 +652,11 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleRemoveFile(index)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRemoveFile(index);
+                    }}
                     className="ml-2 p-1 hover:bg-red-100 rounded-full transition-colors group"
                     title="删除文件"
                   >
