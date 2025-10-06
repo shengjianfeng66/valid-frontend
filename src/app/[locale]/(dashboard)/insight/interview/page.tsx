@@ -453,15 +453,46 @@ export default function InterviewPage() {
                             </StepperNav>
                         </Stepper>
                     </div>
-                    {/* 真人用户区域 */}
-                    <div ref={realUsersRef} className="bg-white rounded-lg shadow-sm">
-                        <CardHeader className="border-b border-gray-200 pt-8">
+
+
+
+                    {/* 用户访谈区域 */}
+                    <div className="bg-white rounded-lg shadow-sm">
+                        {/* 顶部标题和开始访谈按钮 */}
+                        <div className="px-6 py-6 border-b border-gray-200">
                             <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                                        用户的梦境记录习惯和对 Dreamoo 的看法
+                                    </h2>
+                                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                                            待开始
+                                        </span>
+                                        <span>创建时间: 2025.10.03 22:35</span>
+                                        <span>预计访谈人数 24人</span>
+                                        <span>预计积分消耗 2400</span>
+                                        <button className="text-gray-400 hover:text-gray-600">
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-2">
+                                    开始访谈
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* 真人用户区域 */}
+                        <div ref={realUsersRef} className="px-6 py-6">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <CardTitle className="flex items-center gap-2">
+                                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                         <Users className="w-5 h-5 text-primary" />
-                                        真人用户 ({realUsers.length}人)
-                                    </CardTitle>
+                                        真人用户 {realUsers.length}
+                                    </h3>
                                     {realUsers.length === 0 && (
                                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
                                             限时免费
@@ -471,14 +502,14 @@ export default function InterviewPage() {
                                 {realUsers.length === 0 && (
                                     <Button
                                         onClick={() => setShowInviteModal(true)}
-                                        className="bg-primary hover:bg-primary/90 text-white"
+                                        variant="outline"
+                                        className="text-gray-600 hover:text-gray-800"
                                     >
                                         +邀请真人用户
                                     </Button>
                                 )}
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6">
+
                             {realUsers.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {realUsers.map((user) => (
@@ -498,32 +529,44 @@ export default function InterviewPage() {
                                     </p>
                                 </div>
                             )}
-                        </CardContent>
-                    </div>
+                        </div>
 
-                    {/* 模拟用户区域 */}
-                    <div ref={simulatedUsersRef} className="bg-white rounded-lg shadow-sm">
-                        <CardHeader className="border-b border-gray-200 pt-8">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="flex items-center gap-2">
+                        {/* 分隔线 */}
+                        <div className="border-t border-gray-200"></div>
+
+                        {/* 模拟用户区域 */}
+                        <div ref={simulatedUsersRef} className="px-6 py-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                     <Bot className="w-5 h-5 text-primary" />
-                                    模拟用户 ({simulatedUsers.length}人)
-                                </CardTitle>
+                                    模拟用户 {simulatedUsers.length}
+                                </h3>
                                 <Button
                                     onClick={() => setShowSimulatedUserPool(true)}
-                                    className="bg-primary hover:bg-primary/90 text-white"
+                                    variant="outline"
+                                    className="text-gray-600 hover:text-gray-800"
                                 >
                                     +添加模拟用户
                                 </Button>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-6">
+
+                            <div className="mb-4">
+                                <p className="text-sm text-gray-600">
+                                    已匹配 {simulatedUsers.length}位目标用户，他们来自真人数据建模，可以达到真人85%的访谈效果
+                                    <button className="text-gray-400 hover:text-gray-600 ml-1">
+                                        <svg className="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </p>
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {simulatedUsers.map((user) => (
                                     <UserCard key={user.id} user={user} />
                                 ))}
                             </div>
-                        </CardContent>
+                        </div>
                     </div>
 
                     {/* 回到顶部按钮 */}
