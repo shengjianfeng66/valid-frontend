@@ -28,6 +28,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { LoadingAnimation } from "@/components/ui/loading-animation";
 
 // 模拟用户数据
 const mockUsers = [
@@ -288,6 +289,7 @@ export default function InterviewPage() {
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
+    const [showLoadingModal, setShowLoadingModal] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
@@ -479,7 +481,10 @@ export default function InterviewPage() {
                                         </button>
                                     </div>
                                 </div>
-                                <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-2">
+                                <Button
+                                    className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
+                                    onClick={() => setShowLoadingModal(true)}
+                                >
                                     开始访谈
                                 </Button>
                             </div>
@@ -741,6 +746,36 @@ export default function InterviewPage() {
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                {/* Loading Modal */}
+                <Dialog open={showLoadingModal} onOpenChange={setShowLoadingModal}>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="text-center text-xl font-semibold">
+                                AI 正在为您工作
+                            </DialogTitle>
+                            <DialogDescription className="text-center text-gray-600">
+                                我们的AI用户研究员正在自动化完成用户访谈，请稍候...
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-center py-6">
+                            <LoadingAnimation
+                                width={200}
+                                height={200}
+                            />
+                        </div>
+                        <div className="text-center">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowLoadingModal(false)}
+                                className="px-6"
+                            >
+                                取消
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
             </SidebarInset>
         </SidebarProvider>
     );
