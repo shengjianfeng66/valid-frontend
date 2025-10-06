@@ -76,23 +76,40 @@
         "status": {
             "videoCalling": "Video Calling",
             "waiting": "Waiting",
+            "preparing": "Preparing",
             "completed": "Completed"
         },
         "actions": {
             "viewDetails": "View Details",
             "remove": "Remove"
-        }
+        },
+        "realUserLabel": "Real User",
+        "chat": "Chat",
+        "voice": "Voice",
+        "video": "Video"
     },
     "toast": {
         "copySuccess": "Copy Success",
         "copySuccessDescription": "Invitation link has been copied to clipboard",
         "copyFailed": "Copy Failed",
-        "copyFailedDescription": "Please copy the link manually"
+        "copyFailedDescription": "Please copy the link manually",
+        "addSimulatedUsersSuccess": "Added {count} simulated users",
+        "addSimulatedUsersDescription": "Simulated users have been successfully added to the interview list",
+        "removeUserSuccess": "User removed",
+        "removeUserDescription": "User {name} has been removed from the interview list"
     },
     "loading": {
         "title": "AI User Researchers are Interviewing...",
         "description": "Please wait, we are conducting in-depth user interviews for you",
         "progress": "Interview Progress: {current}/{total}",
         "estimatedTime": "Estimated Remaining Time: {time} minutes"
+    },
+    "confirmDialog": {
+        "removeUser": {
+            "title": "Remove User",
+            "description": "Are you sure you don't want to interview {name}? This action will remove the user from the interview list.",
+            "cancel": "Cancel",
+            "confirm": "Don't Interview"
+        }
     }
 }

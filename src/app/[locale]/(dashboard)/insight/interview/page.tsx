@@ -179,14 +179,14 @@ const mockUsers = [
 ];
 
 function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void }) {
-    const t = useTranslations();
+    const t = useTranslations('interview');
     const getStatusColor = (status: string) => {
         switch (status) {
             case "视频通话中":
             case "Video Calling":
                 return "text-green-600 bg-green-50";
             case "准备中":
-            case "Waiting":
+            case "Preparing":
                 return "text-yellow-600 bg-yellow-50";
             case "已完成":
             case "Completed":
@@ -267,7 +267,7 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
                     <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{user.name}</h3>
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-                            真实用户
+                            {t('userCard.realUserLabel')}
                         </span>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -297,13 +297,13 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
 
             <div className="flex gap-2">
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
-                    聊天
+                    {t('userCard.chat')}
                 </button>
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
-                    语音
+                    {t('userCard.voice')}
                 </button>
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm">
-                    视频
+                    {t('userCard.video')}
                 </button>
             </div>
         </div>
@@ -311,7 +311,7 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
 }
 
 export default function InterviewPage() {
-    const t = useTranslations();
+    const t = useTranslations('interview');
     const realUsersRef = useRef<HTMLDivElement>(null);
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -412,8 +412,8 @@ export default function InterviewPage() {
         // 将选中的用户添加到已添加列表中
         setAddedSimulatedUsers(prev => [...prev, ...selectedUserData]);
 
-        toast.success(`已添加 ${selectedUsers.length} 个模拟用户`, {
-            description: "模拟用户已成功添加到访谈列表中"
+        toast.success(t('toast.addSimulatedUsersSuccess', { count: selectedUsers.length }), {
+            description: t('toast.addSimulatedUsersDescription')
         });
         setShowSimulatedUserPool(false);
         setSelectedUsers([]);
@@ -439,8 +439,8 @@ export default function InterviewPage() {
     const confirmRemoveUser = () => {
         if (selectedUser) {
             setAddedSimulatedUsers(prev => prev.filter(user => user.id !== selectedUser.id));
-            toast.success("已移除用户", {
-                description: `用户 ${selectedUser.name} 已从访谈列表中移除`
+            toast.success(t('toast.removeUserSuccess'), {
+                description: t('toast.removeUserDescription', { name: selectedUser.name })
             });
         }
         setShowRemoveConfirmDialog(false);
@@ -839,9 +839,9 @@ export default function InterviewPage() {
                 <Dialog open={showRemoveConfirmDialog} onOpenChange={setShowRemoveConfirmDialog}>
                     <DialogContent className="max-w-md">
                         <DialogHeader>
-                            <DialogTitle>{t('userCard.actions.remove')}</DialogTitle>
+                            <DialogTitle>{t('confirmDialog.removeUser.title')}</DialogTitle>
                             <DialogDescription>
-                                确定不访谈 {selectedUser?.name} 吗？此操作将把该用户从访谈列表中移除。
+                                {t('confirmDialog.removeUser.description', { name: selectedUser?.name })}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-end gap-3 mt-6">
@@ -849,13 +849,13 @@ export default function InterviewPage() {
                                 variant="outline"
                                 onClick={() => setShowRemoveConfirmDialog(false)}
                             >
-                                取消
+                                {t('confirmDialog.removeUser.cancel')}
                             </Button>
                             <Button
                                 onClick={confirmRemoveUser}
                                 className="bg-primary hover:bg-primary/90 text-white"
                             >
-                                不访谈
+                                {t('confirmDialog.removeUser.confirm')}
                             </Button>
                         </div>
                     </DialogContent>
