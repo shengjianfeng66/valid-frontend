@@ -217,11 +217,11 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
                                     </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="justify-center">
+                                    <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="justify-center cursor-pointer">
                                         查看详情
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center">
+                                    <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center cursor-pointer">
                                         不访谈此用户
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
