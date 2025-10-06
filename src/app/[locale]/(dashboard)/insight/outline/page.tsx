@@ -21,7 +21,7 @@ import { useCopilotAction, useCopilotReadable, useCopilotChatInternal } from "@c
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
 import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useDraft } from "@/contexts/draft";
 import {
   Tooltip,

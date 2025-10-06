@@ -17,7 +17,8 @@ import { useCopilotAction, useCopilotAdditionalInstructions, useCopilotReadable,
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
 import { useState, useRef, useEffect } from "react";
 import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
