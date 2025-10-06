@@ -27,6 +27,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 
@@ -169,7 +177,7 @@ const mockUsers = [
     }
 ];
 
-function UserCard({ user }: { user: any }) {
+function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void }) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "视频通话中":
@@ -200,11 +208,34 @@ function UserCard({ user }: { user: any }) {
                     <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                             <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>
-                            <button className="text-gray-400 hover:text-gray-600">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                                </svg>
-                            </button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className="text-gray-400 hover:text-gray-600">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                        </svg>
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48">
+                                    <DropdownMenuItem onClick={() => onViewDetails(user.id)}>
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        查看详情
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={() => onRemoveUser(user.id)}
+                                        className="text-red-600 focus:text-red-600"
+                                    >
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        不访谈此用户
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                         <p className="text-xs text-gray-600 mb-2">男 {user.age}岁 {user.location}</p>
 
@@ -290,6 +321,9 @@ export default function InterviewPage() {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
+    const [showUserDetailSheet, setShowUserDetailSheet] = useState(false);
+    const [showRemoveConfirmDialog, setShowRemoveConfirmDialog] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
@@ -388,6 +422,34 @@ export default function InterviewPage() {
         setSelectedUsers([]);
     };
 
+    // 处理用户菜单点击
+    const handleViewDetails = (userId: string) => {
+        const user = [...originalSimulatedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        if (user) {
+            setSelectedUser(user);
+            setShowUserDetailSheet(true);
+        }
+    };
+
+    const handleRemoveUser = (userId: string) => {
+        const user = [...originalSimulatedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        if (user) {
+            setSelectedUser(user);
+            setShowRemoveConfirmDialog(true);
+        }
+    };
+
+    const confirmRemoveUser = () => {
+        if (selectedUser) {
+            setAddedSimulatedUsers(prev => prev.filter(user => user.id !== selectedUser.id));
+            toast.success("已移除用户", {
+                description: `用户 ${selectedUser.name} 已从访谈列表中移除`
+            });
+        }
+        setShowRemoveConfirmDialog(false);
+        setSelectedUser(null);
+    };
+
     // 监听滚动显示回到顶部按钮
     useEffect(() => {
         const handleScroll = () => {
@@ -402,14 +464,6 @@ export default function InterviewPage() {
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-                <header className="flex h-14 shrink-0 items-center gap-2">
-                    <div className="flex flex-1 items-center gap-2 px-3">
-                        <Separator
-                            orientation="vertical"
-                            className="mr-2 data-[orientation=vertical]:h-4"
-                        />
-                    </div>
-                </header>
                 <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
                     {/* 顶部 - 流程状态栏 */}
                     <div className="bg-white rounded-lg shadow-sm px-6 py-6">
@@ -518,7 +572,12 @@ export default function InterviewPage() {
                             {realUsers.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {realUsers.map((user) => (
-                                        <UserCard key={user.id} user={user} />
+                                        <UserCard
+                                            key={user.id}
+                                            user={user}
+                                            onViewDetails={handleViewDetails}
+                                            onRemoveUser={handleRemoveUser}
+                                        />
                                     ))}
                                 </div>
                             ) : (
@@ -562,7 +621,12 @@ export default function InterviewPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {simulatedUsers.map((user) => (
-                                    <UserCard key={user.id} user={user} />
+                                    <UserCard
+                                        key={user.id}
+                                        user={user}
+                                        onViewDetails={handleViewDetails}
+                                        onRemoveUser={handleRemoveUser}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -771,6 +835,39 @@ export default function InterviewPage() {
                                 className="px-6"
                             >
                                 取消
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* 用户详情抽屉 */}
+                <UserDetailSheet
+                    open={showUserDetailSheet}
+                    onOpenChange={setShowUserDetailSheet}
+                    selectedUser={selectedUser}
+                />
+
+                {/* 移除用户确认弹窗 */}
+                <Dialog open={showRemoveConfirmDialog} onOpenChange={setShowRemoveConfirmDialog}>
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>确认移除用户</DialogTitle>
+                            <DialogDescription>
+                                确定不访谈 {selectedUser?.name} 吗？此操作将把该用户从访谈列表中移除。
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-end gap-3 mt-6">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowRemoveConfirmDialog(false)}
+                            >
+                                取消
+                            </Button>
+                            <Button
+                                onClick={confirmRemoveUser}
+                                className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                                不访谈
                             </Button>
                         </div>
                     </DialogContent>
