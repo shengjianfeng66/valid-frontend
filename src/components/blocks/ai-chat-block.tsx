@@ -277,11 +277,11 @@ Sender.Header = ({ title, children, open, onOpenChange }: any) => (
 )
 
 const formatIcons = [
-  { icon: MessageSquare, label: "一句话" },
-  { icon: FileText, label: "PDF文档" },
-  { icon: AlignLeft, label: "长文本" },
-  { icon: Globe, label: "网站" },
-  { icon: Image, label: "图片" },
+  { icon: MessageSquare, label: "sentence" },
+  { icon: FileText, label: "pdf" },
+  { icon: AlignLeft, label: "longText" },
+  { icon: Globe, label: "website" },
+  { icon: Image, label: "image" },
 ]
 
 export function AiChatBlock() {
@@ -290,7 +290,7 @@ export function AiChatBlock() {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<any[]>([])
   const router = useRouter()
-  const t = useTranslations("aiChat")
+  const t = useTranslations('aiChat')
 
   const attachmentsRef = useRef<any>(null)
   const senderRef = useRef<any>(null)
@@ -349,7 +349,7 @@ export function AiChatBlock() {
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
                 <Icon className="w-5 h-5 text-gray-600" />
               </div>
-              <span className="text-xs text-gray-500">{item.label}</span>
+              <span className="text-xs text-gray-500">{t(`formatIcons.${item.label}`)}</span>
             </div>
           )
         })}

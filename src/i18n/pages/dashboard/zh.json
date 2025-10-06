@@ -3,5 +3,20 @@
         "show_locale": true,
         "show_theme": false,
         "show_sign": true
+    },
+    "aiChat": {
+        "title": "AI 用户洞察平台",
+        "subtitle": "一小时了解你的用户",
+        "description": "让真人和模拟用户体验你的产品并与其对话，支持文字、图片、PDF等多种形式。",
+        "placeholder": "描述你的业务类型、产品功能和用户画像，例如：我的产品是电商平台，想知道用户对它的功能的看法",
+        "startAnalysis": "开始洞察",
+        "analyzing": "分析中...",
+        "formatIcons": {
+            "sentence": "一句话",
+            "pdf": "PDF文档",
+            "longText": "长文本",
+            "website": "网站",
+            "image": "图片"
+        }
     }
 }

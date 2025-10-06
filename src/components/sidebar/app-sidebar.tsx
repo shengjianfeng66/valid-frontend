@@ -13,6 +13,7 @@ import { useAppContext } from "@/contexts/app"
 import { useDraft } from "@/contexts/draft"
 import { NavigationLink } from "@/components/ui/navigation-link"
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 import {
   Sidebar,
@@ -58,10 +59,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <NavigationLink
+              <Link
                 href="/dashboard"
-                hasDraft={hasDraft}
-                onLeave={clearDraft}
                 className="flex items-center gap-2"
               >
                 <img
@@ -70,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="w-8"
                 />
                 <span className="text-xl font-bold text-primary">ValidFlow</span>
-              </NavigationLink>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -137,10 +136,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a href="/settings" className="flex items-center gap-2">
+              <Link href="/settings" className="flex items-center gap-2">
                 <span>{t('navigation.settings')}</span>
                 <ChevronRight className="w-4 h-4 ml-auto" />
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

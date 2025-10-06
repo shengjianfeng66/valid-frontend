@@ -30,6 +30,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       .default;
     const confirmDialogMessages = (await import(`./pages/confirm-dialog/${locale.toLowerCase()}.json`))
       .default;
+    const dashboardMessages = (await import(`./pages/dashboard/${locale.toLowerCase()}.json`))
+      .default;
 
     return {
       locale: locale,
@@ -40,6 +42,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
         ...interviewMessages,
         ...sidebarMessages,
         ...confirmDialogMessages,
+        ...dashboardMessages,
       },
     };
   } catch (e) {

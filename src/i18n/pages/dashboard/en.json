@@ -3,5 +3,20 @@
         "show_locale": true,
         "show_theme": false,
         "show_sign": true
+    },
+    "aiChat": {
+        "title": "AI User Insights Platform",
+        "subtitle": "Understand Your Users in One Hour",
+        "description": "Let real and simulated users experience your product and interact with it, supporting text, images, PDF and other formats.",
+        "placeholder": "Describe your business type, product features and user personas, for example: My product is an e-commerce platform, I want to know users' opinions about its features",
+        "startAnalysis": "Start Analysis",
+        "analyzing": "Analyzing...",
+        "formatIcons": {
+            "sentence": "One Sentence",
+            "pdf": "PDF Document",
+            "longText": "Long Text",
+            "website": "Website",
+            "image": "Image"
+        }
     }
 }
