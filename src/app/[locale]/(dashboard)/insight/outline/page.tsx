@@ -22,6 +22,7 @@ import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } fr
 import { useState, useRef, useEffect } from "react";
 import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
 import {
   Tooltip,
@@ -56,6 +57,7 @@ interface SurveyFormProps {
 }
 
 function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
+  const t = useTranslations();
   const handleInputChange = (field: keyof SurveyData, value: string) => {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
@@ -77,14 +79,14 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
         <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
           <FileText className="w-5 h-5 text-purple-600" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900">Dreamoo 用户体验调查问卷</h2>
+        <h2 className="text-2xl font-semibold text-gray-900">{t('survey.title')}</h2>
       </div>
 
       <div className="space-y-6">
         {/* 引言 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            引言
+            {t('survey.intro.label')}
           </label>
           <textarea
             value={surveyData.surveyIntro}
@@ -97,7 +99,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
         {/* 目标用户 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户/核心用户群体？
+            {t('survey.targetUsers.label')}
           </label>
           <input
             type="text"
@@ -109,7 +111,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
         {/* 第1页：使用动机 */}
         <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">第1页：使用动机</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page1.title')}</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
@@ -134,7 +136,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
         {/* 第2页：使用频率 */}
         <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">第2页：使用频率</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page2.title')}</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
@@ -159,7 +161,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
         {/* 第3页：满意度 */}
         <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">第3页：满意度</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page3.title')}</h3>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
@@ -188,6 +190,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
 
 // 用户访谈大纲组件
 function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
+  const t = useTranslations();
   const handleInputChange = (field: keyof SurveyData, value: string) => {
     setSurveyData(prev => ({ ...prev, [field]: value }));
   };
@@ -235,7 +238,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
         <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
           <FileText className="w-5 h-5 text-purple-600" />
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900">Dreamoo 用户访谈大纲</h2>
+        <h2 className="text-2xl font-semibold text-gray-900">{t('interview.title')}</h2>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -347,6 +350,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
 }
 
 export default function CheckPage() {
+  const t = useTranslations();
   const router = useRouter();
   const { setHasDraft } = useDraft();
   const [currentStep, setCurrentStep] = useState(2);
@@ -498,7 +502,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 更新调查问卷引言
   useCopilotAction({
     name: "updateSurveyIntro",
-    description: "更新用户体验调查问卷的引言内容",
+    description: t('actions.updateSurveyIntro'),
     parameters: [{
       name: "intro",
       type: "string",
@@ -513,7 +517,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 更新访谈大纲引言
   useCopilotAction({
     name: "updateInterviewIntro",
-    description: "更新用户访谈大纲的引言内容",
+    description: t('actions.updateInterviewIntro'),
     parameters: [{
       name: "intro",
       type: "string",
@@ -528,7 +532,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 更新目标用户
   useCopilotAction({
     name: "updateTargetUsers",
-    description: "更新目标用户/核心用户群体",
+    description: t('actions.updateTargetUsers'),
     parameters: [{
       name: "targetUsers",
       type: "string",
@@ -552,7 +556,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 更新问题内容
   useCopilotAction({
     name: "updateQuestions",
-    description: "更新调查问卷或访谈大纲的问题内容",
+    description: t('actions.updateQuestions'),
     parameters: [{
       name: "type",
       type: "string",
@@ -595,7 +599,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 清空所有表单
   useCopilotAction({
     name: "clearAllForms",
-    description: "清空所有表单内容",
+    description: t('actions.clearAllForms'),
     parameters: [],
     handler: () => {
       setSurveyData({
@@ -619,7 +623,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   // 填充示例数据
   useCopilotAction({
     name: "fillSampleData",
-    description: "填充示例调研数据",
+    description: t('actions.fillSampleData'),
     parameters: [],
     handler: () => {
       setSurveyData({
@@ -662,7 +666,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
 
   // 智能建议
   useCopilotChatSuggestions({
-    instructions: "为用户提供以下建议：1. 帮我优化调查问卷的问题设计 2. 清空所有表单内容 3. 根据产品特性自动生成访谈问题 4. 填充示例数据",
+    instructions: t('copilot.suggestions'),
     minSuggestions: 3,
     maxSuggestions: 4,
   });
@@ -689,8 +693,8 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                           <Check className="w-5 h-5" />
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step1.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step1.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
@@ -706,8 +710,8 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                           2
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-primary">访谈大纲</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step2.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step2.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
@@ -723,8 +727,8 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                           3
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step3.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step3.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                     </StepperItem>
@@ -744,10 +748,10 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      下一步预览
+                      {t('navigation.nextPreview')}
                     </h3>
                     <p className="text-gray-600">
-                      将基于您的访谈目标，寻找最匹配的用户，个性化完成深度访谈
+                      {t('navigation.nextDescription')}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -757,7 +761,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       className="flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      上一步
+                      {t('navigation.previous')}
                     </Button>
                     <Button
                       onClick={() => {
@@ -766,7 +770,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       }}
                       className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
                     >
-                      邀请参与者
+                      {t('navigation.next')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -779,8 +783,8 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
           clickOutsideToClose={false}
           defaultOpen={true}
           labels={{
-            title: "AI 调研助手",
-            initial: "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 优化调查问卷和访谈问题\n• 🔄 清空或重置所有表单\n• 💡 根据产品特性生成专业问题\n• 📋 提供调研方法建议\n\n请告诉我你需要什么帮助！"
+            title: t('copilot.title'),
+            initial: t('copilot.initial')
           }}
         />
       </SidebarProvider>

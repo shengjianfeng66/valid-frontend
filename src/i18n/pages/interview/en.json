@@ -1,0 +1,98 @@
+{
+    "title": "Find Participants",
+    "steps": {
+        "step1": {
+            "title": "Set Goals",
+            "description": "Understand your product and users"
+        },
+        "step2": {
+            "title": "Interview Outline",
+            "description": "Deep dive into user needs"
+        },
+        "step3": {
+            "title": "Find Participants",
+            "description": "Invite real and simulated users for interviews"
+        }
+    },
+    "interview": {
+        "title": "Users' Dream Recording Habits and Views on Dreamoo",
+        "status": {
+            "pending": "Pending",
+            "inProgress": "In Progress",
+            "completed": "Completed"
+        },
+        "info": {
+            "createdTime": "Created Time",
+            "expectedUsers": "Expected Interview Count",
+            "expectedCredits": "Expected Credit Cost"
+        },
+        "startInterview": "Start Interview"
+    },
+    "users": {
+        "realUsers": {
+            "title": "Real Users",
+            "freeLabel": "Limited Time Free",
+            "inviteButton": "+Invite Real Users",
+            "emptyDescription": "Usight automatically interviews real users, collects first-hand data, and completes user research analysis for you. ",
+            "inviteLink": "Go invite now"
+        },
+        "simulatedUsers": {
+            "title": "Simulated Users",
+            "description": "Matched {count} target users from real data modeling, achieving 85% of real user interview effectiveness",
+            "addButton": "+Add Simulated Users"
+        }
+    },
+    "modals": {
+        "inviteRealUsers": {
+            "title": "Invite Real Users",
+            "description": "Copy the link and send it to real users. AI user researchers automatically complete user interviews and data cleaning & analysis",
+            "steps": {
+                "step1": {
+                    "title": "Copy Link and Send to Real Users",
+                    "description": "Share the invitation link with target user groups"
+                },
+                "step2": {
+                    "title": "AI User Researchers Automatically Complete User Interviews",
+                    "description": "AI automatically conducts in-depth user interviews and collects first-hand data"
+                },
+                "step3": {
+                    "title": "AI User Researchers Automatically Complete Data Cleaning & Analysis",
+                    "description": "AI automatically processes data and generates in-depth insight reports"
+                }
+            },
+            "stepImage": "Step {number} Image",
+            "previous": "Previous",
+            "next": "Next",
+            "copyLink": "Copy Link"
+        },
+        "simulatedUserPool": {
+            "title": "Simulated User Pool",
+            "description": "They come from real data modeling and can achieve 85% of real user interview effectiveness",
+            "cancel": "Cancel",
+            "confirmAdd": "Confirm Add {count}"
+        }
+    },
+    "userCard": {
+        "status": {
+            "videoCalling": "Video Calling",
+            "waiting": "Waiting",
+            "completed": "Completed"
+        },
+        "actions": {
+            "viewDetails": "View Details",
+            "remove": "Remove"
+        }
+    },
+    "toast": {
+        "copySuccess": "Copy Success",
+        "copySuccessDescription": "Invitation link has been copied to clipboard",
+        "copyFailed": "Copy Failed",
+        "copyFailedDescription": "Please copy the link manually"
+    },
+    "loading": {
+        "title": "AI User Researchers are Interviewing...",
+        "description": "Please wait, we are conducting in-depth user interviews for you",
+        "progress": "Interview Progress: {current}/{total}",
+        "estimatedTime": "Estimated Remaining Time: {time} minutes"
+    }
+}

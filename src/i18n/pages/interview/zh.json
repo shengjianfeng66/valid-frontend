@@ -1,0 +1,98 @@
+{
+    "title": "寻找参与者",
+    "steps": {
+        "step1": {
+            "title": "制定目标",
+            "description": "了解你的产品和用户"
+        },
+        "step2": {
+            "title": "访谈大纲",
+            "description": "深度发掘用户需求"
+        },
+        "step3": {
+            "title": "寻找参与者",
+            "description": "邀请真人和模拟用户访谈"
+        }
+    },
+    "interview": {
+        "title": "用户的梦境记录习惯和对 Dreamoo 的看法",
+        "status": {
+            "pending": "待开始",
+            "inProgress": "进行中",
+            "completed": "已完成"
+        },
+        "info": {
+            "createdTime": "创建时间",
+            "expectedUsers": "预计访谈人数",
+            "expectedCredits": "预计积分消耗"
+        },
+        "startInterview": "开始访谈"
+    },
+    "users": {
+        "realUsers": {
+            "title": "真人用户",
+            "freeLabel": "限时免费",
+            "inviteButton": "+邀请真人用户",
+            "emptyDescription": "Usight 自动化帮你访谈真人用户、回收一手数据、完成用户研究分析，",
+            "inviteLink": "快去邀请吧"
+        },
+        "simulatedUsers": {
+            "title": "模拟用户",
+            "description": "已匹配 {count} 位目标用户，他们来自真人数据建模，可以达到真人 85% 的访谈效果",
+            "addButton": "+添加模拟用户"
+        }
+    },
+    "modals": {
+        "inviteRealUsers": {
+            "title": "邀请真人用户",
+            "description": "复制链接发送给真人用户，AI 用户研究员自动化完成用户访谈，AI 用户研究员自动化完成数据清洗与分析",
+            "steps": {
+                "step1": {
+                    "title": "复制链接发送给真人用户",
+                    "description": "将邀请链接分享给目标用户群体"
+                },
+                "step2": {
+                    "title": "AI 用户研究员自动化完成用户访谈",
+                    "description": "AI自动进行深度用户访谈，收集一手数据"
+                },
+                "step3": {
+                    "title": "AI 用户研究员自动化完成数据清洗与分析",
+                    "description": "AI自动处理数据，生成深度洞察报告"
+                }
+            },
+            "stepImage": "步骤 {number} 图片",
+            "previous": "上一步",
+            "next": "下一步",
+            "copyLink": "复制链接"
+        },
+        "simulatedUserPool": {
+            "title": "模拟用户池",
+            "description": "他们来自真人数据建模，可以达到真人85%的访谈效果",
+            "cancel": "取消",
+            "confirmAdd": "确认添加 {count}"
+        }
+    },
+    "userCard": {
+        "status": {
+            "videoCalling": "视频通话中",
+            "waiting": "等待中",
+            "completed": "已完成"
+        },
+        "actions": {
+            "viewDetails": "查看详情",
+            "remove": "移除"
+        }
+    },
+    "toast": {
+        "copySuccess": "复制成功",
+        "copySuccessDescription": "邀请链接已复制到剪贴板",
+        "copyFailed": "复制失败",
+        "copyFailedDescription": "请手动复制链接"
+    },
+    "loading": {
+        "title": "AI 用户研究员正在访谈中...",
+        "description": "请稍等，我们正在为您进行深度用户访谈",
+        "progress": "访谈进度: {current}/{total}",
+        "estimatedTime": "预计剩余时间: {time}分钟"
+    }
+}

@@ -22,12 +22,18 @@ export default getRequestConfig(async ({ requestLocale }) => {
     // 加载页面级翻译并合并到全局消息中
     const goalMessages = (await import(`./pages/goal/${locale.toLowerCase()}.json`))
       .default;
+    const outlineMessages = (await import(`./pages/outline/${locale.toLowerCase()}.json`))
+      .default;
+    const interviewMessages = (await import(`./pages/interview/${locale.toLowerCase()}.json`))
+      .default;
 
     return {
       locale: locale,
       messages: {
         ...messages,
         ...goalMessages,
+        ...outlineMessages,
+        ...interviewMessages,
       },
     };
   } catch (e) {

@@ -37,6 +37,7 @@ import {
 import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
+import { useTranslations } from "next-intl";
 
 // 模拟用户数据
 const mockUsers = [
@@ -178,15 +179,20 @@ const mockUsers = [
 ];
 
 function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void }) {
+    const t = useTranslations();
     const getStatusColor = (status: string) => {
         switch (status) {
             case "视频通话中":
+            case "Video Calling":
                 return "text-green-600 bg-green-50";
             case "准备中":
+            case "Waiting":
                 return "text-yellow-600 bg-yellow-50";
             case "已完成":
+            case "Completed":
                 return "text-blue-600 bg-blue-50";
             case "等待中":
+            case "Waiting":
                 return "text-gray-600 bg-gray-50";
             default:
                 return "text-gray-600 bg-gray-50";
@@ -218,11 +224,11 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="justify-center cursor-pointer">
-                                        查看详情
+                                        {t('userCard.actions.viewDetails')}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center cursor-pointer">
-                                        不访谈此用户
+                                        {t('userCard.actions.remove')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -305,6 +311,7 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
 }
 
 export default function InterviewPage() {
+    const t = useTranslations();
     const realUsersRef = useRef<HTMLDivElement>(null);
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -321,16 +328,16 @@ export default function InterviewPage() {
     // 邀请流程步骤数据
     const inviteSteps = [
         {
-            title: "复制链接发送给真人用户",
-            description: "将邀请链接分享给目标用户群体"
+            title: t('modals.inviteRealUsers.steps.step1.title'),
+            description: t('modals.inviteRealUsers.steps.step1.description')
         },
         {
-            title: "AI 用户研究员自动化完成用户访谈",
-            description: "AI自动进行深度用户访谈，收集一手数据"
+            title: t('modals.inviteRealUsers.steps.step2.title'),
+            description: t('modals.inviteRealUsers.steps.step2.description')
         },
         {
-            title: "AI 用户研究员自动化完成数据清洗与分析",
-            description: "AI自动处理数据，生成深度洞察报告"
+            title: t('modals.inviteRealUsers.steps.step3.title'),
+            description: t('modals.inviteRealUsers.steps.step3.description')
         }
     ];
 
@@ -372,12 +379,12 @@ export default function InterviewPage() {
     const handleCopyLink = async () => {
         try {
             await navigator.clipboard.writeText('https://validflow.com/invite/real-users');
-            toast.success("复制成功", {
-                description: "邀请链接已复制到剪贴板",
+            toast.success(t('toast.copySuccess'), {
+                description: t('toast.copySuccessDescription'),
             });
         } catch (err) {
-            toast.error("复制失败", {
-                description: "请手动复制链接",
+            toast.error(t('toast.copyFailed'), {
+                description: t('toast.copyFailedDescription'),
             });
         }
     };
@@ -465,8 +472,8 @@ export default function InterviewPage() {
                                             <Check className="w-5 h-5" />
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
-                                            <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
+                                            <StepperTitle className="text-sm font-medium text-primary">{t('steps.step1.title')}</StepperTitle>
+                                            <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step1.description')}</StepperDescription>
                                         </div>
                                     </StepperTrigger>
                                     <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
@@ -478,8 +485,8 @@ export default function InterviewPage() {
                                             <Check className="w-5 h-5" />
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-primary">访谈大纲</StepperTitle>
-                                            <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
+                                            <StepperTitle className="text-sm font-medium text-primary">{t('steps.step2.title')}</StepperTitle>
+                                            <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step2.description')}</StepperDescription>
                                         </div>
                                     </StepperTrigger>
                                     <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
@@ -491,8 +498,8 @@ export default function InterviewPage() {
                                             3
                                         </StepperIndicator>
                                         <div className="text-center">
-                                            <StepperTitle className="text-sm font-medium text-primary">寻找参与者</StepperTitle>
-                                            <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
+                                            <StepperTitle className="text-sm font-medium text-primary">{t('steps.step3.title')}</StepperTitle>
+                                            <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step3.description')}</StepperDescription>
                                         </div>
                                     </StepperTrigger>
                                 </StepperItem>
@@ -509,15 +516,15 @@ export default function InterviewPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                                        用户的梦境记录习惯和对 Dreamoo 的看法
+                                        {t('interview.title')}
                                     </h2>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                         <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                                            待开始
+                                            {t('interview.status.pending')}
                                         </span>
-                                        <span>创建时间: 2025.10.03 22:35</span>
-                                        <span>预计访谈人数 24人</span>
-                                        <span>预计积分消耗 2400</span>
+                                        <span>{t('interview.info.createdTime')}: 2025.10.03 22:35</span>
+                                        <span>{t('interview.info.expectedUsers')} 24人</span>
+                                        <span>{t('interview.info.expectedCredits')} 2400</span>
                                         <button className="text-gray-400 hover:text-gray-600">
                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
@@ -529,7 +536,7 @@ export default function InterviewPage() {
                                     className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
                                     onClick={() => setShowLoadingModal(true)}
                                 >
-                                    开始访谈
+                                    {t('interview.startInterview')}
                                 </Button>
                             </div>
                         </div>
@@ -540,11 +547,11 @@ export default function InterviewPage() {
                                 <div className="flex items-center gap-3">
                                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                         <Users className="w-5 h-5 text-primary" />
-                                        真人用户 {realUsers.length}
+                                        {t('users.realUsers.title')} {realUsers.length}
                                     </h3>
                                     {realUsers.length === 0 && (
                                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-                                            限时免费
+                                            {t('users.realUsers.freeLabel')}
                                         </span>
                                     )}
                                 </div>
@@ -554,7 +561,7 @@ export default function InterviewPage() {
                                         variant="outline"
                                         className="text-gray-600 hover:text-gray-800"
                                     >
-                                        +邀请真人用户
+                                        {t('users.realUsers.inviteButton')}
                                     </Button>
                                 )}
                             </div>
@@ -573,12 +580,12 @@ export default function InterviewPage() {
                             ) : (
                                 <div className="py-8 text-center">
                                     <p className="text-gray-600 text-sm leading-relaxed">
-                                        Usight 自动化帮你访谈真人用户、回收一手数据、完成用户研究分析，
+                                        {t('users.realUsers.emptyDescription')}
                                         <span
                                             className="underline cursor-pointer hover:text-primary text-primary"
                                             onClick={() => setShowInviteModal(true)}
                                         >
-                                            快去邀请吧
+                                            {t('users.realUsers.inviteLink')}
                                         </span>
                                     </p>
                                 </div>
@@ -594,10 +601,10 @@ export default function InterviewPage() {
                                 <div className="flex items-center gap-3">
                                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                         <Bot className="w-5 h-5 text-primary" />
-                                        模拟用户 {simulatedUsers.length}
+                                        {t('users.simulatedUsers.title')} {simulatedUsers.length}
                                     </h3>
                                     <span className="text-sm text-gray-600">
-                                        已匹配 {simulatedUsers.length} 位目标用户，他们来自真人数据建模，可以达到真人 85% 的访谈效果
+                                        {t('users.simulatedUsers.description', { count: simulatedUsers.length })}
                                     </span>
                                 </div>
                                 <Button
@@ -605,7 +612,7 @@ export default function InterviewPage() {
                                     variant="outline"
                                     className="text-gray-600 hover:text-gray-800"
                                 >
-                                    +添加模拟用户
+                                    {t('users.simulatedUsers.addButton')}
                                 </Button>
                             </div>
 
@@ -638,10 +645,10 @@ export default function InterviewPage() {
                     <DialogContent className="max-w-6xl w-full">
                         <DialogHeader>
                             <DialogTitle className="text-2xl font-semibold text-gray-900">
-                                邀请真人用户
+                                {t('modals.inviteRealUsers.title')}
                             </DialogTitle>
                             <DialogDescription className="text-gray-600 text-base leading-relaxed">
-                                复制链接发送给真人用户，AI 用户研究员自动化完成用户访谈，AI 用户研究员自动化完成数据清洗与分析
+                                {t('modals.inviteRealUsers.description')}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -654,7 +661,7 @@ export default function InterviewPage() {
                                         <div key={index} className="w-full flex-shrink-0">
                                             <div className="text-center">
                                                 <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-6">
-                                                    <span className="text-gray-500 text-lg">步骤 {index + 1} 图片</span>
+                                                    <span className="text-gray-500 text-lg">{t('modals.inviteRealUsers.stepImage', { number: index + 1 })}</span>
                                                 </div>
                                                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{step.title}</h3>
                                                 <p className="text-gray-600 text-base leading-relaxed max-w-md mx-auto">
@@ -674,7 +681,7 @@ export default function InterviewPage() {
                                     className="flex items-center gap-2"
                                 >
                                     <ChevronLeft className="w-4 h-4" />
-                                    上一步
+                                    {t('modals.inviteRealUsers.previous')}
                                 </Button>
 
                                 {/* 指示器 */}
@@ -696,7 +703,7 @@ export default function InterviewPage() {
                                     variant="outline"
                                     className="flex items-center gap-2"
                                 >
-                                    下一步
+                                    {t('modals.inviteRealUsers.next')}
                                     <ChevronRight className="w-4 h-4" />
                                 </Button>
                             </div>
@@ -708,7 +715,7 @@ export default function InterviewPage() {
                                 className="bg-primary hover:bg-primary/90 text-white px-12 py-3 rounded-lg flex items-center gap-2 text-lg"
                             >
                                 <Copy className="w-5 h-5" />
-                                复制链接
+                                {t('modals.inviteRealUsers.copyLink')}
                             </Button>
                         </div>
                     </DialogContent>
@@ -719,11 +726,11 @@ export default function InterviewPage() {
                     <DialogContent className="max-w-6xl w-full max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle className="text-2xl font-semibold text-gray-900 mb-2">
-                                模拟用户池
+                                {t('modals.simulatedUserPool.title')}
                             </DialogTitle>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500 font-normal">
-                                    他们来自真人数据建模，可以达到真人85%的访谈效果
+                                    {t('modals.simulatedUserPool.description')}
                                 </span>
                                 <button className="text-gray-400 hover:text-gray-600">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -788,14 +795,14 @@ export default function InterviewPage() {
                                 onClick={() => setShowSimulatedUserPool(false)}
                                 className="px-6"
                             >
-                                取消
+                                {t('modals.simulatedUserPool.cancel')}
                             </Button>
                             <Button
                                 onClick={handleConfirmAdd}
                                 disabled={selectedUsers.length === 0}
                                 className="bg-primary hover:bg-primary/90 text-white px-6"
                             >
-                                确认添加 {selectedUsers.length}
+                                {t('modals.simulatedUserPool.confirmAdd', { count: selectedUsers.length })}
                             </Button>
                         </div>
                     </DialogContent>
@@ -806,10 +813,10 @@ export default function InterviewPage() {
                     <DialogContent className="max-w-md">
                         <DialogHeader>
                             <DialogTitle className="text-center text-xl font-semibold">
-                                AI 正在为您工作
+                                {t('loading.title')}
                             </DialogTitle>
                             <DialogDescription className="text-center text-gray-600">
-                                我们的AI用户研究员正在自动化完成用户访谈，请稍候...
+                                {t('loading.description')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-center py-2">
@@ -832,7 +839,7 @@ export default function InterviewPage() {
                 <Dialog open={showRemoveConfirmDialog} onOpenChange={setShowRemoveConfirmDialog}>
                     <DialogContent className="max-w-md">
                         <DialogHeader>
-                            <DialogTitle>确认移除用户</DialogTitle>
+                            <DialogTitle>{t('userCard.actions.remove')}</DialogTitle>
                             <DialogDescription>
                                 确定不访谈 {selectedUser?.name} 吗？此操作将把该用户从访谈列表中移除。
                             </DialogDescription>
