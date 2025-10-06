@@ -92,12 +92,12 @@ export const useFormStore = create<FormStore>()((set, get) => ({
         });
     },
 
-    hasData: () => {
+    hasData: (): boolean => {
         const { formData } = get();
         return formData.productName.trim() !== "" ||
             formData.businessType.trim() !== "" ||
             formData.targetUsers.trim() !== "" ||
             formData.researchGoals.trim() !== "" ||
-            (formData.productSolution && formData.productSolution.length > 0);
+            (formData.productSolution !== null && formData.productSolution.length > 0);
     }
 }));
