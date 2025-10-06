@@ -59,8 +59,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link
+              <NavigationLink
                 href="/dashboard"
+                hasDraft={hasDraft}
+                onLeave={clearDraft}
                 className="flex items-center gap-2"
               >
                 <img
@@ -69,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="w-8"
                 />
                 <span className="text-xl font-bold text-primary">ValidFlow</span>
-              </Link>
+              </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
