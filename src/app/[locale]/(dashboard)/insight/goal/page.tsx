@@ -265,7 +265,7 @@ export default function Page() {
     <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset>
+        <SidebarInset className="flex flex-col h-screen">
           <header className="flex h-14 shrink-0 items-center gap-2">
             <div className="flex flex-1 items-center gap-2 px-3">
               <Separator
@@ -274,90 +274,95 @@ export default function Page() {
               />
             </div>
           </header>
-          <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
-            {/* 顶部 - 流程状态栏 */}
-            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-              <Stepper value={1} className="w-full">
-                <StepperNav className="flex justify-between items-center">
-                  <StepperItem step={1} completed={1 > 1}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
-                        1
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                    <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                  </StepperItem>
+          <div className="flex flex-1 flex-col bg-gray-100 min-h-0">
+            {/* 可滚动区域 - 包含顶部和中间内容 */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+              {/* 顶部 - 流程状态栏 */}
+              <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+                <Stepper value={1} className="w-full">
+                  <StepperNav className="flex justify-between items-center">
+                    <StepperItem step={1} completed={1 > 1}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
+                          1
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
 
-                  <StepperItem step={2} completed={1 > 2}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                        2
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-gray-500">访谈大纲</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                    <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                  </StepperItem>
+                    <StepperItem step={2} completed={1 > 2}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          2
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-gray-500">访谈大纲</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
+                    </StepperItem>
 
-                  <StepperItem step={3} completed={1 > 3}>
-                    <StepperTrigger className="flex flex-col items-center gap-3">
-                      <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                        3
-                      </StepperIndicator>
-                      <div className="text-center">
-                        <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
-                        <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
-                      </div>
-                    </StepperTrigger>
-                  </StepperItem>
-                </StepperNav>
-              </Stepper>
+                    <StepperItem step={3} completed={1 > 3}>
+                      <StepperTrigger className="flex flex-col items-center gap-3">
+                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
+                          3
+                        </StepperIndicator>
+                        <div className="text-center">
+                          <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
+                        </div>
+                      </StepperTrigger>
+                    </StepperItem>
+                  </StepperNav>
+                </Stepper>
+              </div>
+
+              {/* 中间内容区 */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <SurveyForm
+                  fileInputRef={fileInputRef}
+                />
+              </div>
             </div>
 
-            {/* 中间内容区 */}
-            <div className="bg-white rounded-lg shadow-sm flex-1 p-6">
-              <SurveyForm
-                fileInputRef={fileInputRef}
-              />
-            </div>
-
-            {/* 底部导航 */}
-            <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    下一步预览
-                  </h3>
-                  <p className="text-gray-600">
-                    将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => router.push('/dashboard')}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    上一步
-                  </Button>
-                  <Button
-                    onClick={handleNext}
-                    disabled={!isFormValid()}
-                    className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
-                      ? 'bg-primary hover:bg-primary/90 text-white'
-                      : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
-                      }`}
-                  >
-                    下一步
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
+            {/* 底部导航 - 吸底显示 */}
+            <div className="bg-gray-100 p-4 flex-shrink-0">
+              <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      下一步预览
+                    </h3>
+                    <p className="text-gray-600">
+                      将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => router.push('/dashboard')}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      上一步
+                    </Button>
+                    <Button
+                      onClick={handleNext}
+                      disabled={!isFormValid()}
+                      className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
+                        ? 'bg-primary hover:bg-primary/90 text-white'
+                        : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
+                        }`}
+                    >
+                      下一步
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
