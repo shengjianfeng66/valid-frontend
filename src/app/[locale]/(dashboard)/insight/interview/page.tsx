@@ -453,27 +453,6 @@ export default function InterviewPage() {
                             </StepperNav>
                         </Stepper>
                     </div>
-
-                    {/* 快捷导航按钮 */}
-                    <div className="bg-white rounded-lg shadow-sm p-4">
-                        <div className="flex gap-4">
-                            <Button
-                                onClick={() => scrollToSection(realUsersRef)}
-                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
-                            >
-                                <Users className="w-4 h-4" />
-                                真人用户 ({realUsers.length}人)
-                            </Button>
-                            <Button
-                                onClick={() => scrollToSection(simulatedUsersRef)}
-                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
-                            >
-                                <Bot className="w-4 h-4" />
-                                模拟用户 ({simulatedUsers.length}人)
-                            </Button>
-                        </div>
-                    </div>
-
                     {/* 真人用户区域 */}
                     <div ref={realUsersRef} className="bg-white rounded-lg shadow-sm">
                         <CardHeader className="border-b border-gray-200 pt-8">
