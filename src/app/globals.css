@@ -64,3 +64,13 @@ button[title="Thumbs up"],
 button[title="Thumbs down"] {
   display: none !important;
 }
+
+/* 隐藏滚动条 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
