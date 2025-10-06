@@ -1,0 +1,77 @@
+{
+    "title": "补充调研信息",
+    "steps": {
+        "step1": {
+            "title": "制定目标",
+            "description": "了解你的产品和用户"
+        },
+        "step2": {
+            "title": "访谈大纲",
+            "description": "深度发掘用户需求"
+        },
+        "step3": {
+            "title": "寻找参与者",
+            "description": "邀请真人和模拟用户访谈"
+        }
+    },
+    "form": {
+        "productName": {
+            "label": "您的产品名称",
+            "placeholder": "Dreamoo",
+            "help": "这将帮助我们确定访谈的重点方向"
+        },
+        "businessType": {
+            "label": "您的业务类型",
+            "placeholder": "笔记APP、工具类、社交类",
+            "help": "这将帮助我们确定访谈的重点方向"
+        },
+        "targetUsers": {
+            "label": "目标用户画像",
+            "placeholder": "例如：年轻女性用户、下沉市场用户、重度购物用户等",
+            "help": "请详细描述您的目标用户群体特征"
+        },
+        "researchGoals": {
+            "label": "调研目标",
+            "placeholder": "例如：了解用户使用习惯、验证产品功能需求、分析用户痛点等",
+            "help": "请描述您希望通过调研了解什么"
+        },
+        "productSolution": {
+            "label": "产品方案文件",
+            "uploadText": "点击或拖拽文件到此上传",
+            "uploadHelp": "Only pdf, png, jpg can be uploaded, and the size does not exceed 100MB",
+            "changeText": "点击更换文件"
+        }
+    },
+    "validation": {
+        "required": "请填写以下必填项：{fields}",
+        "fields": {
+            "productName": "产品名称",
+            "businessType": "业务类型",
+            "targetUsers": "目标用户画像",
+            "researchGoals": "调研目标"
+        }
+    },
+    "fileUpload": {
+        "invalidType": "只支持 PDF、PNG、JPG 格式的文件",
+        "tooLarge": "文件大小不能超过 100MB"
+    },
+    "navigation": {
+        "nextPreview": "下一步预览",
+        "nextDescription": "将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求",
+        "previous": "上一步",
+        "next": "下一步"
+    },
+    "copilot": {
+        "title": "AI 调研助手",
+        "initial": "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 填写和修改表单内容\n• 🔄 清空或重置表单\n• 💡 根据产品信息自动补充相关内容\n• 📋 提供调研问题建议\n\n请告诉我你需要什么帮助！",
+        "suggestions": "为用户提供以下建议：1. 帮我填写一个笔记APP的调研信息 2. 清空当前表单 3. 根据产品名称自动填充相关信息"
+    },
+    "actions": {
+        "updateProductName": "更新产品名称",
+        "updateBusinessType": "更新业务类型",
+        "updateTargetUsers": "更新目标用户/核心用户群体字段",
+        "updateResearchGoals": "更新调研目标",
+        "clearForm": "清空所有表单字段",
+        "fillSampleData": "填充示例调研数据"
+    }
+}

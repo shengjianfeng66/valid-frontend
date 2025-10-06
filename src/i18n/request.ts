@@ -18,9 +18,17 @@ export default getRequestConfig(async ({ requestLocale }) => {
   try {
     const messages = (await import(`./messages/${locale.toLowerCase()}.json`))
       .default;
+
+    // 加载页面级翻译并合并到全局消息中
+    const goalMessages = (await import(`./pages/goal/${locale.toLowerCase()}.json`))
+      .default;
+
     return {
       locale: locale,
-      messages: messages,
+      messages: {
+        ...messages,
+        ...goalMessages,
+      },
     };
   } catch (e) {
     return {

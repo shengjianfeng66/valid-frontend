@@ -19,6 +19,7 @@ import { useState, useRef, useEffect } from "react";
 import { FileText, Upload, Plus, ArrowRight, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ interface FormData {
 }
 
 export default function Page() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const { setHasDraft } = useDraft();
   const { formData, updateField, hasData, setFormData, clearForm } = useFormStore();
@@ -60,10 +62,10 @@ export default function Page() {
   // 表单验证函数
   const validateForm = () => {
     const requiredFields = [
-      { key: 'productName', label: '产品名称' },
-      { key: 'businessType', label: '业务类型' },
-      { key: 'targetUsers', label: '目标用户画像' },
-      { key: 'researchGoals', label: '调研目标' }
+      { key: 'productName', label: t('validation.fields.productName') },
+      { key: 'businessType', label: t('validation.fields.businessType') },
+      { key: 'targetUsers', label: t('validation.fields.targetUsers') },
+      { key: 'researchGoals', label: t('validation.fields.researchGoals') }
     ];
 
     const missingFields = requiredFields.filter(field => {
@@ -84,7 +86,7 @@ export default function Page() {
     const missingFields = validateForm();
     if (missingFields.length > 0) {
       const fieldNames = missingFields.map(field => field.label).join('、');
-      alert(`请填写以下必填项：${fieldNames}`);
+      alert(t('validation.required', { fields: fieldNames }));
       return;
     }
 
@@ -169,7 +171,7 @@ export default function Page() {
   // 更新产品名称
   useCopilotAction({
     name: "updateProductName",
-    description: "更新产品名称字段",
+    description: t('actions.updateProductName'),
     parameters: [{
       name: "productName",
       type: "string",
@@ -184,7 +186,7 @@ export default function Page() {
   // 更新业务类型
   useCopilotAction({
     name: "updateBusinessType",
-    description: "更新业务类型字段",
+    description: t('actions.updateBusinessType'),
     parameters: [{
       name: "businessType",
       type: "string",
@@ -199,7 +201,7 @@ export default function Page() {
   // 更新目标用户群体
   useCopilotAction({
     name: "updateTargetUsers",
-    description: "更新目标用户/核心用户群体字段",
+    description: t('actions.updateTargetUsers'),
     parameters: [{
       name: "targetUsers",
       type: "string",
@@ -214,7 +216,7 @@ export default function Page() {
   // 更新调研目标
   useCopilotAction({
     name: "updateResearchGoals",
-    description: "更新调研目标",
+    description: t('actions.updateResearchGoals'),
     parameters: [{
       name: "researchGoals",
       type: "string",
@@ -229,7 +231,7 @@ export default function Page() {
   // 清空表单
   useCopilotAction({
     name: "clearForm",
-    description: "清空所有表单字段",
+    description: t('actions.clearForm'),
     parameters: [],
     handler: () => {
       clearForm();
@@ -242,7 +244,7 @@ export default function Page() {
   // // 填充示例数据
   useCopilotAction({
     name: "fillSampleData",
-    description: "填充示例调研数据",
+    description: t('actions.fillSampleData'),
     parameters: [],
     handler: () => {
       setFormData({
@@ -257,7 +259,7 @@ export default function Page() {
 
   // 智能建议
   useCopilotChatSuggestions({
-    instructions: "为用户提供以下建议：1. 帮我填写一个笔记APP的调研信息 2. 清空当前表单 3. 根据产品名称自动填充相关信息",
+    instructions: t('copilot.suggestions'),
     minSuggestions: 3,
     maxSuggestions: 3,
   });
@@ -280,8 +282,8 @@ export default function Page() {
                           1
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-primary">制定目标</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">了解你的产品和用户</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step1.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step1.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
@@ -293,8 +295,8 @@ export default function Page() {
                           2
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">访谈大纲</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">深度发掘用户需求</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step2.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step2.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                       <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
@@ -306,8 +308,8 @@ export default function Page() {
                           3
                         </StepperIndicator>
                         <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">寻找参与者</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">邀请真人和模拟用户访谈</StepperDescription>
+                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step3.title')}</StepperTitle>
+                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step3.description')}</StepperDescription>
                         </div>
                       </StepperTrigger>
                     </StepperItem>
@@ -329,10 +331,10 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      下一步预览
+                      {t('navigation.nextPreview')}
                     </h3>
                     <p className="text-gray-600">
-                      将基于产品信息和访谈目标，生成目标用户的访谈大纲，深度发掘用户的需求
+                      {t('navigation.nextDescription')}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -342,7 +344,7 @@ export default function Page() {
                       className="flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      上一步
+                      {t('navigation.previous')}
                     </Button>
                     <Button
                       onClick={handleNext}
@@ -352,7 +354,7 @@ export default function Page() {
                         : 'bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70'
                         }`}
                     >
-                      下一步
+                      {t('navigation.next')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -365,8 +367,8 @@ export default function Page() {
           clickOutsideToClose={false}
           defaultOpen={true}
           labels={{
-            title: "AI 调研助手",
-            initial: "👋 你好！我是你的AI调研助手。\n\n我可以帮助你：\n\n• 📝 填写和修改表单内容\n• 🔄 清空或重置表单\n• 💡 根据产品信息自动补充相关内容\n• 📋 提供调研问题建议\n\n请告诉我你需要什么帮助！"
+            title: t('copilot.title'),
+            initial: t('copilot.initial')
           }}
         />
       </SidebarProvider>
@@ -379,6 +381,7 @@ interface SurveyFormProps {
 }
 
 function SurveyForm({ fileInputRef }: SurveyFormProps) {
+  const t = useTranslations();
   const { formData, updateField } = useFormStore();
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -391,12 +394,12 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
       // 检查文件类型
       const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert('只支持 PDF、PNG、JPG 格式的文件');
+        alert(t('fileUpload.invalidType'));
         return;
       }
       // 检查文件大小 (100MB)
       if (file.size > 100 * 1024 * 1024) {
-        alert('文件大小不能超过 100MB');
+        alert(t('fileUpload.tooLarge'));
         return;
       }
 
@@ -425,7 +428,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
         <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
           <FileText className="w-5 h-5 text-primary" />
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900">补充调研信息</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
       </div>
 
       <div className="space-y-6">
@@ -433,67 +436,67 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的产品名称 <span className="text-red-500">*</span>
+              {t('form.productName.label')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.productName}
               onChange={(e) => handleInputChange('productName', e.target.value)}
-              placeholder="Dreamoo"
+              placeholder={t('form.productName.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
+            <p className="text-xs text-gray-500 mt-1">{t('form.productName.help')}</p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              您的业务类型 <span className="text-red-500">*</span>
+              {t('form.businessType.label')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.businessType}
               onChange={(e) => handleInputChange('businessType', e.target.value)}
-              placeholder="笔记APP、工具类、社交类"
+              placeholder={t('form.businessType.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
-            <p className="text-xs text-gray-500 mt-1">这将帮助我们确定访谈的重点方向</p>
+            <p className="text-xs text-gray-500 mt-1">{t('form.businessType.help')}</p>
           </div>
         </div>
 
         {/* 目标用户画像 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            目标用户画像 <span className="text-red-500">*</span>
+            {t('form.targetUsers.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.targetUsers}
             onChange={(e) => handleInputChange('targetUsers', e.target.value)}
-            placeholder="例如：年轻女性用户、下沉市场用户、重度购物用户等"
+            placeholder={t('form.targetUsers.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">请详细描述您的目标用户群体特征</p>
+          <p className="text-xs text-gray-500 mt-1">{t('form.targetUsers.help')}</p>
         </div>
 
         {/* 调研目标 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            调研目标 <span className="text-red-500">*</span>
+            {t('form.researchGoals.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
             value={formData.researchGoals}
             onChange={(e) => handleInputChange('researchGoals', e.target.value)}
-            placeholder="例如：了解用户使用习惯、验证产品功能需求、分析用户痛点等"
+            placeholder={t('form.researchGoals.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
           />
-          <p className="text-xs text-gray-500 mt-1">请描述您希望通过调研了解什么</p>
+          <p className="text-xs text-gray-500 mt-1">{t('form.researchGoals.help')}</p>
         </div>
 
         {/* 产品方案文件上传 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            产品方案文件
+            {t('form.productSolution.label')}
           </label>
           <div
             onClick={handleUploadClick}
@@ -518,12 +521,12 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
                 {formData.productSolution ? (
                   <div>
                     <p className="text-sm font-medium text-gray-900">{formData.productSolution.name}</p>
-                    <p className="text-xs text-gray-500">点击更换文件</p>
+                    <p className="text-xs text-gray-500">{t('form.productSolution.changeText')}</p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">点击或拖拽文件到此上传</p>
-                    <p className="text-xs text-gray-500 mt-1">Only pdf, png, jpg can be uploaded, and the size does not exceed 100MB</p>
+                    <p className="text-sm font-medium text-gray-700">{t('form.productSolution.uploadText')}</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('form.productSolution.uploadHelp')}</p>
                   </div>
                 )}
               </div>
