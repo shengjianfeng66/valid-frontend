@@ -13,6 +13,7 @@ interface AttachmentItem {
     size: number;
     type: string;
     url?: string;
+    originFileObj?: File;  // 原始文件对象
 }
 
 interface FormStore {

@@ -68,6 +68,60 @@ export default function Page() {
     setHasDraft(hasData());
   }, [formData, setHasDraft, hasData]);
 
+  // 同步 dashboard 上传的附件到产品方案文件
+  const hasSyncedAttachmentsRef = useRef(false);
+  useEffect(() => {
+    if (hasSyncedAttachmentsRef.current) return;
+    if (!attachments || attachments.length === 0) return;
+    if (formData.productSolution && formData.productSolution.length > 0) return; // 已有文件，不覆盖
+
+    hasSyncedAttachmentsRef.current = true;
+
+    // 将附件转换为产品方案文件
+    const convertAttachmentsToFiles = async () => {
+      const filePromises = attachments.map(async (item: any) => {
+        try {
+          let file: File;
+
+          // 优先使用原始文件对象
+          if (item.originFileObj) {
+            file = item.originFileObj;
+          } else if (item.url) {
+            // 备用方案：从 URL 获取文件
+            const response = await fetch(item.url);
+            const blob = await response.blob();
+            file = new File([blob], item.name, { type: item.type });
+          } else {
+            return null;
+          }
+
+          // 读取文件内容为 base64
+          return new Promise<File & { _content?: string }>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const content = e.target?.result as string;
+              const fileWithContent = Object.assign(file, { _content: content });
+              resolve(fileWithContent);
+            };
+            reader.readAsDataURL(file);
+          });
+        } catch (error) {
+          console.warn('无法转换附件:', item.name, error);
+          return null;
+        }
+      });
+
+      const files = await Promise.all(filePromises);
+      const validFiles = files.filter((f): f is File & { _content?: string } => f !== null);
+
+      if (validFiles.length > 0) {
+        updateField('productSolution', validFiles);
+      }
+    };
+
+    convertAttachmentsToFiles();
+  }, [attachments, formData.productSolution, updateField]);
+
   // 表单验证函数
   const validateForm = () => {
     const requiredFields = [
@@ -353,31 +407,6 @@ export default function Page() {
 
               {/* 中间内容区 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                {/* 显示附件信息 */}
-                {attachments.length > 0 && (
-                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="w-5 h-5 text-blue-600" />
-                      <h3 className="text-sm font-semibold text-blue-900">
-                        已上传的附件 ({attachments.length})
-                      </h3>
-                    </div>
-                    <div className="space-y-2">
-                      {attachments.map((item: any, index: number) => (
-                        <div key={index} className="flex items-center gap-2 text-sm text-blue-800">
-                          <span>📎</span>
-                          <span className="font-medium">{item.name}</span>
-                          <span className="text-blue-600">({(item.size / 1024).toFixed(2)} KB)</span>
-                          <span className="text-blue-500">{item.type}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-blue-700 mt-2">
-                      💡 AI助手已收到这些附件信息，可以基于附件内容帮你分析和填写表单
-                    </p>
-                  </div>
-                )}
-
                 <SurveyForm
                   fileInputRef={fileInputRef}
                 />

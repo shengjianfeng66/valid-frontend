@@ -307,13 +307,14 @@ export function AiChatBlock() {
     const value = messageToSend.trim()
     setInitialMessage(value)
 
-    // 存储附件信息到 store
+    // 存储附件信息到 store（包括原始文件对象）
     if (items.length > 0) {
       const attachmentInfo = items.map((item: any) => ({
         name: item.name,
         size: item.size,
         type: item.type,
-        url: item.url
+        url: item.url,
+        originFileObj: item.originFileObj || item  // 保存原始文件对象
       }))
       setAttachments(attachmentInfo)
     } else {
@@ -435,7 +436,8 @@ export function AiChatBlock() {
                           size: file.size,
                           type: file.type,
                           url: URL.createObjectURL(file),
-                          status: 'done'
+                          status: 'done',
+                          originFileObj: file  // ✅ 保存原始文件对象
                         }))
                         setItems(prev => [...prev, ...newItems])
                         setOpen(true) // 显示附件区域
@@ -476,7 +478,8 @@ export function AiChatBlock() {
                   size: file.size,
                   type: file.type,
                   url: URL.createObjectURL(file),
-                  status: 'done'
+                  status: 'done',
+                  originFileObj: file  // ✅ 保存原始文件对象
                 }))
                 setItems(prev => [...prev, ...newItems])
                 setOpen(true);
