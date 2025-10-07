@@ -42,12 +42,7 @@ interface SurveyData {
     page2: { q1: string; q2: string };
     page3: { q1: string; q2: string };
   };
-  interviewIntro: string;
   interviewTargetUsers: string;
-  interviewQuestions: {
-    page1: string[];
-    page2: string[];
-  };
   interviewOutline: InterviewOutline;
 }
 
@@ -100,7 +95,7 @@ function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
       return newData;
     });
   };
- 
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-8">
@@ -374,7 +369,14 @@ export default function CheckPage() {
   const router = useRouter();
   const { setHasDraft } = useDraft();
   const [currentStep, setCurrentStep] = useState(2);
-  const {name, nodeName, state, running, setState, start, stop, run} = useCoAgent({
+  const { name, nodeName, state, running, setState, start, stop, run } = useCoAgent<{
+    count: number;
+    tool_result?: {
+      opening_script?: { introduction?: string };
+      closing_script?: { conclusion?: string };
+      sections?: any[];
+    };
+  }>({
     name: "outline_agent",
     initialState: {
       count: 0,
@@ -419,7 +421,7 @@ export default function CheckPage() {
 
   useEffect(() => {
     if (!running) {
-      
+
     }
   }, [running])
 
@@ -483,307 +485,76 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
   };
 
   const [surveyData, setSurveyData] = useState<SurveyData>({
-    surveyIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
-    surveyTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
+    surveyIntro: "",
+    surveyTargetUsers: "",
     surveyQuestions: {
-      page1: {
-        q1: "您记录梦境的主要动机是什么？【必答】",
-        q2: "请根据您的真实感受，在1（非常不同意）到5（非常同意）之间评分："
-      },
-      page2: {
-        q1: "您多久记录一次梦境？【必答】",
-        q2: "请根据实际情况，在1（从不）到5（每天）之间评分："
-      },
-      page3: {
-        q1: "您对 Dreamoo 记录梦境的功能满意吗？【必答】",
-        q2: "请根据使用体验，在1（非常不满意）到5（非常满意）之间评分："
-      }
+      page1: { q1: "", q2: "" },
+      page2: { q1: "", q2: "" },
+      page3: { q1: "", q2: "" }
     },
-    interviewTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
+    interviewTargetUsers: "",
     interviewOutline: {
-      closing_script: {
-        conclusion: "感谢您参与本次访谈，您的反馈对我们非常重要。我们会认真考虑您的建议，以改进应用的'做梦'和'社交'功能。如果您有任何其他想法或问题，欢迎随时与我们联系。祝您有美好的一天！"
-      },
       opening_script: {
-        introduction: "您好，感谢您参与本次访谈。我们希望了解您在使用应用的'做梦'和'社交'功能时的具体体验和期望。您的反馈将帮助我们改进产品。访谈将被录音，仅用于研究目的，您的隐私将得到保护。您可以随时选择退出。请问可以开始吗？"
+        introduction: ""
       },
-      sections: [
-        {
-          name: "热身与背景",
-          questions: [
-            {
-              main: "您通常在什么情况下使用应用的'做梦'功能？",
-              probes: [
-                "能否描述一次您最近使用'做梦'功能的经历？",
-                "使用'做梦'功能时，您通常在什么时间段进行？"
-              ]
-            },
-            {
-              main: "在什么场景下，您会使用应用的'社交'功能？",
-              probes: [
-                "您通常与谁通过'社交'功能进行互动？",
-                "您会在什么情况下选择不使用'社交'功能？"
-              ]
-            }
-          ],
-          reason: "了解用户在使用应用的'做梦'和'社交'功能时的基本背景和使用习惯。"
-        },
-        {
-          name: "现状与痛点",
-          questions: [
-            {
-              main: "在使用'做梦'功能时，您遇到过哪些困难或问题？",
-              probes: [
-                "这些问题对您的使用体验有什么影响？",
-                "您是如何尝试解决这些问题的？"
-              ]
-            },
-            {
-              main: "使用'社交'功能时，您觉得哪些方面最不顺利？",
-              probes: [
-                "能否分享一次因为'社交'功能不如预期而感到失望的经历？",
-                "这些问题是否影响了您与他人的互动？"
-              ]
-            }
-          ],
-          reason: "识别用户在使用'做梦'和'社交'功能时遇到的主要问题和挑战。"
-        },
-        {
-          name: "动机与优先级",
-          questions: [
-            {
-              main: "您使用'做梦'功能的主要动机是什么？",
-              probes: [
-                "如果只能保留一个功能，您会选择'做梦'还是'社交'？为什么？",
-                "在使用'做梦'功能时，您最看重的是什么？"
-              ]
-            },
-            {
-              main: "在'社交'功能中，您最希望实现什么目标？",
-              probes: [
-                "您如何决定与谁进行互动？",
-                "在社交互动中，您最看重哪些因素？"
-              ]
-            }
-          ],
-          reason: "了解用户在使用'做梦'和'社交'功能时的动机和优先级。"
-        },
-        {
-          name: "期望与理想",
-          questions: [
-            {
-              main: "在理想情况下，您希望'做梦'功能如何改进？",
-              probes: [
-                "如果可以增加一个新功能，您希望是什么？",
-                "怎样的改进能让您更频繁地使用'做梦'功能？"
-              ]
-            },
-            {
-              main: "您对'社交'功能有哪些改进建议？",
-              probes: [
-                "您希望在'社交'功能中增加哪些互动方式？",
-                "理想的社交体验对您来说是什么样的？"
-              ]
-            }
-          ],
-          reason: "探索用户对'做梦'和'社交'功能的期望和理想改进方向。"
-        },
-        {
-          name: "收束与补充",
-          questions: [
-            {
-              main: "关于'做梦'和'社交'功能，您还有什么其他想法或建议吗？",
-              probes: [
-                "您认为还有哪些方面我们没有涉及到，但对您很重要？",
-                "您是否有其他使用体验想要分享？"
-              ]
-            }
-          ],
-          reason: "总结用户的反馈，确保没有遗漏重要信息。"
-        }
-      ]
+      closing_script: {
+        conclusion: ""
+      },
+      sections: []
     }
   });
 
 
-  // // 让AI能够读取所有表单数据
-  // useCopilotReadable({
-  //   description: "当前用户体验调查问卷和访谈大纲的所有数据，包括引言、目标用户、各页面问题内容以及完整的访谈大纲结构",
-  //   value: {
-  //     surveyIntro: surveyData.surveyIntro,
-  //     surveyTargetUsers: surveyData.surveyTargetUsers,
-  //     surveyQuestions: surveyData.surveyQuestions,
-  //     interviewIntro: surveyData.interviewIntro,
-  //     interviewTargetUsers: surveyData.interviewTargetUsers,
-  //     interviewQuestions: surveyData.interviewQuestions,
-  //     interviewOutline: surveyData.interviewOutline,
-  //   },
-  // });
+  useEffect(() => {
+    try {
+      // 检查是否有有效的 tool_result
+      if (!state?.tool_result) return;
 
-  // // 更新调查问卷引言
-  // useCopilotAction({
-  //   name: "updateSurveyIntro",
-  //   description: t('actions.updateSurveyIntro'),
-  //   parameters: [{
-  //     name: "intro",
-  //     type: "string",
-  //     description: "新的调查问卷引言内容",
-  //     required: true,
-  //   }],
-  //   handler: ({ intro }) => {
-  //     setSurveyData(prev => ({ ...prev, surveyIntro: intro }));
-  //   },
-  // });
+      const { tool_result } = state;
 
-  // // 更新访谈大纲引言
-  // useCopilotAction({
-  //   name: "updateInterviewIntro",
-  //   description: t('actions.updateInterviewIntro'),
-  //   parameters: [{
-  //     name: "intro",
-  //     type: "string",
-  //     description: "新的访谈大纲引言内容",
-  //     required: true,
-  //   }],
-  //   handler: ({ intro }) => {
-  //     setSurveyData(prev => ({ ...prev, interviewIntro: intro }));
-  //   },
-  // });
+      // 验证数据完整性
+      const hasValidData =
+        tool_result.opening_script?.introduction ||
+        (tool_result.sections && tool_result.sections.length > 0);
 
-  // // 更新目标用户
-  // useCopilotAction({
-  //   name: "updateTargetUsers",
-  //   description: t('actions.updateTargetUsers'),
-  //   parameters: [{
-  //     name: "targetUsers",
-  //     type: "string",
-  //     description: "新的目标用户群体描述",
-  //     required: true,
-  //   }, {
-  //     name: "type",
-  //     type: "string",
-  //     description: "更新类型：survey（调查问卷）或 interview（访谈大纲）",
-  //     required: true,
-  //   }],
-  //   handler: ({ targetUsers, type }) => {
-  //     if (type === "survey") {
-  //       setSurveyData(prev => ({ ...prev, surveyTargetUsers: targetUsers }));
-  //     } else if (type === "interview") {
-  //       setSurveyData(prev => ({ ...prev, interviewTargetUsers: targetUsers }));
-  //     }
-  //   },
-  // });
+      if (!hasValidData) {
+        console.warn('⚠️ Agent 返回数据不完整');
+        return;
+      }
 
-  // // 更新问题内容
-  // useCopilotAction({
-  //   name: "updateQuestions",
-  //   description: t('actions.updateQuestions'),
-  //   parameters: [{
-  //     name: "type",
-  //     type: "string",
-  //     description: "更新类型：survey（调查问卷）或 interview（访谈大纲）",
-  //     required: true,
-  //   }, {
-  //     name: "page",
-  //     type: "string",
-  //     description: "页面编号：page1, page2, page3",
-  //     required: true,
-  //   }, {
-  //     name: "questionNumber",
-  //     type: "string",
-  //     description: "问题编号：q1 或 q2",
-  //     required: true,
-  //   }, {
-  //     name: "content",
-  //     type: "string",
-  //     description: "新的问题内容",
-  //     required: true,
-  //   }],
-  //   handler: ({ type, page, questionNumber, content }) => {
-  //     setSurveyData(prev => {
-  //       const newData = { ...prev };
-  //       if (type === "survey" && newData.surveyQuestions[page as keyof typeof newData.surveyQuestions]) {
-  //         newData.surveyQuestions[page as keyof typeof newData.surveyQuestions][questionNumber as 'q1' | 'q2'] = content;
-  //       } else if (type === "interview" && newData.interviewQuestions[page as keyof typeof newData.interviewQuestions]) {
-  //         const questions = [...newData.interviewQuestions[page as keyof typeof newData.interviewQuestions]];
-  //         const questionIndex = questionNumber === 'q1' ? 0 : 1;
-  //         if (questionIndex < questions.length) {
-  //           questions[questionIndex] = content;
-  //           newData.interviewQuestions[page as keyof typeof newData.interviewQuestions] = questions;
-  //         }
-  //       }
-  //       return newData;
-  //     });
-  //   },
-  // });
+      // 提取数据
+      const newOutline = {
+        opening_script: {
+          introduction: tool_result.opening_script?.introduction || ""
+        },
+        closing_script: {
+          conclusion: tool_result.closing_script?.conclusion || ""
+        },
+        sections: tool_result.sections || []
+      };
 
-  // // 清空所有表单
-  // useCopilotAction({
-  //   name: "clearAllForms",
-  //   description: t('actions.clearAllForms'),
-  //   parameters: [],
-  //   handler: () => {
-  //     setSurveyData({
-  //       surveyIntro: "",
-  //       surveyTargetUsers: "",
-  //       surveyQuestions: {
-  //         page1: { q1: "", q2: "" },
-  //         page2: { q1: "", q2: "" },
-  //         page3: { q1: "", q2: "" }
-  //       },
-  //       interviewIntro: "",
-  //       interviewTargetUsers: "",
-  //       interviewQuestions: {
-  //         page1: [],
-  //         page2: []
-  //       }
-  //     });
-  //   },
-  // });
+      // 更新表单数据
+      setSurveyData((prev: any) => ({
+        ...prev,
+        interviewOutline: newOutline
+      }));
 
-  // // 填充示例数据
-  // useCopilotAction({
-  //   name: "fillSampleData",
-  //   description: t('actions.fillSampleData'),
-  //   parameters: [],
-  //   handler: () => {
-  //     setSurveyData({
-  //       surveyIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
-  //       surveyTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
-  //       surveyQuestions: {
-  //         page1: {
-  //           q1: "您记录梦境的主要动机是什么？【必答】",
-  //           q2: "请根据您的真实感受，在1（非常不同意）到5（非常同意）之间评分："
-  //         },
-  //         page2: {
-  //           q1: "您多久记录一次梦境？【必答】",
-  //           q2: "请根据实际情况，在1（从不）到5（每天）之间评分："
-  //         },
-  //         page3: {
-  //           q1: "您对 Dreamoo 记录梦境的功能满意吗？【必答】",
-  //           q2: "请根据使用体验，在1（非常不满意）到5（非常满意）之间评分："
-  //         }
-  //       },
-  //       interviewIntro: "您好！感谢您参与本次调研。本问卷旨在了解您在 Dreamoo 记录梦境的动机、使用频率单次满意度，以便我们优化内容创作、互动与留存功能。问卷采用匿名方式，大约需要10分钟完成。所有数据仅用于内部优化，请您根据实际情况填写。",
-  //       interviewTargetUsers: "热爱表达与二次创作的青少年/年轻用户",
-  //       interviewQuestions: {
-  //         page1: [
-  //           "你希望我怎么称呼你?你今年多大了?",
-  //           "你目前在哪个城市?从事什么工作?月收入大概在什么区间?",
-  //           "你的最高学历是?",
-  //           "你平时睡眠质量怎么样?一般几点睡觉,睡多久?",
-  //           "你平时会记录什么生活内容?(比如日记、笔记、工作记录等)",
-  //           "你用过AI相关的产品吗?比如AI绘画、AI写作这类工具?"
-  //         ],
-  //         page2: [
-  //           "你多久会做一次让你印象深刻的梦?醒来后通常会做什么?",
-  //           "你现在有记录梦境的习惯吗?如果有,用什么方式记录?(备忘录/日记本/语音/不记录)",
-  //           "你一般在什么时候会回想或谈论自己的梦?(早上醒来/和朋友聊天/睡前)"
-  //         ]
-  //       }
-  //     });
-  //   },
-  // });
+      // 显示成功提示
+      toast.success(`访谈大纲已生成！包含 ${newOutline.sections.length} 个章节`);
+
+      // 详细日志
+      console.log('✅ 访谈大纲已自动填充:', {
+        introduction: newOutline.opening_script.introduction.substring(0, 50) + '...',
+        sectionsCount: newOutline.sections.length,
+        sectionNames: newOutline.sections.map((s: any) => s.name),
+        conclusion: newOutline.closing_script.conclusion.substring(0, 50) + '...'
+      });
+
+    } catch (error) {
+      console.error('❌ 填充表单时出错:', error);
+      toast.error('自动填充失败，请检查数据格式');
+    }
+  }, [state?.tool_result]); // 监听 tool_result 变化
 
   // 智能建议
   useCopilotChatSuggestions({
