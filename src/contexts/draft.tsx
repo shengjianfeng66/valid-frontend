@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useFormStore } from "@/stores/form-store";
+import { useSurveyStore } from "@/stores/survey-store";
 
 interface DraftContextType {
     hasDraft: boolean;
@@ -31,10 +32,12 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // 离开创建流程页面时，清空表单数据
                 setHasDraft(false);
-                // 只有在真正离开创建流程时才清空表单
+                // 只有在真正离开创建流程时才清空表单和调研数据
                 // 避免从 dashboard 跳转到 goal 时清空数据
                 if (pathname && !pathname.includes('/insight/')) {
                     clearForm();
+                    // ✅ 清空调研数据（内存中的 Zustand store）
+                    useSurveyStore.getState().clearAll();
                 }
             }
         };
@@ -43,13 +46,9 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
     }, [pathname, clearForm]);
 
     const checkFormData = () => {
-        // 检查 sessionStorage 中是否有调研信息
-        try {
-            const surveyInfo = sessionStorage.getItem('vf_surveyInfo');
-            return surveyInfo && surveyInfo.trim() !== '';
-        } catch {
-            return false;
-        }
+        // ✅ 检查 Zustand store 中是否有调研信息
+        const surveyInfo = useSurveyStore.getState().surveyInfo;
+        return !!surveyInfo;
     };
 
     const clearDraft = () => {

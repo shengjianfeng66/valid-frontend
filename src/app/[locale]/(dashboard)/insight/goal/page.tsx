@@ -24,6 +24,7 @@ import { useDraft } from "@/contexts/draft";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useFormStore } from "@/stores/form-store";
+import { useSurveyStore } from "@/stores/survey-store";
 import {
   Stepper,
   StepperItem,
@@ -155,22 +156,18 @@ export default function Page() {
       return;
     }
 
-    // 将调研信息存储到 sessionStorage，供 outline 页面使用
+    // ✅ 将调研信息存储到 Zustand store，供 outline 页面使用
     const surveyInfo = {
       productName: formData.productName,
       businessType: formData.businessType,
       targetUsers: formData.targetUsers,
-      researchGoals: formData.researchGoals,
+      userConcerns: formData.researchGoals || '',
+      coreFeatures: '',
       hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
-      productSolutionNames: formData.productSolution?.map(file => file.name).join(', ') || null,
-      productSolutionCount: formData.productSolution?.length || 0,
+      productSolutionName: formData.productSolution?.map(file => file.name).join(', ') || '',
     };
 
-    try {
-      sessionStorage.setItem('vf_surveyInfo', JSON.stringify(surveyInfo));
-    } catch (e) {
-      console.warn('无法存储调研信息到 sessionStorage:', e);
-    }
+    useSurveyStore.getState().setSurveyInfo(surveyInfo);
 
     router.push('/insight/outline');
   };

@@ -25,6 +25,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
 import { toast } from "sonner";
+import { useSurveyStore } from "@/stores/survey-store";
 import {
   Tooltip,
   TooltipContent,
@@ -263,31 +264,14 @@ export default function CheckPage() {
   const { sendMessage, messages } = useCopilotChatInternal();
   const hasSentInitialRef = useRef(false);
 
-  // 检测是否有草稿数据
+  // ✅ 检测是否有草稿数据（使用 Zustand）
+  const surveyInfo = useSurveyStore((state) => state.surveyInfo);
+  const interviewData = useSurveyStore((state) => state.interviewData);
+
   useEffect(() => {
-    // 检查是否有调研信息（从 goal 页面传递过来的）
-    const hasSurveyInfo = () => {
-      try {
-        const surveyInfo = sessionStorage.getItem('vf_surveyInfo');
-        return surveyInfo && surveyInfo.trim() !== '';
-      } catch {
-        return false;
-      }
-    };
-
-    // 检查是否有访谈数据
-    const hasInterviewData = () => {
-      try {
-        const interviewData = sessionStorage.getItem('vf_interviewData');
-        return interviewData && interviewData.trim() !== '';
-      } catch {
-        return false;
-      }
-    };
-
-    const hasDraft = hasSurveyInfo() || hasInterviewData();
-    setHasDraft(!!hasDraft);
-  }, [setHasDraft]);
+    const hasDraft = !!surveyInfo || !!interviewData;
+    setHasDraft(hasDraft);
+  }, [surveyInfo, interviewData, setHasDraft]);
 
   useEffect(() => {
     if (!running) {
@@ -330,16 +314,10 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
       setTimeout(checkAndSend, 500);
     };
 
-    // 从 sessionStorage 读取调研信息
-    try {
-      const surveyInfoStr = sessionStorage.getItem('vf_surveyInfo');
-      if (surveyInfoStr && surveyInfoStr.trim()) {
-        const surveyInfo = JSON.parse(surveyInfoStr);
-        // 不删除调研信息，保留数据供用户返回时使用
-        sendSurveyInfo(surveyInfo);
-      }
-    } catch (e) {
-      console.warn('无法读取调研信息:', e);
+    // ✅ 从 Zustand store 读取调研信息
+    const currentSurveyInfo = useSurveyStore.getState().surveyInfo;
+    if (currentSurveyInfo) {
+      sendSurveyInfo(currentSurveyInfo);
     }
   }, [sendMessage]);
 
