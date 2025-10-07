@@ -1,40 +1,21 @@
-import { AdapterUser } from "next-auth/adapters";
-import { Account, User } from "next-auth";
-import { getUuid } from "@/lib/hash";
-import { getIsoTimestr } from "@/lib/time";
-import { saveUser } from "@/services/user";
-import { User as UserType } from "@/types/user";
-import { getClientIp } from "@/lib/ip";
+// ============================================
+// 注意：此文件已废弃
+// ============================================
+// 
+// 项目已从 NextAuth 迁移到 Supabase Auth
+// 用户创建和登录处理现在由 Supabase Auth 触发器自动完成
+// 
+// 触发器位置：supabase/migrations/001_setup_auth_triggers.sql
+// 
+// 如果需要自定义用户创建逻辑，请修改触发器中的 handle_new_user() 函数
+// 
+// ============================================
 
-export async function handleSignInUser(
-  user: User | AdapterUser,
-  account: Account
-): Promise<UserType | null> {
-  try {
-    if (!user.email) {
-      throw new Error("invalid signin user");
-    }
-    if (!account.type || !account.provider || !account.providerAccountId) {
-      throw new Error("invalid signin account");
-    }
+// 保留此文件是为了避免破坏可能存在的引用
+// 可以在确认没有引用后安全删除
 
-    const userInfo: UserType = {
-      uuid: getUuid(),
-      email: user.email,
-      nickname: user.name || "",
-      avatar_url: user.image || "",
-      signin_type: account.type,
-      signin_provider: account.provider,
-      signin_openid: account.providerAccountId,
-      created_at: new Date(),
-      signin_ip: await getClientIp(),
-    };
-
-    const savedUser = await saveUser(userInfo);
-
-    return savedUser;
-  } catch (e) {
-    console.error("handle signin user failed:", e);
-    throw e;
-  }
+export async function handleSignInUser() {
+  throw new Error(
+    "handleSignInUser is deprecated. User creation is now handled by Supabase Auth triggers."
+  );
 }

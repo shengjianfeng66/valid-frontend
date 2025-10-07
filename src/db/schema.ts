@@ -10,9 +10,9 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-// Users table
-export const users = pgTable(
-  "users",
+// User table
+export const user = pgTable(
+  "user",
   {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     uuid: varchar({ length: 255 }).notNull().unique(),
@@ -21,22 +21,15 @@ export const users = pgTable(
     nickname: varchar({ length: 255 }),
     avatar_url: varchar({ length: 255 }),
     locale: varchar({ length: 50 }),
-    signin_type: varchar({ length: 50 }),
-    signin_ip: varchar({ length: 255 }),
-    signin_provider: varchar({ length: 50 }),
-    signin_openid: varchar({ length: 255 }),
     invite_code: varchar({ length: 255 }).notNull().default(""),
     updated_at: timestamp({ withTimezone: true }),
     invited_by: varchar({ length: 255 }).notNull().default(""),
     is_affiliate: boolean().notNull().default(false),
-  },
-  (table) => [
-    uniqueIndex("email_provider_unique_idx").on(
-      table.email,
-      table.signin_provider
-    ),
-  ]
+  }
 );
+
+// 保持向后兼容的别名（可选，方便过渡期使用）
+export const users = user;
 
 // Orders table
 export const orders = pgTable("orders", {
