@@ -41,7 +41,6 @@ next-env.d.ts
 Makefile
 .wrangler
 wrangler.toml
-supabase
 .*next
 .dev.vars*
 .source
