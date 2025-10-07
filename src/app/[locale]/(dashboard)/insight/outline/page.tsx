@@ -19,7 +19,7 @@ import {
 import { Check } from "lucide-react";
 import { useCopilotAction, useCopilotReadable, useCopilotChatInternal, useCoAgent } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -78,143 +78,11 @@ interface InterviewQuestion {
 interface SurveyFormProps {
   surveyData: SurveyData;
   setSurveyData: React.Dispatch<React.SetStateAction<SurveyData>>;
-}
-
-function SurveyForm({ surveyData, setSurveyData }: SurveyFormProps) {
-  const t = useTranslations('outline');
-  const handleInputChange = (field: keyof SurveyData, value: string) => {
-    setSurveyData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleQuestionChange = (page: string, questionNumber: string, value: string) => {
-    setSurveyData(prev => {
-      const newData = { ...prev };
-      if (newData.surveyQuestions[page as keyof typeof newData.surveyQuestions]) {
-        newData.surveyQuestions[page as keyof typeof newData.surveyQuestions][questionNumber as 'q1' | 'q2'] = value;
-      }
-      return newData;
-    });
-  };
-
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm p-8">
-      {/* 标题 */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-          <FileText className="w-5 h-5 text-purple-600" />
-        </div>
-        <h2 className="text-2xl font-semibold text-gray-900">{t('survey.title')}</h2>
-      </div>
-
-      <div className="space-y-6">
-        {/* 引言 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('survey.intro.label')}
-          </label>
-          <textarea
-            value={surveyData.surveyIntro}
-            onChange={(e) => handleInputChange('surveyIntro', e.target.value)}
-            rows={4}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
-          />
-        </div>
-
-        {/* 目标用户 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('survey.targetUsers.label')}
-          </label>
-          <input
-            type="text"
-            value={surveyData.surveyTargetUsers}
-            onChange={(e) => handleInputChange('surveyTargetUsers', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-          />
-        </div>
-
-        {/* 第1页：使用动机 */}
-        <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page1.title')}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page1.q1}
-                onChange={(e) => handleQuestionChange('page1', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page1.q2}
-                onChange={(e) => handleQuestionChange('page1', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 第2页：使用频率 */}
-        <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page2.title')}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page2.q1}
-                onChange={(e) => handleQuestionChange('page2', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page2.q2}
-                onChange={(e) => handleQuestionChange('page2', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 第3页：满意度 */}
-        <div className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('survey.pages.page3.title')}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">1.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page3.q1}
-                onChange={(e) => handleQuestionChange('page3', 'q1', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2.</label>
-              <input
-                type="text"
-                value={surveyData.surveyQuestions.page3.q2}
-                onChange={(e) => handleQuestionChange('page3', 'q2', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  syncToAgent?: () => void; // ✅ 添加失焦同步函数
 }
 
 // 用户访谈大纲组件
-function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
+function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormProps) {
   const t = useTranslations('outline');
 
   // 计算总问题数量
@@ -313,6 +181,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
           <textarea
             value={surveyData.interviewOutline.opening_script.introduction}
             onChange={(e) => handleIntroductionChange(e.target.value)}
+            onBlur={syncToAgent}
             rows={6}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
             placeholder="欢迎您参加 Dreamoo 用户访谈。本次访谈的目的是了解您使用 Dreamoo 记录梦境的体验，包括使用习惯、满意的地方以及希望改进的地方，以帮助我们优化产品。访谈预计需要约10分钟，您的信息将被严格保密，仅用于产品优化。没有标准答案，您的真实感受最有价值。如果您准备好了，我们将开始访谈。"
@@ -333,6 +202,7 @@ function InterviewForm({ surveyData, setSurveyData }: SurveyFormProps) {
                     type="text"
                     value={question.main}
                     onChange={(e) => handleQuestionChange(sectionIndex, questionIndex, e.target.value)}
+                    onBlur={syncToAgent}
                     className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                     placeholder="请输入问题..."
                   />
@@ -538,23 +408,19 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
         ...prev,
         interviewOutline: newOutline
       }));
-
-      // 显示成功提示
-      toast.success(`访谈大纲已生成！包含 ${newOutline.sections.length} 个章节`);
-
-      // 详细日志
-      console.log('✅ 访谈大纲已自动填充:', {
-        introduction: newOutline.opening_script.introduction.substring(0, 50) + '...',
-        sectionsCount: newOutline.sections.length,
-        sectionNames: newOutline.sections.map((s: any) => s.name),
-        conclusion: newOutline.closing_script.conclusion.substring(0, 50) + '...'
-      });
-
     } catch (error) {
-      console.error('❌ 填充表单时出错:', error);
-      toast.error('自动填充失败，请检查数据格式');
     }
   }, [state?.tool_result]); // 监听 tool_result 变化
+
+  // ✅ 失焦时同步：前端 → Agent
+  const syncToAgent = useCallback(() => {
+    if (surveyData.interviewOutline) {
+      setState(prev => ({
+        count: prev?.count || 0,
+        tool_result: surveyData.interviewOutline
+      }));
+    }
+  }, [surveyData.interviewOutline, setState]);
 
   // 智能建议
   useCopilotChatSuggestions({
@@ -630,7 +496,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
 
               {/* 中间内容区 */}
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} />
+                <InterviewForm surveyData={surveyData} setSurveyData={setSurveyData} syncToAgent={syncToAgent} />
               </div>
             </div>
 
