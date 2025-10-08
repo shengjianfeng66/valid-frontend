@@ -18,6 +18,7 @@ import {
 } from "@/components/stepper";
 import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -38,6 +39,62 @@ import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 import { useTranslations } from "next-intl";
+
+// API 数据类型定义
+interface PersonaContent {
+    [key: string]: string;
+}
+
+interface PersonaFromAPI {
+    id: number;
+    name: string;
+    content: PersonaContent;
+    source: number;
+    created_at: string;
+    updated_at: string | null;
+}
+
+interface PersonasResponse {
+    personas: PersonaFromAPI[];
+    total_count: number;
+    requested_count: number;
+}
+
+// SWR fetcher 函数
+const fetcher = async (url: string, count: number): Promise<PersonasResponse> => {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            persona_count: count
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(`获取到 ${data.total_count} 个人物画像`);
+
+    return data;
+}
+
+// 将 API 返回的数据转换为组件需要的格式
+function transformPersonaToUser(persona: PersonaFromAPI): any {
+    const content = persona.content;
+
+    return {
+        id: `api-${persona.id}`,
+        name: persona.name,
+        avatar: "😊",
+        attributes: content,
+        source: persona.source,
+        created_at: persona.created_at
+    };
+}
 
 // 模拟用户数据
 const mockUsers = [
@@ -324,6 +381,32 @@ export default function InterviewPage() {
     const [currentStep, setCurrentStep] = useState(0);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
+    const [removedUserIds, setRemovedUserIds] = useState<string[]>([]);
+
+    // 使用 SWR 获取推荐用户
+    const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
+        ['http://localhost:8000/api/v1/persona/recommend', 10],
+        ([url, count]) => fetcher(url, count),
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+        }
+    );
+
+    // 转换推荐用户数据，并过滤掉已删除的
+    const recommendedUsers = personasData?.personas
+        ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
+        : [];
+
+    // 处理错误
+    useEffect(() => {
+        if (error) {
+            console.error('获取推荐用户失败:', error);
+            toast.error('获取推荐用户失败', {
+                description: '请检查后端服务是否正常运行'
+            });
+        }
+    }, [error]);
 
     // 邀请流程步骤数据
     const inviteSteps = [
@@ -342,8 +425,8 @@ export default function InterviewPage() {
     ];
 
     const realUsers = mockUsers.filter(user => user.isReal && false); // 临时设置为空来测试空状态
-    const originalSimulatedUsers = mockUsers.filter(user => !user.isReal);
-    const simulatedUsers = [...originalSimulatedUsers, ...addedSimulatedUsers];
+    // 使用推荐用户和添加的用户，过滤掉已删除的
+    const simulatedUsers = [...recommendedUsers, ...addedSimulatedUsers.filter(user => !removedUserIds.includes(user.id))];
 
     // 模拟用户池数据
     const simulatedUserPool = Array.from({ length: 16 }, (_, index) => ({
@@ -421,7 +504,7 @@ export default function InterviewPage() {
 
     // 处理用户菜单点击
     const handleViewDetails = (userId: string) => {
-        const user = [...originalSimulatedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        const user = [...recommendedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
         if (user) {
             setSelectedUser(user);
             setShowUserDetailSheet(true);
@@ -429,7 +512,7 @@ export default function InterviewPage() {
     };
 
     const handleRemoveUser = (userId: string) => {
-        const user = [...originalSimulatedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        const user = [...recommendedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
         if (user) {
             setSelectedUser(user);
             setShowRemoveConfirmDialog(true);
@@ -438,7 +521,8 @@ export default function InterviewPage() {
 
     const confirmRemoveUser = () => {
         if (selectedUser) {
-            setAddedSimulatedUsers(prev => prev.filter(user => user.id !== selectedUser.id));
+            // 将用户ID添加到已删除列表
+            setRemovedUserIds(prev => [...prev, selectedUser.id]);
             toast.success(t('toast.removeUserSuccess'), {
                 description: t('toast.removeUserDescription', { name: selectedUser.name })
             });
@@ -616,16 +700,23 @@ export default function InterviewPage() {
                                 </Button>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {simulatedUsers.map((user) => (
-                                    <UserCard
-                                        key={user.id}
-                                        user={user}
-                                        onViewDetails={handleViewDetails}
-                                        onRemoveUser={handleRemoveUser}
-                                    />
-                                ))}
-                            </div>
+                            {isLoadingRecommended ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <LoadingAnimation width={150} height={150} />
+                                    <p className="text-gray-600 mt-4">正在获取推荐用户...</p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {simulatedUsers.map((user) => (
+                                        <UserCard
+                                            key={user.id}
+                                            user={user}
+                                            onViewDetails={handleViewDetails}
+                                            onRemoveUser={handleRemoveUser}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
