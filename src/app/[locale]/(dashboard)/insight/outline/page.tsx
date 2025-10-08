@@ -47,6 +47,22 @@ interface SurveyData {
   interviewOutline: InterviewOutline;
 }
 
+// 创建访谈的响应类型
+interface CreateInterviewResponse {
+  id: number;
+  name: string;
+  description: string;
+  proposal: any;
+  outline: any;
+  questionnaire: any;
+  duration: number;
+  organization_id: number;
+  user_id: number;
+  project_id: number;
+  state: number;
+  created_at: string;
+}
+
 interface AgentState {
   count: number;
   data: Record<string, any>;
@@ -240,6 +256,7 @@ export default function CheckPage() {
   const router = useRouter();
   const { setHasDraft } = useDraft();
   const [currentStep, setCurrentStep] = useState(2);
+  const [isCreatingInterview, setIsCreatingInterview] = useState(false);
   const { name, nodeName, state, running, setState, start, stop, run } = useCoAgent<{
     count: number;
     tool_result?: {
@@ -400,6 +417,49 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
     }
   }, [surveyData.interviewOutline, setState]);
 
+  // 创建访谈
+  const handleCreateInterview = async () => {
+    setIsCreatingInterview(true);
+
+    try {
+      // TODO: 从认证系统获取真实的 user_id
+      const userId = 1; // 临时硬编码，后续需要从 session 或 context 中获取
+
+      const response = await fetch('http://localhost:8000/api/v1/interview/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: '产品用户体验访谈', // 可以根据需要修改为动态名称
+          user_id: userId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: CreateInterviewResponse = await response.json();
+      console.log('访谈创建成功:', data);
+
+      toast.success('访谈创建成功', {
+        description: `项目ID: ${data.project_id}`
+      });
+
+      // 跳转到访谈页面，并带上 project_id
+      setCurrentStep(3);
+      router.push(`/insight/interview?project_id=${data.project_id}`);
+    } catch (error) {
+      console.error('创建访谈失败:', error);
+      toast.error('创建访谈失败', {
+        description: '请检查后端服务是否正常运行'
+      });
+    } finally {
+      setIsCreatingInterview(false);
+    }
+  };
+
   // 智能建议
   useCopilotChatSuggestions({
     instructions: t('copilot.suggestions'),
@@ -500,14 +560,12 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
                       {t('previous')}
                     </Button>
                     <Button
-                      onClick={() => {
-                        setCurrentStep(3);
-                        router.push('/insight/interview');
-                      }}
+                      onClick={handleCreateInterview}
+                      disabled={isCreatingInterview}
                       className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2"
                     >
-                      {t('next')}
-                      <ArrowRight className="w-4 h-4" />
+                      {isCreatingInterview ? '创建中...' : t('next')}
+                      {!isCreatingInterview && <ArrowRight className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>

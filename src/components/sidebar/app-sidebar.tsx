@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import useSWR from "swr"
 
 import {
   Home,
@@ -30,28 +31,52 @@ import {
 } from "@/components/ui/sidebar"
 import { Switch } from "@/components/ui/switch"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "杨昊霖",
-    email: "yanghaolin@example.com",
-    avatar: "/avatars/user.jpg",
-    points: 2300,
-  },
-  recentItems: [
-    {
-      name: "模拟验证驱动的AI产品规划...",
-      size: "1.52 KB",
-      date: "24/03/2025",
-      icon: FileText,
-    },
-  ],
+// 项目类型定义
+interface Interview {
+  id: number;
+  name: string;
+  description: string | null;
+  proposal: any;
+  outline: any;
+  questionnaire: any;
+  duration: number | null;
+  organization_id: number | null;
+  user_id: number;
+  project_id: number | null;
+  state: number;
+  created_at: string;
+}
+
+// fetcher 函数 - 直接返回数组
+const fetcher = async (url: string): Promise<Interview[]> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations()
   const { user } = useAppContext()
   const { hasDraft, clearDraft } = useDraft()
+
+  // 使用 SWR 获取项目列表
+  const { data: interviews, error, isLoading } = useSWR(
+    'http://localhost:8000/api/v1/interview/list',
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  // 处理错误
+  React.useEffect(() => {
+    if (error) {
+      console.error('获取项目列表失败:', error);
+    }
+  }, [error]);
 
   return (
     <Sidebar className="border-r-0" {...props}>
@@ -98,36 +123,56 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 分割线 */}
         <div className="border-t border-gray-200 my-4"></div>
 
-        {/* 最近使用 */}
+        {/* 项目列表 */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium text-gray-600">
             {t('recentItems.title')}
           </SidebarGroupLabel>
           <SidebarGroupContent className="p-2">
             <SidebarMenu>
-              {data.recentItems.map((item, index) => (
-                <SidebarMenuItem key={index}>
-                  <SidebarMenuButton className="text-gray-900" asChild>
-                    <NavigationLink
-                      href="#"
-                      hasDraft={hasDraft}
-                      onLeave={clearDraft}
-                      className="flex items-center gap-3 px-3 py-6"
-                    >
-                      <item.icon className="w-4 h-4 text-gray-500" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate leading-5">
-                          {item.name}
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
-                          <span>{item.size}</span>
-                          <span>{item.date}</span>
-                        </div>
-                      </div>
-                    </NavigationLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {isLoading ? (
+                <div className="px-3 py-6 text-center text-sm text-gray-500">
+                  加载中...
+                </div>
+              ) : interviews && interviews.length > 0 ? (
+                interviews
+                  .filter(interview => interview.project_id !== null) // 只显示有 project_id 的项目
+                  .map((interview) => {
+                    const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
+                      year: '2-digit',
+                      month: '2-digit',
+                      day: '2-digit'
+                    }).replace(/\//g, '/');
+
+                    return (
+                      <SidebarMenuItem key={interview.id}>
+                        <SidebarMenuButton className="text-gray-900" asChild>
+                          <NavigationLink
+                            href={`/insight/interview?project_id=${interview.project_id}`}
+                            hasDraft={hasDraft}
+                            onLeave={clearDraft}
+                            className="flex items-center gap-3 px-3 py-6"
+                          >
+                            <FileText className="w-4 h-4 text-gray-500" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium truncate leading-5">
+                                {interview.name}
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
+                                <span>项目 #{interview.project_id}</span>
+                                <span>{date}</span>
+                              </div>
+                            </div>
+                          </NavigationLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })
+              ) : (
+                <div className="px-3 py-6 text-center text-sm text-gray-500">
+                  暂无项目
+                </div>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
