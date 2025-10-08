@@ -16,7 +16,7 @@ import {
     StepperDescription,
     StepperNav
 } from "@/components/stepper";
-import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
@@ -102,18 +102,18 @@ function transformPersonaToUser(persona: PersonaFromAPI): any {
     const content = persona.content;
     const attributes: Record<string, string> = {};
 
-    // 提取所有标签
-    if (content.user_profile_tags) {
+    // 提取所有标签 - 添加 null 检查
+    if (content && content.user_profile_tags) {
         Object.keys(content.user_profile_tags).forEach(categoryKey => {
             const category = content.user_profile_tags![categoryKey];
 
             // 遍历子分类
-            if (category.subcategories) {
+            if (category && category.subcategories) {
                 Object.keys(category.subcategories).forEach(subKey => {
                     const subcategory = category.subcategories![subKey];
 
                     // 提取所有tags
-                    if (subcategory.tags) {
+                    if (subcategory && subcategory.tags) {
                         Object.keys(subcategory.tags).forEach(tagKey => {
                             attributes[tagKey] = subcategory.tags[tagKey];
                         });
@@ -125,7 +125,7 @@ function transformPersonaToUser(persona: PersonaFromAPI): any {
 
     return {
         id: `api-${persona.id}`,
-        name: persona.name,
+        name: persona.name || '未命名用户',
         avatar: "😊",
         status: "等待中",
         isReal: false,
@@ -283,6 +283,8 @@ export default function InterviewPage() {
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
     const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
     const [removedUserIds, setRemovedUserIds] = useState<string[]>([]);
+    const [simulatedUserPoolData, setSimulatedUserPoolData] = useState<any[]>([]);
+    const [isLoadingUserPool, setIsLoadingUserPool] = useState(false);
 
     // 使用 SWR 获取推荐用户
     const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
@@ -366,8 +368,59 @@ export default function InterviewPage() {
         );
     };
 
+    // 获取模拟用户池数据
+    const fetchSimulatedUserPool = async () => {
+        setIsLoadingUserPool(true);
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/interviewee/list_simulated_users', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // 转换数据格式 - 支持两种数据结构
+            let personasArray: PersonaFromAPI[] = [];
+
+            if (Array.isArray(data.personas)) {
+                // 如果返回的是 { personas: [...] } 格式
+                personasArray = data.personas;
+            } else if (Array.isArray(data)) {
+                // 如果直接返回数组格式
+                personasArray = data;
+            }
+
+            if (personasArray.length > 0) {
+                const transformedUsers = personasArray.map(transformPersonaToUser);
+                setSimulatedUserPoolData(transformedUsers);
+            }
+        } catch (error) {
+            console.error('获取模拟用户池失败:', error);
+            toast.error('获取模拟用户池失败', {
+                description: '请检查后端服务是否正常运行'
+            });
+        } finally {
+            setIsLoadingUserPool(false);
+        }
+    };
+
+    // 打开模拟用户池弹窗
+    const handleOpenSimulatedUserPool = () => {
+        setShowSimulatedUserPool(true);
+        fetchSimulatedUserPool();
+    };
+
     const handleConfirmAdd = () => {
-        // TODO: 从实际的用户池中获取选中的用户数据
+        // 从用户池中获取选中的用户
+        const usersToAdd = simulatedUserPoolData.filter(user => selectedUsers.includes(user.id));
+        setAddedSimulatedUsers(prev => [...prev, ...usersToAdd]);
+
         toast.success(t('toast.addSimulatedUsersSuccess', { count: selectedUsers.length }), {
             description: t('toast.addSimulatedUsersDescription')
         });
@@ -377,7 +430,7 @@ export default function InterviewPage() {
 
     // 处理用户菜单点击
     const handleViewDetails = (userId: string) => {
-        const user = [...recommendedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        const user = [...recommendedUsers, ...addedSimulatedUsers, ...simulatedUserPoolData].find(u => u.id === userId);
         if (user) {
             setSelectedUser(user);
             setShowUserDetailSheet(true);
@@ -565,7 +618,7 @@ export default function InterviewPage() {
                                     </span>
                                 </div>
                                 <Button
-                                    onClick={() => setShowSimulatedUserPool(true)}
+                                    onClick={handleOpenSimulatedUserPool}
                                     variant="outline"
                                     className="text-gray-600 hover:text-gray-800"
                                 >
@@ -696,6 +749,11 @@ export default function InterviewPage() {
                                 <span className="text-sm text-gray-500 font-normal">
                                     {t('modals.simulatedUserPool.description')}
                                 </span>
+                                {selectedUsers.length > 0 && (
+                                    <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+                                        已选择 {selectedUsers.length} 人
+                                    </span>
+                                )}
                                 <button className="text-gray-400 hover:text-gray-600">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
@@ -705,25 +763,106 @@ export default function InterviewPage() {
                         </DialogHeader>
 
                         {/* 用户池网格 */}
-                        <div className="py-12">
-                            <div className="text-center">
-                                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <Bot className="w-8 h-8 text-gray-400" />
+                        <div className="py-6">
+                            {isLoadingUserPool ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <LoadingAnimation width={150} height={150} />
+                                    <p className="text-gray-600 mt-4">正在加载模拟用户池...</p>
                                 </div>
-                                <p className="text-gray-600 mb-2">模拟用户池功能开发中</p>
-                                <p className="text-sm text-gray-500">即将支持从用户池中选择模拟用户</p>
-                            </div>
+                            ) : simulatedUserPoolData.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {simulatedUserPoolData.map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className={`relative cursor-pointer transition-all ${selectedUsers.includes(user.id)
+                                                ? 'ring-2 ring-primary bg-primary/5'
+                                                : 'hover:shadow-lg'
+                                                }`}
+                                        >
+                                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                                {/* 查看详情按钮 - 右上角 */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleViewDetails(user.id);
+                                                    }}
+                                                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-white hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors shadow-sm border border-gray-200 z-10"
+                                                    title="查看详情"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+
+                                                {/* 选择指示器 */}
+                                                <div
+                                                    className="flex items-start gap-3 mb-4"
+                                                    onClick={() => toggleUserSelection(user.id)}
+                                                >
+                                                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${selectedUsers.includes(user.id)
+                                                        ? 'bg-primary border-primary'
+                                                        : 'border-gray-300'
+                                                        }`}>
+                                                        {selectedUsers.includes(user.id) && (
+                                                            <Check className="w-3 h-3 text-white" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
+                                                                {user.avatar}
+                                                            </div>
+                                                            <h3 className="text-sm font-semibold text-gray-900 pr-8">{user.name}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* 属性标签网格 */}
+                                                <div onClick={() => toggleUserSelection(user.id)}>
+                                                    {user.attributes && Object.keys(user.attributes).length > 0 && (
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            {Object.entries(user.attributes).slice(0, 6).map(([key, value], index) => (
+                                                                <div key={index} className="bg-gray-50 rounded-lg px-2 py-1.5 flex flex-col items-center">
+                                                                    <span className="text-xs text-gray-600 truncate w-full text-center">{key}</span>
+                                                                    <span className="text-xs font-medium text-gray-900 truncate w-full text-center">{String(value)}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                                        <Bot className="w-8 h-8 text-gray-400" />
+                                    </div>
+                                    <p className="text-gray-600 mb-2">暂无可用的模拟用户</p>
+                                    <p className="text-sm text-gray-500">请稍后再试</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* 底部按钮 */}
-                        <div className="flex justify-center items-center pt-4 border-t border-gray-200">
+                        <div className="flex justify-center items-center gap-3 pt-4 border-t border-gray-200">
                             <Button
                                 variant="outline"
-                                onClick={() => setShowSimulatedUserPool(false)}
+                                onClick={() => {
+                                    setShowSimulatedUserPool(false);
+                                    setSelectedUsers([]);
+                                }}
                                 className="px-6"
                             >
                                 {t('modals.simulatedUserPool.cancel')}
                             </Button>
+                            {selectedUsers.length > 0 && (
+                                <Button
+                                    onClick={handleConfirmAdd}
+                                    className="bg-primary hover:bg-primary/90 text-white px-6"
+                                >
+                                    确认添加 ({selectedUsers.length})
+                                </Button>
+                            )}
                         </div>
                     </DialogContent>
                 </Dialog>
