@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // 调研信息接口
 export interface SurveyInfo {
@@ -52,14 +53,26 @@ interface SurveyStore {
     clearAll: () => void;
 }
 
-// ✅ 创建纯内存 store（不持久化到 sessionStorage）
-export const useSurveyStore = create<SurveyStore>((set) => ({
-    surveyInfo: null,
-    interviewData: null,
+// 创建 store，使用 persist 中间件持久化到 sessionStorage
+export const useSurveyStore = create<SurveyStore>()(
+    persist(
+        (set) => ({
+            surveyInfo: null,
+            interviewData: null,
 
-    setSurveyInfo: (info) => set({ surveyInfo: info }),
-    setInterviewData: (data) => set({ interviewData: data }),
-    clearSurveyInfo: () => set({ surveyInfo: null }),
-    clearInterviewData: () => set({ interviewData: null }),
-    clearAll: () => set({ surveyInfo: null, interviewData: null }),
-}));
+            setSurveyInfo: (info) => set({ surveyInfo: info }),
+            setInterviewData: (data) => set({ interviewData: data }),
+            clearSurveyInfo: () => set({ surveyInfo: null }),
+            clearInterviewData: () => set({ interviewData: null }),
+            clearAll: () => set({ surveyInfo: null, interviewData: null }),
+        }),
+        {
+            name: 'vf-survey-storage', // sessionStorage key
+            partialize: (state) => ({
+                surveyInfo: state.surveyInfo,
+                interviewData: state.interviewData,
+            }),
+        }
+    )
+);
+

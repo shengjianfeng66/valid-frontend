@@ -36,7 +36,7 @@ export function DraftProvider({ children }: { children: React.ReactNode }) {
                 // 避免从 dashboard 跳转到 goal 时清空数据
                 if (pathname && !pathname.includes('/insight/')) {
                     clearForm();
-                    // ✅ 清空调研数据（内存中的 Zustand store）
+                    // ✅ 清空调研数据（同时清空 sessionStorage）
                     useSurveyStore.getState().clearAll();
                 }
             }
