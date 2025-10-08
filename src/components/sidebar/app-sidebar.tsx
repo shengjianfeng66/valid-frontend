@@ -135,39 +135,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   加载中...
                 </div>
               ) : interviews && interviews.length > 0 ? (
-                interviews
-                  .filter(interview => interview.project_id !== null) // 只显示有 project_id 的项目
-                  .map((interview) => {
-                    const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
-                      year: '2-digit',
-                      month: '2-digit',
-                      day: '2-digit'
-                    }).replace(/\//g, '/');
+                interviews.map((interview) => {
+                  const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit'
+                  }).replace(/\//g, '/');
 
-                    return (
-                      <SidebarMenuItem key={interview.id}>
-                        <SidebarMenuButton className="text-gray-900" asChild>
-                          <NavigationLink
-                            href={`/insight/interview?project_id=${interview.project_id}`}
-                            hasDraft={hasDraft}
-                            onLeave={clearDraft}
-                            className="flex items-center gap-3 px-3 py-6"
-                          >
-                            <FileText className="w-4 h-4 text-gray-500" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium truncate leading-5">
-                                {interview.name}
-                              </div>
-                              <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
-                                <span>项目 #{interview.project_id}</span>
-                                <span>{date}</span>
-                              </div>
+                  return (
+                    <SidebarMenuItem key={interview.id}>
+                      <SidebarMenuButton className="text-gray-900" asChild>
+                        <NavigationLink
+                          href={`/insight/interview?id=${interview.id}`}
+                          hasDraft={hasDraft}
+                          onLeave={clearDraft}
+                          className="flex items-center gap-3 px-3 py-6"
+                        >
+                          <FileText className="w-4 h-4 text-gray-500" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate leading-5">
+                              {interview.name}
                             </div>
-                          </NavigationLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    );
-                  })
+                            <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
+                              <span>访谈 #{interview.id}</span>
+                              <span>{date}</span>
+                            </div>
+                          </div>
+                        </NavigationLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })
               ) : (
                 <div className="px-3 py-6 text-center text-sm text-gray-500">
                   暂无项目
