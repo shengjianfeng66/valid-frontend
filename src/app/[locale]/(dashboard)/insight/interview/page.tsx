@@ -42,7 +42,22 @@ import { useTranslations } from "next-intl";
 
 // API 数据类型定义
 interface PersonaContent {
-    [key: string]: string;
+    meta?: any;
+    user_profile_tags?: {
+        [categoryKey: string]: {
+            name: string;
+            description?: string;
+            subcategories?: {
+                [subKey: string]: {
+                    name: string;
+                    tags: {
+                        [tagKey: string]: string;
+                    }
+                }
+            }
+        }
+    };
+    [key: string]: any;
 }
 
 interface PersonaFromAPI {
@@ -85,155 +100,42 @@ const fetcher = async (url: string, count: number): Promise<PersonasResponse> =>
 // 将 API 返回的数据转换为组件需要的格式
 function transformPersonaToUser(persona: PersonaFromAPI): any {
     const content = persona.content;
+    const attributes: Record<string, string> = {};
+
+    // 提取所有标签
+    if (content.user_profile_tags) {
+        Object.keys(content.user_profile_tags).forEach(categoryKey => {
+            const category = content.user_profile_tags![categoryKey];
+
+            // 遍历子分类
+            if (category.subcategories) {
+                Object.keys(category.subcategories).forEach(subKey => {
+                    const subcategory = category.subcategories![subKey];
+
+                    // 提取所有tags
+                    if (subcategory.tags) {
+                        Object.keys(subcategory.tags).forEach(tagKey => {
+                            attributes[tagKey] = subcategory.tags[tagKey];
+                        });
+                    }
+                });
+            }
+        });
+    }
 
     return {
         id: `api-${persona.id}`,
         name: persona.name,
         avatar: "😊",
-        attributes: content,
+        status: "等待中",
+        isReal: false,
+        attributes: attributes,
+        rawContent: content, // 保存原始 content 供详情页使用
         source: persona.source,
         created_at: persona.created_at
     };
 }
 
-// 模拟用户数据
-const mockUsers = [
-    {
-        id: "1",
-        name: "张雨晴",
-        age: 28,
-        location: "北京一线",
-        avatar: "🤗",
-        status: "视频通话中",
-        tags: ["创意爱好", "上班族", "数码爱好者", "理想主义"],
-        isReal: true
-    },
-    {
-        id: "2",
-        name: "李小红",
-        age: 32,
-        location: "上海一线",
-        avatar: "😊",
-        status: "视频通话中",
-        tags: ["通勤族", "实用", "时间敏感", "精致生活"],
-        isReal: true
-    },
-    {
-        id: "3",
-        name: "王大伟",
-        age: 29,
-        location: "广州一线",
-        avatar: "😄",
-        status: "准备中",
-        tags: ["品质生活", "细致", "追求完美", "社交达人"],
-        isReal: true
-    },
-    {
-        id: "4",
-        name: "陈美丽",
-        age: 24,
-        location: "深圳一线",
-        avatar: "🤗",
-        status: "已完成",
-        tags: ["创意爱好", "上班族", "追求品质", "精致生活"],
-        isReal: true
-    },
-    {
-        id: "5",
-        name: "刘强",
-        age: 27,
-        location: "杭州新一线",
-        avatar: "😎",
-        status: "等待中",
-        tags: ["效率", "实用", "文艺青年", "追求品质"],
-        isReal: true
-    },
-    {
-        id: "6",
-        name: "赵敏",
-        age: 27,
-        location: "南京新一线",
-        avatar: "😊",
-        status: "视频通话中",
-        attributes: {
-            "性格": "ENTP",
-            "国籍": "中国",
-            "职业": "设计师",
-            "月入": "15000",
-            "教育": "本科",
-            "婚恋": "未婚"
-        },
-        isReal: false
-    },
-    {
-        id: "7",
-        name: "孙小明",
-        age: 25,
-        location: "成都新一线",
-        avatar: "🙂",
-        status: "准备中",
-        attributes: {
-            "性格": "INTJ",
-            "国籍": "中国",
-            "职业": "程序员",
-            "月入": "20000",
-            "教育": "硕士",
-            "婚恋": "已婚"
-        },
-        isReal: false
-    },
-    {
-        id: "8",
-        name: "周丽娜",
-        age: 30,
-        location: "武汉新一线",
-        avatar: "😍",
-        status: "已完成",
-        attributes: {
-            "性格": "ESFP",
-            "国籍": "中国",
-            "职业": "摄影师",
-            "月入": "12000",
-            "教育": "本科",
-            "婚恋": "未婚"
-        },
-        isReal: false
-    },
-    {
-        id: "9",
-        name: "吴建华",
-        age: 35,
-        location: "西安新一线",
-        avatar: "🤓",
-        status: "等待中",
-        attributes: {
-            "性格": "ISTJ",
-            "国籍": "中国",
-            "职业": "教师",
-            "月入": "8000",
-            "教育": "博士",
-            "婚恋": "已婚"
-        },
-        isReal: false
-    },
-    {
-        id: "10",
-        name: "郑小芳",
-        age: 26,
-        location: "青岛二线",
-        avatar: "😋",
-        status: "视频通话中",
-        attributes: {
-            "性格": "ENFJ",
-            "国籍": "中国",
-            "职业": "营养师",
-            "月入": "10000",
-            "教育": "本科",
-            "婚恋": "未婚"
-        },
-        isReal: false
-    }
-];
 
 function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void }) {
     const t = useTranslations('interview');
@@ -290,7 +192,6 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
-                        <p className="text-xs text-gray-600 mb-2">男 {user.age}岁 {user.location}</p>
 
                         {/* 状态标签 */}
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
@@ -385,7 +286,7 @@ export default function InterviewPage() {
 
     // 使用 SWR 获取推荐用户
     const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
-        ['http://localhost:8000/api/v1/persona/recommend', 10],
+        ['http://localhost:8000/api/v1/persona/recommend', 2],
         ([url, count]) => fetcher(url, count),
         {
             revalidateOnFocus: false,
@@ -424,32 +325,9 @@ export default function InterviewPage() {
         }
     ];
 
-    const realUsers = mockUsers.filter(user => user.isReal && false); // 临时设置为空来测试空状态
+    const realUsers: any[] = []; // 真人用户列表（暂时为空）
     // 使用推荐用户和添加的用户，过滤掉已删除的
     const simulatedUsers = [...recommendedUsers, ...addedSimulatedUsers.filter(user => !removedUserIds.includes(user.id))];
-
-    // 模拟用户池数据
-    const simulatedUserPool = Array.from({ length: 16 }, (_, index) => ({
-        id: `pool-${index + 1}`,
-        name: "夏宇轩",
-        age: 24,
-        location: "杭州新一线",
-        avatar: "😊",
-        status: "等待中", // 添加状态字段
-        isReal: false, // 标记为模拟用户
-        attributes: {
-            "性格": "ENTP",
-            "国籍": "巴西",
-            "人种": "黄种人",
-            "职业": "金融业",
-            "月入": "42000",
-            "教育": "本科毕业",
-            "婚恋": "未婚",
-            "子女": "无",
-            "住房": "有房无贷"
-        },
-        hobbies: ["摄影", "烘焙", "瑜伽", "钓鱼", "阅读", "编程"]
-    }));
 
     const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -489,12 +367,7 @@ export default function InterviewPage() {
     };
 
     const handleConfirmAdd = () => {
-        // 获取选中的用户数据
-        const selectedUserData = simulatedUserPool.filter(user => selectedUsers.includes(user.id));
-
-        // 将选中的用户添加到已添加列表中
-        setAddedSimulatedUsers(prev => [...prev, ...selectedUserData]);
-
+        // TODO: 从实际的用户池中获取选中的用户数据
         toast.success(t('toast.addSimulatedUsersSuccess', { count: selectedUsers.length }), {
             description: t('toast.addSimulatedUsersDescription')
         });
@@ -832,68 +705,24 @@ export default function InterviewPage() {
                         </DialogHeader>
 
                         {/* 用户池网格 */}
-                        <div className="grid grid-cols-4 gap-4 py-6">
-                            {simulatedUserPool.map((user) => (
-                                <div
-                                    key={user.id}
-                                    className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer relative"
-                                    onClick={() => toggleUserSelection(user.id)}
-                                >
-                                    {/* 选择指示器 */}
-                                    <div className="absolute top-2 right-2">
-                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedUsers.includes(user.id)
-                                            ? 'bg-green-500 border-green-500'
-                                            : 'bg-white border-gray-300'
-                                            }`}>
-                                            {selectedUsers.includes(user.id) && (
-                                                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                </svg>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* 用户基本信息 */}
-                                    <div className="flex items-start gap-3 mb-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">
-                                            {user.avatar}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>
-                                            </div>
-                                            <p className="text-xs text-gray-600 mb-2">男 {user.age}岁 {user.location}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* 属性标签网格 - 一行三个 */}
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {Object.entries(user.attributes).slice(0, 6).map(([key, value], index) => (
-                                            <div key={index} className="bg-gray-50 rounded-lg px-2 py-1.5 flex flex-col items-center">
-                                                <span className="text-xs text-gray-600">{key}</span>
-                                                <span className="text-xs font-medium text-gray-900">{String(value)}</span>
-                                            </div>
-                                        ))}
-                                    </div>
+                        <div className="py-12">
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <Bot className="w-8 h-8 text-gray-400" />
                                 </div>
-                            ))}
+                                <p className="text-gray-600 mb-2">模拟用户池功能开发中</p>
+                                <p className="text-sm text-gray-500">即将支持从用户池中选择模拟用户</p>
+                            </div>
                         </div>
 
                         {/* 底部按钮 */}
-                        <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                        <div className="flex justify-center items-center pt-4 border-t border-gray-200">
                             <Button
                                 variant="outline"
                                 onClick={() => setShowSimulatedUserPool(false)}
                                 className="px-6"
                             >
                                 {t('modals.simulatedUserPool.cancel')}
-                            </Button>
-                            <Button
-                                onClick={handleConfirmAdd}
-                                disabled={selectedUsers.length === 0}
-                                className="bg-primary hover:bg-primary/90 text-white px-6"
-                            >
-                                {t('modals.simulatedUserPool.confirmAdd', { count: selectedUsers.length })}
                             </Button>
                         </div>
                     </DialogContent>

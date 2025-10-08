@@ -16,29 +16,41 @@ interface UserDetailSheetProps {
 }
 
 export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetailSheetProps) {
-    // 模拟数据 - 基本标签
-    const basicTags = [
-        "李梦瑶", "女", "28岁", "身高165cm", "52kg", "新一线城市",
-        "月薪8500", "互联网运营专员", "本科", "白领", "黄种人/亚洲人",
-        "已婚", "无子女", "有(贷款购房)", "无车"
-    ];
+    // 动态提取所有分类
+    const getCategories = () => {
+        const content = (selectedUser as any)?.rawContent;
+        if (!content?.user_profile_tags) return [];
 
-    // 模拟数据 - 性格喜好
-    const personalityTags = [
-        "ENFP-A(活动家)", "摄影", "烘焙", "瑜伽", "追剧",
-        "阅读", "旅游", "美食探店", "宠物养护"
-    ];
+        return Object.keys(content.user_profile_tags).map(categoryKey => {
+            const category = content.user_profile_tags[categoryKey];
+            const tags: Array<{ key: string; value: string }> = [];
 
-    // 模拟数据 - 业务属性
-    const businessTags = [
-        "种草达人型", "品质导向型", "冲动消费型", "社交影响型",
-        "淘宝", "小红书商城", "京东", "美妆", "服装", "家居用品",
-        "零食", "数码配件", "宠物用品", "周均下单3次", "周均浏览15次"
-    ];
+            // 提取该分类下的所有标签
+            if (category.subcategories) {
+                Object.keys(category.subcategories).forEach(subKey => {
+                    const subcategory = category.subcategories[subKey];
+                    if (subcategory?.tags) {
+                        Object.entries(subcategory.tags).forEach(([key, value]) => {
+                            tags.push({ key, value: String(value) });
+                        });
+                    }
+                });
+            }
+
+            return {
+                key: categoryKey,
+                name: category.name || categoryKey,
+                description: category.description,
+                tags
+            };
+        });
+    };
+
+    const categories = getCategories();
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="w-[500px] sm:w-[600px] overflow-y-auto">
+            <SheetContent className="w-[65vw] min-w-[800px] max-w-[95vw] overflow-y-auto">
                 <SheetHeader className="pb-4">
                     <SheetTitle className="flex items-center gap-3 text-xl">
                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-xl">
@@ -72,64 +84,67 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                         </div>
 
                         {/* 标签页 */}
-                        <Tabs defaultValue="basic" className="w-full">
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="basic">基本标签</TabsTrigger>
-                                <TabsTrigger value="personality">性格喜好</TabsTrigger>
-                                <TabsTrigger value="business">业务属性</TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="basic" className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-900">基本标签</h3>
-                                    <span className="text-sm text-gray-500">{basicTags.length}</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {basicTags.map((tag, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium"
-                                        >
-                                            {tag}
-                                        </span>
+                        {categories.length > 0 ? (
+                            <Tabs defaultValue={categories[0]?.key} className="w-full">
+                                <TabsList
+                                    className="grid w-full"
+                                    style={{ gridTemplateColumns: `repeat(${Math.min(categories.length, 5)}, minmax(0, 1fr))` }}
+                                >
+                                    {categories.map(category => (
+                                        <TabsTrigger key={category.key} value={category.key}>
+                                            {category.name}
+                                        </TabsTrigger>
                                     ))}
-                                </div>
-                            </TabsContent>
+                                </TabsList>
 
-                            <TabsContent value="personality" className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-900">性格喜好</h3>
-                                    <span className="text-sm text-gray-500">{personalityTags.length}</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {personalityTags.map((tag, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </TabsContent>
+                                {categories.map((category, catIndex) => {
+                                    // 为不同的分类设置不同的颜色
+                                    const colors = [
+                                        { bg: 'bg-gray-100', text: 'text-gray-600', textDark: 'text-gray-900' },
+                                        { bg: 'bg-blue-50', text: 'text-blue-600', textDark: 'text-blue-900' },
+                                        { bg: 'bg-green-50', text: 'text-green-600', textDark: 'text-green-900' },
+                                        { bg: 'bg-purple-50', text: 'text-purple-600', textDark: 'text-purple-900' },
+                                        { bg: 'bg-orange-50', text: 'text-orange-600', textDark: 'text-orange-900' }
+                                    ];
+                                    const color = colors[catIndex % colors.length];
 
-                            <TabsContent value="business" className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-lg font-semibold text-gray-900">业务属性</h3>
-                                    <span className="text-sm text-gray-500">{businessTags.length}</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {businessTags.map((tag, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </TabsContent>
-                        </Tabs>
+                                    return (
+                                        <TabsContent key={category.key} value={category.key} className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                                                    {category.description && (
+                                                        <p className="text-xs text-gray-500 mt-1">{category.description}</p>
+                                                    )}
+                                                </div>
+                                                <span className="text-sm text-gray-500">{category.tags.length}</span>
+                                            </div>
+                                            {category.tags.length > 0 ? (
+                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                    {category.tags.map((tag, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className={`px-3 py-2 ${color.bg} rounded-lg`}
+                                                        >
+                                                            <div className={`text-xs ${color.text}`}>{tag.key}</div>
+                                                            <div className={`text-sm font-medium ${color.textDark}`}>{tag.value}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">
+                                                    <p className="text-sm">暂无{category.name}</p>
+                                                </div>
+                                            )}
+                                        </TabsContent>
+                                    );
+                                })}
+                            </Tabs>
+                        ) : (
+                            <div className="text-center py-12 text-gray-500">
+                                <p className="text-sm">暂无标签数据</p>
+                            </div>
+                        )}
 
                         {/* 问答记录 */}
                         <div className="space-y-4">
