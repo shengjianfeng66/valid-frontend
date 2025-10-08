@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import useSWR from "swr"
+import { useRouter } from 'next/navigation'
 
 import {
   Home,
@@ -60,6 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const t = useTranslations()
   const { user } = useAppContext()
   const { hasDraft, clearDraft } = useDraft()
+  const router = useRouter()
 
   // 使用 SWR 获取项目列表
   const { data: interviews, error, isLoading } = useSWR(
@@ -77,6 +79,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       console.error('获取项目列表失败:', error);
     }
   }, [error]);
+
+  // 处理访谈项点击
+  const handleInterviewClick = (id: number) => {
+    if (hasDraft) {
+      const confirmed = window.confirm('您有未保存的更改，是否继续？');
+      if (confirmed) {
+        clearDraft();
+        router.push(`/insight/interview?id=${id}`);
+      }
+    } else {
+      router.push(`/insight/interview?id=${id}`);
+    }
+  };
 
   return (
     <Sidebar className="border-r-0" {...props}>

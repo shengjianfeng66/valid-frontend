@@ -18,6 +18,7 @@ import {
 } from "@/components/stepper";
 import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from 'next/navigation';
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -270,6 +271,9 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
 
 export default function InterviewPage() {
     const t = useTranslations('interview');
+    const searchParams = useSearchParams();
+    const interviewId = searchParams.get('id');
+
     const realUsersRef = useRef<HTMLDivElement>(null);
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -296,6 +300,31 @@ export default function InterviewPage() {
         }
     );
 
+    // 使用 SWR 获取访谈详情
+    const { data: interviewData, error: interviewError, isLoading: isLoadingInterview } = useSWR(
+        interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
+        async (url: string) => {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('📝 获取到访谈详情:', data);
+            return data;
+        },
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+        }
+    );
+
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
         ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
@@ -310,6 +339,30 @@ export default function InterviewPage() {
             });
         }
     }, [error]);
+
+    // 处理访谈详情错误
+    useEffect(() => {
+        if (interviewError) {
+            console.error('❌ 获取访谈详情失败:', interviewError);
+            toast.error('获取访谈详情失败', {
+                description: '请检查后端服务是否正常运行'
+            });
+        }
+    }, [interviewError]);
+
+    // 监听访谈数据变化
+    useEffect(() => {
+        if (interviewData) {
+            console.log('✅ 访谈数据已加载:', {
+                id: interviewData.id,
+                name: interviewData.name,
+                description: interviewData.description,
+                state: interviewData.state,
+                created_at: interviewData.created_at,
+                fullData: interviewData
+            });
+        }
+    }, [interviewData]);
 
     // 邀请流程步骤数据
     const inviteSteps = [
