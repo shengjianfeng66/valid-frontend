@@ -290,16 +290,6 @@ export default function InterviewPage() {
     const [simulatedUserPoolData, setSimulatedUserPoolData] = useState<any[]>([]);
     const [isLoadingUserPool, setIsLoadingUserPool] = useState(false);
 
-    // 使用 SWR 获取推荐用户
-    const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
-        ['http://localhost:8000/api/v1/persona/recommend', 2],
-        ([url, count]) => fetcher(url, count),
-        {
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-        }
-    );
-
     // 使用 SWR 获取访谈详情
     const { data: interviewData, error: interviewError, isLoading: isLoadingInterview } = useSWR(
         interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
@@ -325,10 +315,34 @@ export default function InterviewPage() {
         }
     );
 
+    // 从访谈详情中获取推荐人数
+    const recommendedCount = interviewData?.participants?.recommended_total || 0;
+
+    // 使用 SWR 获取推荐用户 - 使用访谈详情中的推荐人数
+    const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
+        interviewData ? ['http://localhost:8000/api/v1/persona/recommend', recommendedCount] : null,
+        ([url, count]) => fetcher(url, count),
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+        }
+    );
+
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
         ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
         : [];
+
+    // 监听推荐用户数据加载
+    useEffect(() => {
+        if (personasData) {
+            console.log('👥 推荐用户数据已加载:', {
+                请求数量: recommendedCount,
+                实际返回: personasData.total_count,
+                用户列表长度: recommendedUsers.length
+            });
+        }
+    }, [personasData, recommendedCount, recommendedUsers.length]);
 
     // 处理错误
     useEffect(() => {
@@ -359,8 +373,10 @@ export default function InterviewPage() {
                 description: interviewData.description,
                 state: interviewData.state,
                 created_at: interviewData.created_at,
+                recommended_total: interviewData.participants?.recommended_total,
                 fullData: interviewData
             });
+            console.log('📊 推荐用户数量:', interviewData.participants?.recommended_total || 2);
         }
     }, [interviewData]);
 
