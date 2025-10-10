@@ -152,18 +152,20 @@ export const authOptions: NextAuthConfig = {
           return token;
         }
 
+        // @ts-ignore
         const userInfo = await handleSignInUser(user, account);
+        // @ts-ignore
         if (!userInfo) {
           throw new Error("save user failed");
         }
 
-        token.user = {
-          uuid: userInfo.uuid,
-          email: userInfo.email,
-          nickname: userInfo.nickname,
-          avatar_url: userInfo.avatar_url,
-          created_at: userInfo.created_at,
-        };
+        // token.user = {
+        //   uuid: userInfo.uuid,
+        //   email: userInfo.email,
+        //   nickname: userInfo.nickname,
+        //   avatar_url: userInfo.avatar_url,
+        //   created_at: userInfo.created_at,
+        // };
 
         return token;
       } catch (e) {
