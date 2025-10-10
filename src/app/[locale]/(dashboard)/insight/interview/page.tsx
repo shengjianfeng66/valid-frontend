@@ -535,6 +535,77 @@ export default function InterviewPage() {
         setSelectedUsers([]);
     };
 
+    // 开始访谈
+    const handleStartInterview = async () => {
+        if (!interviewData) {
+            toast.error('无法开始访谈', {
+                description: '访谈数据未加载'
+            });
+            return;
+        }
+
+        // 提取所有模拟用户的真实 ID（去掉 "api-" 前缀）
+        console.log('模拟用户列表:', simulatedUsers.map(u => ({ id: u.id, name: u.name })));
+
+        const intervieweeIds = simulatedUsers
+            .map(user => {
+                // user.id 格式是 "api-123"，需要提取数字部分
+                const match = user.id.match(/^api-(\d+)$/);
+                return match ? parseInt(match[1], 10) : null;
+            })
+            .filter((id): id is number => id !== null);
+
+        console.log('提取的 interviewee IDs:', intervieweeIds);
+
+        if (intervieweeIds.length === 0) {
+            toast.error('无法开始访谈', {
+                description: '请至少添加一个模拟用户'
+            });
+            return;
+        }
+
+        try {
+            console.log('开始访谈，参数:', {
+                interview_id: interviewData.id,
+                interviewee_ids: intervieweeIds
+            });
+
+            const response = await fetch('http://localhost:8000/api/v1/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    interview_id: interviewData.id,
+                    interviewee_ids: intervieweeIds
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('访谈开始成功:', data);
+
+            toast.success('访谈已开始', {
+                description: `正在访谈 ${intervieweeIds.length} 位用户`
+            });
+
+            // 显示加载弹窗
+            setShowLoadingModal(true);
+
+            // TODO: 可以考虑重新获取访谈详情以更新状态
+            // mutate(); // 如果使用 SWR 的 mutate 函数
+
+        } catch (error) {
+            console.error('开始访谈失败:', error);
+            toast.error('开始访谈失败', {
+                description: '请检查后端服务是否正常运行'
+            });
+        }
+    };
+
     // 处理用户菜单点击
     const handleViewDetails = (userId: string) => {
         const user = [...recommendedUsers, ...addedSimulatedUsers, ...simulatedUserPoolData].find(u => u.id === userId);
@@ -658,7 +729,14 @@ export default function InterviewPage() {
                                     </div>
                                     <Button
                                         className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
-                                        onClick={() => setShowLoadingModal(true)}
+                                        onClick={() => {
+                                            if (interviewData.state === 0) {
+                                                handleStartInterview();
+                                            } else if (interviewData.state === 1) {
+                                                // TODO: 实现结束访谈接口
+                                                setShowLoadingModal(true);
+                                            }
+                                        }}
                                         disabled={interviewData.state === 2}
                                     >
                                         {interviewData.state === 0 ? t('interview.startInterview') :
