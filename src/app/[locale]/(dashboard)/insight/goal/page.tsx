@@ -38,11 +38,11 @@ import {
 import { Check } from "lucide-react";
 
 interface FormData {
-  productName: string;
-  businessType: string;
-  targetUsers: string;
-  researchGoals: string;
-  productSolution: (File & { _content?: string })[];
+  product_name: string;
+  business_type: string;
+  target_users: string;
+  research_goal: string;
+  product_solution: (File & { _content?: string })[];
 }
 
 export default function Page() {
@@ -76,7 +76,7 @@ export default function Page() {
     // 只在初始加载时同步一次，之后不再重新同步
     if (hasSyncedAttachmentsRef.current) return;
     if (!attachments || attachments.length === 0) return;
-    if (formData.productSolution && formData.productSolution.length > 0) return; // 已有文件，不覆盖
+    if (formData.product_solution && formData.product_solution.length > 0) return; // 已有文件，不覆盖
 
     // 将附件转换为产品方案文件
     const convertAttachmentsToFiles = async () => {
@@ -118,20 +118,20 @@ export default function Page() {
       if (validFiles.length > 0) {
         // 只有在成功转换文件后才标记为已同步
         hasSyncedAttachmentsRef.current = true;
-        updateField('productSolution', validFiles);
+        updateField('product_solution', validFiles);
       }
     };
 
     convertAttachmentsToFiles();
-  }, [attachments, formData.productSolution, updateField]);
+  }, [attachments, formData.product_solution, updateField]);
 
   // 表单验证函数
   const validateForm = () => {
     const requiredFields = [
-      { key: 'productName', label: t('validation.fields.productName') },
-      { key: 'businessType', label: t('validation.fields.businessType') },
-      { key: 'targetUsers', label: t('validation.fields.targetUsers') },
-      { key: 'researchGoals', label: t('validation.fields.researchGoals') }
+      { key: 'product_name', label: t('validation.fields.productName') },
+      { key: 'business_type', label: t('validation.fields.businessType') },
+      { key: 'target_users', label: t('validation.fields.targetUsers') },
+      { key: 'research_goal', label: t('validation.fields.researchGoals') }
     ];
 
     const missingFields = requiredFields.filter(field => {
@@ -158,13 +158,13 @@ export default function Page() {
 
     // ✅ 将调研信息存储到 Zustand store，供 outline 页面使用
     const surveyInfo = {
-      productName: formData.productName,
-      businessType: formData.businessType,
-      targetUsers: formData.targetUsers,
-      userConcerns: formData.researchGoals || '',
+      product_name: formData.product_name,
+      business_type: formData.business_type,
+      target_users: formData.target_users,
+      userConcerns: formData.research_goal || '',
       coreFeatures: '',
-      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
-      productSolutionName: formData.productSolution?.map(file => file.name).join(', ') || '',
+      hasProductSolution: formData.product_solution && formData.product_solution.length > 0,
+      productSolutionName: formData.product_solution?.map(file => file.name).join(', ') || '',
     };
 
     useSurveyStore.getState().setSurveyInfo(surveyInfo);
@@ -230,20 +230,20 @@ export default function Page() {
   useCopilotReadable({
     description: "当前表单的所有数据，包括产品名称、业务类型、目标用户画像、调研目标、产品方案文件和用户上传的附件信息",
     value: {
-      productName: formData.productName,
-      businessType: formData.businessType,
-      targetUsers: formData.targetUsers,
-      researchGoals: formData.researchGoals,
-      hasProductSolution: formData.productSolution && formData.productSolution.length > 0,
-      productSolutionFiles: formData.productSolution && formData.productSolution.length > 0
-        ? formData.productSolution.map(file => ({
+      product_name: formData.product_name,
+      business_type: formData.business_type,
+      target_users: formData.target_users,
+      research_goal: formData.research_goal,
+      hasProductSolution: formData.product_solution && formData.product_solution.length > 0,
+      productSolutionFiles: formData.product_solution && formData.product_solution.length > 0
+        ? formData.product_solution.map(file => ({
           name: file.name,
           size: file.size,
           type: file.type,
           sizeInKB: (file.size / 1024).toFixed(2)
         }))
         : null,
-      productSolutionCount: formData.productSolution?.length || 0,
+      productSolutionCount: formData.product_solution?.length || 0,
       attachments: attachments.length > 0 ? attachments.map((item: any) => ({
         name: item.name,
         size: item.size,
@@ -260,13 +260,13 @@ export default function Page() {
     name: "updateProductName",
     description: t('actions.updateProductName'),
     parameters: [{
-      name: "productName",
+      name: "product_name",
       type: "string",
       description: "新的产品名称",
       required: true,
     }],
-    handler: ({ productName }) => {
-      updateField('productName', productName);
+    handler: ({ product_name }) => {
+      updateField('product_name', product_name);
     },
   });
 
@@ -275,13 +275,13 @@ export default function Page() {
     name: "updateBusinessType",
     description: t('actions.updateBusinessType'),
     parameters: [{
-      name: "businessType",
+      name: "business_type",
       type: "string",
       description: "新的业务类型，如：笔记APP、工具类、社交类等",
       required: true,
     }],
-    handler: ({ businessType }) => {
-      updateField('businessType', businessType);
+    handler: ({ business_type }) => {
+      updateField('business_type', business_type);
     },
   });
 
@@ -290,13 +290,13 @@ export default function Page() {
     name: "updateTargetUsers",
     description: t('actions.updateTargetUsers'),
     parameters: [{
-      name: "targetUsers",
+      name: "target_users",
       type: "string",
       description: "目标用户群体描述，如：年轻女性用户、下沉市场用户、重度购物用户等",
       required: true,
     }],
-    handler: ({ targetUsers }) => {
-      updateField('targetUsers', targetUsers);
+    handler: ({ target_users }) => {
+      updateField('target_users', target_users);
     },
   });
 
@@ -305,13 +305,13 @@ export default function Page() {
     name: "updateResearchGoals",
     description: t('actions.updateResearchGoals'),
     parameters: [{
-      name: "researchGoals",
+      name: "research_goal",
       type: "string",
       description: "调研目标，如：了解用户使用习惯、验证产品功能需求、分析用户痛点等",
       required: true,
     }],
-    handler: ({ researchGoals }) => {
-      updateField('researchGoals', researchGoals);
+    handler: ({ research_goal }) => {
+      updateField('research_goal', research_goal);
     },
   });
 
@@ -335,12 +335,12 @@ export default function Page() {
     parameters: [],
     handler: () => {
       setFormData({
-        productName: "Dreamoo",
-        businessType: "笔记APP、工具类、社交类",
-        targetUsers: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
-        researchGoals: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
+        product_name: "Dreamoo",
+        business_type: "笔记APP、工具类、社交类",
+        target_users: "年轻女性用户、下沉市场用户、重度购物用户等\n\n请详细描述您的目标用户群体特征",
+        research_goal: "了解用户使用习惯、验证产品功能需求、分析用户痛点等\n\n请描述您希望通过调研了解什么",
         // 不清空现有的产品方案文件
-        productSolution: formData.productSolution,
+        product_solution: formData.product_solution,
       });
     },
   });
@@ -485,7 +485,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
     const maxSize = 100 * 1024 * 1024; // 100MB
 
     const validFiles: File[] = [];
-    const currentFiles = formData.productSolution || [];
+    const currentFiles = formData.product_solution || [];
 
     // 验证所有文件
     for (let i = 0; i < files.length; i++) {
@@ -522,7 +522,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
 
       Promise.all(filePromises).then((filesWithContent) => {
         // 添加到现有文件列表
-        updateField('productSolution', [...currentFiles, ...filesWithContent]);
+        updateField('product_solution', [...currentFiles, ...filesWithContent]);
       });
     }
 
@@ -533,14 +533,14 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
   };
 
   const handleRemoveFile = (index: number) => {
-    console.log('删除文件:', index, '当前文件数:', formData.productSolution?.length);
-    const currentFiles = formData.productSolution || [];
+    console.log('删除文件:', index, '当前文件数:', formData.product_solution?.length);
+    const currentFiles = formData.product_solution || [];
     const newFiles = currentFiles.filter((_, i) => i !== index);
     console.log('删除后文件数:', newFiles.length);
 
     // 删除文件
 
-    updateField('productSolution', newFiles.length > 0 ? newFiles : []);
+    updateField('product_solution', newFiles.length > 0 ? newFiles : []);
   };
 
   const handleUploadClick = () => {
@@ -566,8 +566,8 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             </label>
             <input
               type="text"
-              value={formData.productName}
-              onChange={(e) => handleInputChange('productName', e.target.value)}
+              value={formData.product_name}
+              onChange={(e) => handleInputChange('product_name', e.target.value)}
               placeholder={t('form.productName.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
@@ -580,8 +580,8 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             </label>
             <input
               type="text"
-              value={formData.businessType}
-              onChange={(e) => handleInputChange('businessType', e.target.value)}
+              value={formData.business_type}
+              onChange={(e) => handleInputChange('business_type', e.target.value)}
               placeholder={t('form.businessType.placeholder')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             />
@@ -595,8 +595,8 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             {t('form.targetUsers.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
-            value={formData.targetUsers}
-            onChange={(e) => handleInputChange('targetUsers', e.target.value)}
+            value={formData.target_users}
+            onChange={(e) => handleInputChange('target_users', e.target.value)}
             placeholder={t('form.targetUsers.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
@@ -610,8 +610,8 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             {t('form.researchGoals.label')} <span className="text-red-500">*</span>
           </label>
           <textarea
-            value={formData.researchGoals}
-            onChange={(e) => handleInputChange('researchGoals', e.target.value)}
+            value={formData.research_goal}
+            onChange={(e) => handleInputChange('research_goal', e.target.value)}
             placeholder={t('form.researchGoals.placeholder')}
             rows={4}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
@@ -623,17 +623,17 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {t('form.productSolution.label')}
-            {formData.productSolution && formData.productSolution.length > 0 && (
+            {formData.product_solution && formData.product_solution.length > 0 && (
               <span className="ml-2 text-xs text-gray-500">
-                ({formData.productSolution.length} 个文件)
+                ({formData.product_solution.length} 个文件)
               </span>
             )}
           </label>
 
           {/* 已上传文件列表 */}
-          {formData.productSolution && formData.productSolution.length > 0 && (
+          {formData.product_solution && formData.product_solution.length > 0 && (
             <div className="mb-3 space-y-2">
-              {formData.productSolution.map((file, index) => (
+              {formData.product_solution.map((file, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
@@ -684,7 +684,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-700">
-                  {formData.productSolution && formData.productSolution.length > 0
+                  {formData.product_solution && formData.product_solution.length > 0
                     ? '继续添加文件'
                     : t('form.productSolution.uploadText')}
                 </p>

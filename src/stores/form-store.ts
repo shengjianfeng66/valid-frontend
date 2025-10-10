@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
 interface FormData {
-    productName: string;
-    businessType: string;
-    targetUsers: string;
-    researchGoals: string;
-    productSolution: (File & { _content?: string })[];
+    product_name: string;
+    business_type: string;
+    target_users: string;
+    research_goal: string;
+    product_solution: (File & { _content?: string })[];
 }
 
 interface AttachmentItem {
@@ -33,11 +33,11 @@ interface FormStore {
 }
 
 const initialFormData: FormData = {
-    productName: "",
-    businessType: "",
-    targetUsers: "",
-    researchGoals: "",
-    productSolution: [],
+    product_name: "",
+    business_type: "",
+    target_users: "",
+    research_goal: "",
+    product_solution: [],
 };
 
 export const useFormStore = create<FormStore>()((set, get) => ({
@@ -95,10 +95,10 @@ export const useFormStore = create<FormStore>()((set, get) => ({
 
     hasData: (): boolean => {
         const { formData } = get();
-        return formData.productName.trim() !== "" ||
-            formData.businessType.trim() !== "" ||
-            formData.targetUsers.trim() !== "" ||
-            formData.researchGoals.trim() !== "" ||
-            formData.productSolution.length > 0;
+        return formData.product_name.trim() !== "" ||
+            formData.business_type.trim() !== "" ||
+            formData.target_users.trim() !== "" ||
+            formData.research_goal.trim() !== "" ||
+            formData.product_solution.length > 0;
     }
 }));

@@ -310,9 +310,9 @@ export default function CheckPage() {
           // 构建发送给 copilot 的消息
           const message = `基于以下调研信息，请帮我生成访谈大纲：
 
-产品名称：${surveyInfo.productName}
-业务类型：${surveyInfo.businessType}
-目标用户群体：${surveyInfo.targetUsers}
+产品名称：${surveyInfo.product_name}
+业务类型：${surveyInfo.business_type}
+目标用户群体：${surveyInfo.target_users}
 用户关心的方面：${surveyInfo.userConcerns}
 核心功能模块：${surveyInfo.coreFeatures}
 ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolutionName}` : ''}

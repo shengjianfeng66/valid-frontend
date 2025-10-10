@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware';
 
 // 调研信息接口
 export interface SurveyInfo {
-    productName: string;
-    businessType: string;
-    targetUsers: string;
+    product_name: string;
+    business_type: string;
+    target_users: string;
     userConcerns: string;
     coreFeatures: string;
     hasProductSolution?: boolean;
