@@ -425,14 +425,51 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
       // TODO: 从认证系统获取真实的 user_id
       const userId = 1; // 临时硬编码，后续需要从 session 或 context 中获取
 
+      // 从 Zustand store 获取调研信息
+      const currentSurveyInfo = useSurveyStore.getState().surveyInfo;
+
+      // 构建 goal 参数
+      const goal = currentSurveyInfo ? {
+        product_name: currentSurveyInfo.product_name || '',
+        business_type: currentSurveyInfo.business_type || '',
+        target_users: currentSurveyInfo.target_users || '',
+        research_goal: currentSurveyInfo.userConcerns || ''
+      } : undefined;
+
+      // 调试：查看 surveyData 状态
+      console.log('surveyData.interviewOutline:', surveyData.interviewOutline);
+      console.log('sections 数量:', surveyData.interviewOutline.sections.length);
+      console.log('opening_script:', surveyData.interviewOutline.opening_script);
+
+      // 构建 outline 参数 - 只要有 opening_script 或 sections 就发送
+      const hasOutlineData =
+        surveyData.interviewOutline.opening_script.introduction?.trim() ||
+        surveyData.interviewOutline.sections.length > 0;
+
+      const outline = hasOutlineData ? {
+        opening_script: {
+          introduction: surveyData.interviewOutline.opening_script.introduction || ''
+        },
+        sections: surveyData.interviewOutline.sections.map(section => ({
+          name: section.name,
+          questions: section.questions.map(q => ({
+            main: q.main,
+            probes: q.probes
+          }))
+        }))
+      } : undefined;
+
+      console.log('创建访谈参数:', { name: '产品用户体验访谈', user_id: userId, goal, outline });
+
       const response = await fetch('http://localhost:8000/api/v1/interview/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: '产品用户体验访谈', // 可以根据需要修改为动态名称
-          user_id: userId
+          user_id: userId,
+          goal: goal,
+          outline: outline
         })
       });
 
@@ -444,12 +481,12 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
       console.log('访谈创建成功:', data);
 
       toast.success('访谈创建成功', {
-        description: `项目ID: ${data.project_id}`
+        description: `访谈ID: ${data.id}`
       });
 
-      // 跳转到访谈页面，并带上 project_id
+      // 跳转到访谈页面，并带上访谈 id
       setCurrentStep(3);
-      router.push(`/insight/interview?project_id=${data.project_id}`);
+      router.push(`/insight/interview?id=${data.id}`);
     } catch (error) {
       console.error('创建访谈失败:', error);
       toast.error('创建访谈失败', {
