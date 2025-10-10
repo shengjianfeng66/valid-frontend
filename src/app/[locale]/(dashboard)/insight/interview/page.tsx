@@ -380,6 +380,44 @@ export default function InterviewPage() {
         }
     }, [interviewData]);
 
+    // 根据 state 获取访谈状态
+    const getInterviewStatus = (state: number) => {
+        switch (state) {
+            case 0:
+                return {
+                    text: '未开始',
+                    className: 'bg-gray-100 text-gray-700'
+                };
+            case 1:
+                return {
+                    text: '进行中',
+                    className: 'bg-green-100 text-green-700'
+                };
+            case 2:
+                return {
+                    text: '已结束',
+                    className: 'bg-blue-100 text-blue-700'
+                };
+            default:
+                return {
+                    text: '未知',
+                    className: 'bg-gray-100 text-gray-700'
+                };
+        }
+    };
+
+    // 格式化日期
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).replace(/\//g, '.');
+    };
+
     // 邀请流程步骤数据
     const inviteSteps = [
         {
@@ -592,32 +630,47 @@ export default function InterviewPage() {
                     <div className="bg-white rounded-lg shadow-sm">
                         {/* 顶部标题和开始访谈按钮 */}
                         <div className="px-6 py-6 border-b border-gray-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                                        {t('interview.title')}
-                                    </h2>
-                                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                                            {t('interview.status.pending')}
-                                        </span>
-                                        <span>{t('interview.info.createdTime')}: 2025.10.03 22:35</span>
-                                        <span>{t('interview.info.expectedUsers')} 24人</span>
-                                        <span>{t('interview.info.expectedCredits')} 2400</span>
-                                        <button className="text-gray-400 hover:text-gray-600">
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                            {isLoadingInterview ? (
+                                <div className="flex items-center justify-center py-4">
+                                    <LoadingAnimation width={100} height={100} />
                                 </div>
-                                <Button
-                                    className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
-                                    onClick={() => setShowLoadingModal(true)}
-                                >
-                                    {t('interview.startInterview')}
-                                </Button>
-                            </div>
+                            ) : interviewData ? (
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                                            {interviewData.name}
+                                        </h2>
+                                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                                            <span className={`${getInterviewStatus(interviewData.state).className} px-2 py-1 rounded-full text-xs font-medium`}>
+                                                {getInterviewStatus(interviewData.state).text}
+                                            </span>
+                                            <span>{t('interview.info.createdTime')}: {formatDate(interviewData.created_at)}</span>
+                                            <span>{t('interview.info.expectedUsers')} {interviewData.participants?.recommended_total || 0}人</span>
+                                            {interviewData.duration && (
+                                                <span>预计时长: {Math.round(interviewData.duration / 60)}分钟</span>
+                                            )}
+                                            <button className="text-gray-400 hover:text-gray-600">
+                                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
+                                        onClick={() => setShowLoadingModal(true)}
+                                        disabled={interviewData.state === 2}
+                                    >
+                                        {interviewData.state === 0 ? t('interview.startInterview') :
+                                            interviewData.state === 1 ? t('interview.endInterview') :
+                                                t('interview.interviewEnded')}
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="text-center py-4 text-gray-500">
+                                    {t('interview.noData')}
+                                </div>
+                            )}
                         </div>
 
                         {/* 真人用户区域 */}

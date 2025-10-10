@@ -26,7 +26,10 @@
             "expectedUsers": "Expected Interview Count",
             "expectedCredits": "Expected Credit Cost"
         },
-        "startInterview": "Start Interview"
+        "startInterview": "Start Interview",
+        "endInterview": "End Interview",
+        "interviewEnded": "Interview Ended",
+        "noData": "No interview data found"
     },
     "users": {
         "realUsers": {

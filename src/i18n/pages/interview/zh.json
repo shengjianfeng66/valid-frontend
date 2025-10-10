@@ -26,7 +26,10 @@
             "expectedUsers": "预计访谈人数",
             "expectedCredits": "预计积分消耗"
         },
-        "startInterview": "开始访谈"
+        "startInterview": "开始访谈",
+        "endInterview": "结束访谈",
+        "interviewEnded": "访谈已结束",
+        "noData": "未找到访谈数据"
     },
     "users": {
         "realUsers": {
