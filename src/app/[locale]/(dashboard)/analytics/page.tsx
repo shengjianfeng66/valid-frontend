@@ -352,18 +352,28 @@ export default function Page() {
                   ) : (
                     <>
                       {/* 表格展示 */}
-                      <div className="bg-white rounded-b-lg shadow-sm overflow-hidden">
-                        <Table>
+                      <div className="bg-white rounded-b-lg shadow-sm overflow-x-auto">
+                        <Table className="table-fixed w-full">
+                          <colgroup>
+                            <col className="w-[80px]" />
+                            <col className="w-[200px]" />
+                            <col className="w-[380px]" />
+                            <col className="w-[110px]" />
+                            <col className="w-[110px]" />
+                            <col className="w-[140px]" />
+                            <col className="w-[100px]" />
+                            <col className="w-[100px]" />
+                          </colgroup>
                           <TableHeader>
                             <TableRow className="bg-gray-50/80 border-b-2 border-gray-100">
-                              <TableHead className="w-[80px] py-4 font-semibold text-gray-700">序号</TableHead>
-                              <TableHead className="py-4 font-semibold text-gray-700 min-w-[180px]">受访者</TableHead>
-                              <TableHead className="py-4 font-semibold text-gray-700 min-w-[280px]">用户画像</TableHead>
-                              <TableHead className="w-[100px] py-4 font-semibold text-gray-700">类型</TableHead>
-                              <TableHead className="w-[110px] py-4 font-semibold text-gray-700">状态</TableHead>
-                              <TableHead className="w-[160px] py-4 font-semibold text-gray-700">访谈时间</TableHead>
-                              <TableHead className="w-[100px] py-4 font-semibold text-gray-700 text-center">问答数</TableHead>
-                              <TableHead className="w-[100px] py-4 font-semibold text-gray-700 text-center">操作</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">序号</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">受访者</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">用户画像</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">类型</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">状态</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700">访谈时间</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700 text-center">问答数</TableHead>
+                              <TableHead className="py-4 font-semibold text-gray-700 text-center">操作</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -391,18 +401,13 @@ export default function Page() {
                                       <span className="font-semibold text-gray-900 text-base">
                                         {item.interviewee.name}
                                       </span>
-                                      <span className="text-xs text-gray-500">
-                                        ID: {item.response.id}
-                                      </span>
                                     </div>
                                   </div>
                                 </TableCell>
-                                <TableCell className="py-5">
-                                  <div className="max-w-[350px]">
-                                    <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">
-                                      {item.response.details.meta.profile_brief}
-                                    </p>
-                                  </div>
+                                <TableCell className="py-5 align-top">
+                                  <p className="text-sm text-gray-700 leading-relaxed break-words whitespace-normal">
+                                    {item.response.details.meta.profile_brief}
+                                  </p>
                                 </TableCell>
                                 <TableCell className="py-5">
                                   <Badge
