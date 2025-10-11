@@ -299,7 +299,7 @@ export default function InterviewPage() {
     const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
 
     // 使用 SWR 获取访谈详情
-    const { data: interviewData, error: interviewError, isLoading: isLoadingInterview } = useSWR(
+    const { data: interviewData, error: interviewError, isLoading: isLoadingInterview, mutate: mutateInterview } = useSWR(
         interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
         async (url: string) => {
             const response = await fetch(url, {
@@ -450,11 +450,20 @@ export default function InterviewPage() {
     // 重置分页状态（当访谈状态改变时）
     useEffect(() => {
         if (!shouldUseRecommend) {
+            console.log('🔄 访谈状态切换，重置分页数据');
             setAllInterviewedUsers([]);
             setCurrentResponsePage(1);
             setHasMoreResponses(true);
         }
     }, [shouldUseRecommend, interviewData?.id]);
+
+    // 当状态从推荐模式切换到已访谈模式时，关闭加载弹窗
+    useEffect(() => {
+        if (!shouldUseRecommend && allInterviewedUsers.length > 0) {
+            // 有数据了，关闭加载弹窗
+            setShowLoadingModal(false);
+        }
+    }, [shouldUseRecommend, allInterviewedUsers.length]);
 
     // 处理错误
     const error = recommendError || responsesError;
@@ -712,8 +721,14 @@ export default function InterviewPage() {
             setLoadingModalType('start');
             setShowLoadingModal(true);
 
-            // TODO: 可以考虑重新获取访谈详情以更新状态
-            // mutate(); // 如果使用 SWR 的 mutate 函数
+            // 等待一小段时间让后端处理，然后刷新访谈详情
+            setTimeout(async () => {
+                await mutateInterview();
+                console.log('✅ 访谈状态已刷新');
+
+                // 刷新后，状态会变成 1，shouldUseRecommend 会变成 false
+                // 自动触发已访谈用户数据的获取
+            }, 1000); // 等待 1 秒
 
         } catch (error) {
             console.error('开始访谈失败:', error);
@@ -768,10 +783,14 @@ export default function InterviewPage() {
             setLoadingModalType('finish');
             setShowLoadingModal(true);
 
-            // 刷新页面或重新获取访谈详情
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // 等待一小段时间让后端处理，然后刷新访谈详情
+            setTimeout(async () => {
+                await mutateInterview();
+                console.log('✅ 访谈状态已刷新为已结束');
+
+                // 刷新后，状态会变成 2，接口会自动切换
+                // 加载弹窗会在数据加载完成后自动关闭
+            }, 1000); // 等待 1 秒
 
         } catch (error) {
             console.error('结束访谈失败:', error);
