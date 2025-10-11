@@ -1,8 +1,10 @@
-import { AppSidebar } from "@/components/app-sidebar"
+"use client";
+
+import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
-import { SiteHeader } from "@/components/site-header"
+import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 import data from "./data.json"
@@ -10,16 +12,13 @@ import data from "./data.json"
 export default function Page() {
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
+      <AppSidebar />
+      <SidebarInset className="flex flex-col h-screen">
+        <div className="flex flex-1 flex-col bg-gray-100 min-h-0">
+          {/* 可滚动区域 */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+            {/* 数据表格 */}
+            <div className="bg-white rounded-lg shadow-sm">
               <DataTable data={data} />
             </div>
           </div>
