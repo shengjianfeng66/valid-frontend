@@ -4,11 +4,10 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
-import { Loader2, Eye, Search } from "lucide-react"
+import { Loader2, Eye } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CopilotChat, CopilotKitCSSProperties } from "@copilotkit/react-ui"
 import { useCopilotReadable } from "@copilotkit/react-core"
@@ -107,19 +106,20 @@ export default function Page() {
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
   const [interviewName, setInterviewName] = useState<string>('')
-  const [searchName, setSearchName] = useState('')
   const [filterSource, setFilterSource] = useState<string>('all') // all | 0 | 1
 
   // 筛选数据
   const filteredData = data.filter(item => {
-    // 姓名筛选
-    if (searchName && !item.interviewee.name.toLowerCase().includes(searchName.toLowerCase())) {
+    // 确保数据完整性
+    if (!item || !item.interviewee) {
       return false
     }
+
     // 类型筛选
     if (filterSource !== 'all' && item.interviewee.source !== Number(filterSource)) {
       return false
     }
+
     return true
   })
 
@@ -135,7 +135,7 @@ export default function Page() {
   // 筛选条件改变时重置到第一页
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchName, filterSource])
+  }, [filterSource])
 
   const handleViewDetail = (item: InterviewResponse) => {
     // 转换数据格式为 UserDetailSheet 期望的格式
@@ -247,7 +247,6 @@ export default function Page() {
         }
 
         const result: ApiResponse = await response.json()
-        console.log('API 返回数据:', result)
 
         if (result.success && result.items) {
           setData(result.items)
@@ -336,7 +335,7 @@ export default function Page() {
                       </svg>
                     </div>
                     <p className="text-base font-medium text-gray-900">数据报告</p>
-                    <p className="text-sm text-gray-500">功能开发中...</p>
+
                   </div>
                 </div>
               </TabsContent>
@@ -384,7 +383,9 @@ export default function Page() {
                   <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                        <Search className="w-6 h-6 text-orange-500" />
+                        <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                       </div>
                       <p className="text-sm font-medium text-gray-900">未找到匹配结果</p>
                       <p className="text-xs text-gray-500">请尝试调整筛选条件</p>
@@ -392,7 +393,6 @@ export default function Page() {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setSearchName('')
                           setFilterSource('all')
                         }}
                         className="mt-2"
@@ -406,18 +406,6 @@ export default function Page() {
                     {/* 筛选区域 - 固定 */}
                     <div className="flex-shrink-0 px-6 py-4 border-b bg-gray-50/30">
                       <div className="flex items-center gap-4">
-                        {/* 搜索框 */}
-                        <div className="relative flex-1 max-w-xs">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <Input
-                            type="text"
-                            placeholder="搜索受访者姓名..."
-                            value={searchName}
-                            onChange={(e) => setSearchName(e.target.value)}
-                            className="pl-9 h-9"
-                          />
-                        </div>
-
                         {/* 类型筛选 */}
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-600">类型:</span>
@@ -434,7 +422,7 @@ export default function Page() {
                         </div>
 
                         {/* 结果统计 */}
-                        {(searchName || filterSource !== 'all') && (
+                        {filterSource !== 'all' && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <span>找到</span>
                             <span className="font-semibold text-primary">{filteredData.length}</span>
@@ -704,6 +692,7 @@ export default function Page() {
                       title: "深度洞察分析",
                       initial: "你好！我是 AI 分析助手。我已经了解了当前访谈的所有数据，包括受访者信息和完整的问答记录。\n\n我可以帮你：\n• 分析用户反馈的共性和差异\n• 提取关键洞察和痛点\n• 生成用户画像总结\n• 提供产品优化建议\n\n请告诉我你想了解什么？"
                     }}
+                    imageUploadsEnabled={true}
                     instructions="你是一个专业的用户研究分析助手。基于提供的访谈数据，进行深度分析并提供有价值的洞察。请用中文回答，语言要专业且易懂。"
                   />
                 </div>
