@@ -425,7 +425,7 @@ export default function InterviewPage() {
                         id: `response-${item.response.id}`,
                         name: item.interviewee.name,
                         avatar: "😊",
-                        status: item.response.state === 2 ? "已完成" : "进行中",
+                        status: item.response.state === 3 ? "已完成" : "进行中",
                         isReal: false,
                         attributes: attributes,
                         rawContent: content,
@@ -525,12 +525,17 @@ export default function InterviewPage() {
                 };
             case 1:
                 return {
-                    text: '进行中',
+                    text: '访谈中',
                     className: 'bg-green-100 text-green-700'
                 };
             case 2:
                 return {
-                    text: '已结束',
+                    text: '暂停访谈',
+                    className: 'bg-yellow-100 text-yellow-700'
+                };
+            case 3:
+                return {
+                    text: '访谈结束',
                     className: 'bg-blue-100 text-blue-700'
                 };
             default:
@@ -801,7 +806,7 @@ export default function InterviewPage() {
                 await mutateInterview();
                 console.log('✅ 访谈状态已刷新为已结束');
 
-                // 刷新后，状态会变成 2，接口会自动切换
+                // 刷新后，状态会变成 3，接口会自动切换
                 // 加载弹窗会在数据加载完成后自动关闭
             }, 1000); // 等待 1 秒
 
@@ -962,7 +967,7 @@ export default function InterviewPage() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         {/* 查看分析报告按钮 - 只在已结束状态显示 */}
-                                        {interviewData.state === 2 && (
+                                        {interviewData.state === 3 && (
                                             <Button
                                                 variant="outline"
                                                 className="border-primary text-primary hover:bg-primary/10 px-6 py-2 flex items-center gap-2"
@@ -975,7 +980,7 @@ export default function InterviewPage() {
                                             </Button>
                                         )}
 
-                                        {/* 开始/结束访谈按钮 */}
+                                        {/* 开始/暂停/结束访谈按钮 */}
                                         <Button
                                             className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
                                             onClick={() => {
@@ -985,11 +990,12 @@ export default function InterviewPage() {
                                                     handleFinishInterview();
                                                 }
                                             }}
-                                            disabled={interviewData.state === 2}
+                                            disabled={interviewData.state === 2 || interviewData.state === 3}
                                         >
                                             {interviewData.state === 0 ? t('interview.startInterview') :
                                                 interviewData.state === 1 ? t('interview.endInterview') :
-                                                    t('interview.interviewEnded')}
+                                                    interviewData.state === 2 ? '已暂停' :
+                                                        t('interview.interviewEnded')}
                                         </Button>
                                     </div>
                                 </div>
