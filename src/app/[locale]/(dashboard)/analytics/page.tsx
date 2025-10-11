@@ -4,10 +4,11 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
-import { Loader2, Eye } from "lucide-react"
+import { Loader2, Eye, Search } from "lucide-react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CopilotChat, CopilotKitCSSProperties } from "@copilotkit/react-ui"
 import { useCopilotReadable } from "@copilotkit/react-core"
@@ -106,6 +107,35 @@ export default function Page() {
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
   const [interviewName, setInterviewName] = useState<string>('')
+  const [searchName, setSearchName] = useState('')
+  const [filterSource, setFilterSource] = useState<string>('all') // all | 0 | 1
+
+  // 筛选数据
+  const filteredData = data.filter(item => {
+    // 姓名筛选
+    if (searchName && !item.interviewee.name.toLowerCase().includes(searchName.toLowerCase())) {
+      return false
+    }
+    // 类型筛选
+    if (filterSource !== 'all' && item.interviewee.source !== Number(filterSource)) {
+      return false
+    }
+    return true
+  })
+
+  // 客户端分页
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
+
+  // 计算总页数
+  const filteredTotalPages = Math.ceil(filteredData.length / pageSize)
+
+  // 筛选条件改变时重置到第一页
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchName, filterSource])
 
   const handleViewDetail = (item: InterviewResponse) => {
     // 转换数据格式为 UserDetailSheet 期望的格式
@@ -166,6 +196,9 @@ export default function Page() {
   }
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
+
+  // 使用筛选后的总页数
+  const displayTotalPages = filteredTotalPages || totalPages
 
   // 让 AI 能够读取访谈数据
   useCopilotReadable({
@@ -309,7 +342,7 @@ export default function Page() {
               </TabsContent>
 
               {/* 用户原声 Tab */}
-              <TabsContent value="original" className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
+              <TabsContent value="original" className="flex-1 flex flex-col px-4 pb-4 min-h-0">
                 {loading ? (
                   <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
                     <div className="flex flex-col items-center gap-3">
@@ -347,10 +380,72 @@ export default function Page() {
                       <p className="text-xs text-gray-500">当前访谈没有相关数据</p>
                     </div>
                   </div>
+                ) : filteredData.length === 0 ? (
+                  <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+                        <Search className="w-6 h-6 text-orange-500" />
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">未找到匹配结果</p>
+                      <p className="text-xs text-gray-500">请尝试调整筛选条件</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSearchName('')
+                          setFilterSource('all')
+                        }}
+                        className="mt-2"
+                      >
+                        清除筛选
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
-                  <>
-                    {/* 表格展示 */}
-                    <div className="bg-white rounded-b-lg shadow-sm overflow-x-auto">
+                  <div className="bg-white rounded-b-lg shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+                    {/* 筛选区域 - 固定 */}
+                    <div className="flex-shrink-0 px-6 py-4 border-b bg-gray-50/30">
+                      <div className="flex items-center gap-4">
+                        {/* 搜索框 */}
+                        <div className="relative flex-1 max-w-xs">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <Input
+                            type="text"
+                            placeholder="搜索受访者姓名..."
+                            value={searchName}
+                            onChange={(e) => setSearchName(e.target.value)}
+                            className="pl-9 h-9"
+                          />
+                        </div>
+
+                        {/* 类型筛选 */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">类型:</span>
+                          <Select value={filterSource} onValueChange={setFilterSource}>
+                            <SelectTrigger className="w-[140px] h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">全部</SelectItem>
+                              <SelectItem value="0">👤 真人用户</SelectItem>
+                              <SelectItem value="1">🤖 模拟用户</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* 结果统计 */}
+                        {(searchName || filterSource !== 'all') && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>找到</span>
+                            <span className="font-semibold text-primary">{filteredData.length}</span>
+                            <span>条记录</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 表头 - 固定 */}
+                    <div className="flex-shrink-0 border-b-2 border-gray-100">
                       <Table className="table-fixed w-full">
                         <colgroup>
                           <col className="w-[80px]" />
@@ -363,7 +458,7 @@ export default function Page() {
                           <col className="w-[100px]" />
                         </colgroup>
                         <TableHeader>
-                          <TableRow className="bg-gray-50/80 border-b-2 border-gray-100">
+                          <TableRow className="bg-gray-50/80">
                             <TableHead className="py-4 font-semibold text-gray-700">序号</TableHead>
                             <TableHead className="py-4 font-semibold text-gray-700">受访者</TableHead>
                             <TableHead className="py-4 font-semibold text-gray-700">用户画像</TableHead>
@@ -374,8 +469,24 @@ export default function Page() {
                             <TableHead className="py-4 font-semibold text-gray-700 text-center">操作</TableHead>
                           </TableRow>
                         </TableHeader>
+                      </Table>
+                    </div>
+
+                    {/* 表格内容 - 可滚动 */}
+                    <div className="flex-1 overflow-y-auto scrollbar-hide">
+                      <Table className="table-fixed w-full">
+                        <colgroup>
+                          <col className="w-[80px]" />
+                          <col className="w-[200px]" />
+                          <col className="w-[380px]" />
+                          <col className="w-[110px]" />
+                          <col className="w-[110px]" />
+                          <col className="w-[140px]" />
+                          <col className="w-[100px]" />
+                          <col className="w-[100px]" />
+                        </colgroup>
                         <TableBody>
-                          {data.map((item, index) => (
+                          {paginatedData.map((item, index) => (
                             <TableRow
                               key={item.response.id}
                               className="border-b border-gray-100 hover:bg-primary/5 transition-colors"
@@ -468,127 +579,125 @@ export default function Page() {
                           ))}
                         </TableBody>
                       </Table>
-
-                      {/* 分页器 */}
-                      <div className="flex items-center justify-between px-6 py-4 border-t">
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">每页显示</span>
-                            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                              <SelectTrigger className="w-[70px]">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="5">5</SelectItem>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="20">20</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <span className="text-sm text-muted-foreground">条</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            显示 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, pagination.total)} 条，
-                            共 {pagination.total} 条
-                          </span>
-                        </div>
-
-                        <Pagination>
-                          <PaginationContent>
-                            <PaginationItem>
-                              <PaginationPrevious
-                                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                              />
-                            </PaginationItem>
-
-                            {/* 第一页 */}
-                            {currentPage > 2 && (
-                              <PaginationItem>
-                                <PaginationLink size="icon" onClick={() => handlePageChange(1)} className="cursor-pointer">
-                                  1
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 省略号 */}
-                            {currentPage > 3 && (
-                              <PaginationItem>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            )}
-
-                            {/* 当前页前一页 */}
-                            {currentPage > 1 && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(currentPage - 1)}
-                                  className="cursor-pointer"
-                                >
-                                  {currentPage - 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 当前页 */}
-                            <PaginationItem>
-                              <PaginationLink size="icon" isActive className="cursor-default">
-                                {currentPage}
-                              </PaginationLink>
-                            </PaginationItem>
-
-                            {/* 当前页后一页 */}
-                            {currentPage < totalPages && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(currentPage + 1)}
-                                  className="cursor-pointer"
-                                >
-                                  {currentPage + 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 省略号 */}
-                            {currentPage < totalPages - 2 && (
-                              <PaginationItem>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            )}
-
-                            {/* 最后一页 */}
-                            {currentPage < totalPages - 1 && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(totalPages)}
-                                  className="cursor-pointer"
-                                >
-                                  {totalPages}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            <PaginationItem>
-                              <PaginationNext
-                                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                              />
-                            </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
-                      </div>
                     </div>
 
-                  </>
+                    {/* 分页器 - 固定 */}
+                    <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-t bg-gray-50/50">
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          <span className="text-sm text-gray-600">每页显示</span>
+                          <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                            <SelectTrigger className="w-[70px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-sm text-gray-600">条</span>
+                        </div>
+                        <span className="text-sm text-gray-600 whitespace-nowrap">
+                          显示 {filteredData.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} - {Math.min(currentPage * pageSize, filteredData.length)} 条，共 {filteredData.length} 条
+                        </span>
+                      </div>
+
+                      <Pagination className="flex-shrink-0">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                              className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+
+                          {/* 第一页 */}
+                          {currentPage > 2 && (
+                            <PaginationItem>
+                              <PaginationLink size="icon" onClick={() => handlePageChange(1)} className="cursor-pointer">
+                                1
+                              </PaginationLink>
+                            </PaginationItem>
+                          )}
+
+                          {/* 省略号 */}
+                          {currentPage > 3 && (
+                            <PaginationItem>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )}
+
+                          {/* 当前页前一页 */}
+                          {currentPage > 1 && (
+                            <PaginationItem>
+                              <PaginationLink
+                                size="icon"
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                className="cursor-pointer"
+                              >
+                                {currentPage - 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          )}
+
+                          {/* 当前页 */}
+                          <PaginationItem>
+                            <PaginationLink size="icon" isActive className="cursor-default">
+                              {currentPage}
+                            </PaginationLink>
+                          </PaginationItem>
+
+                          {/* 当前页后一页 */}
+                          {currentPage < displayTotalPages && (
+                            <PaginationItem>
+                              <PaginationLink
+                                size="icon"
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                className="cursor-pointer"
+                              >
+                                {currentPage + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          )}
+
+                          {/* 省略号 */}
+                          {currentPage < displayTotalPages - 2 && (
+                            <PaginationItem>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )}
+
+                          {/* 最后一页 */}
+                          {currentPage < displayTotalPages - 1 && (
+                            <PaginationItem>
+                              <PaginationLink
+                                size="icon"
+                                onClick={() => handlePageChange(displayTotalPages)}
+                                className="cursor-pointer"
+                              >
+                                {displayTotalPages}
+                              </PaginationLink>
+                            </PaginationItem>
+                          )}
+
+                          <PaginationItem>
+                            <PaginationNext
+                              onClick={() => handlePageChange(Math.min(displayTotalPages, currentPage + 1))}
+                              className={currentPage === displayTotalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
+                  </div>
                 )}
               </TabsContent>
 
               {/* 深度洞察 Tab */}
               <TabsContent value="insights" className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
-                <div className="bg-white rounded-b-lg shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 250px)' }}>
+                <div className="bg-white rounded-b-lg shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 120px)' }}>
                   <CopilotChat
                     className="h-full"
                     labels={{
