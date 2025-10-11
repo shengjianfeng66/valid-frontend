@@ -8,6 +8,13 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface UserDetailSheetProps {
     open: boolean;
@@ -47,6 +54,7 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
     };
 
     const categories = getCategories();
+    const hasInterview = selectedUser?.hasInterviewData;
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -83,81 +91,168 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                             </div>
                         </div>
 
-                        {/* 标签页 */}
-                        {categories.length > 0 ? (
-                            <Tabs defaultValue={categories[0]?.key} className="w-full">
-                                <TabsList
-                                    className="grid w-full"
-                                    style={{ gridTemplateColumns: `repeat(${Math.min(categories.length, 5)}, minmax(0, 1fr))` }}
-                                >
-                                    {categories.map(category => (
-                                        <TabsTrigger key={category.key} value={category.key}>
-                                            {category.name}
-                                        </TabsTrigger>
-                                    ))}
-                                </TabsList>
+                        {/* 标签页：用户画像 vs 问答记录 */}
+                        <Tabs defaultValue={hasInterview ? "interview" : "profile"} className="w-full">
+                            <TabsList className={`grid w-full ${hasInterview ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                                <TabsTrigger value="profile">
+                                    👤 用户画像
+                                </TabsTrigger>
+                                {hasInterview && (
+                                    <TabsTrigger value="interview">
+                                        📝 问答记录
+                                    </TabsTrigger>
+                                )}
+                            </TabsList>
 
-                                {categories.map((category, catIndex) => {
-                                    // 为不同的分类设置不同的颜色
-                                    const colors = [
-                                        { bg: 'bg-gray-100', text: 'text-gray-600', textDark: 'text-gray-900' },
-                                        { bg: 'bg-blue-50', text: 'text-blue-600', textDark: 'text-blue-900' },
-                                        { bg: 'bg-green-50', text: 'text-green-600', textDark: 'text-green-900' },
-                                        { bg: 'bg-purple-50', text: 'text-purple-600', textDark: 'text-purple-900' },
-                                        { bg: 'bg-orange-50', text: 'text-orange-600', textDark: 'text-orange-900' }
-                                    ];
-                                    const color = colors[catIndex % colors.length];
+                            {/* 用户画像 Tab - 使用 Accordion 整合所有分类 */}
+                            <TabsContent value="profile" className="mt-4">
+                                <ScrollArea className="h-[calc(100vh-350px)] pr-4">
+                                    {categories.length > 0 ? (
+                                        <Accordion type="multiple" defaultValue={categories.map(c => c.key)} className="w-full">
+                                            {categories.map((category, catIndex) => {
+                                                // 为不同的分类设置不同的颜色
+                                                const colors = [
+                                                    { bg: 'bg-gray-100', text: 'text-gray-600', textDark: 'text-gray-900' },
+                                                    { bg: 'bg-blue-50', text: 'text-blue-600', textDark: 'text-blue-900' },
+                                                    { bg: 'bg-green-50', text: 'text-green-600', textDark: 'text-green-900' },
+                                                    { bg: 'bg-purple-50', text: 'text-purple-600', textDark: 'text-purple-900' },
+                                                    { bg: 'bg-orange-50', text: 'text-orange-600', textDark: 'text-orange-900' }
+                                                ];
+                                                const color = colors[catIndex % colors.length];
 
-                                    return (
-                                        <TabsContent key={category.key} value={category.key} className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
-                                                    {category.description && (
-                                                        <p className="text-xs text-gray-500 mt-1">{category.description}</p>
-                                                    )}
+                                                return (
+                                                    <AccordionItem key={category.key} value={category.key}>
+                                                        <AccordionTrigger className="hover:no-underline">
+                                                            <div className="flex items-center justify-between w-full pr-4">
+                                                                <div className="flex flex-col items-start">
+                                                                    <span className="text-base font-semibold text-gray-900">{category.name}</span>
+                                                                    {category.description && (
+                                                                        <span className="text-xs text-gray-500 mt-0.5">{category.description}</span>
+                                                                    )}
+                                                                </div>
+                                                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                                                    {category.tags.length} 个
+                                                                </span>
+                                                            </div>
+                                                        </AccordionTrigger>
+                                                        <AccordionContent>
+                                                            {category.tags.length > 0 ? (
+                                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
+                                                                    {category.tags.map((tag, index) => (
+                                                                        <div
+                                                                            key={index}
+                                                                            className={`px-3 py-2 ${color.bg} rounded-lg`}
+                                                                        >
+                                                                            <div className={`text-xs ${color.text}`}>{tag.key}</div>
+                                                                            <div className={`text-sm font-medium ${color.textDark}`}>{tag.value}</div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-center py-4 text-gray-500">
+                                                                    <p className="text-sm">暂无标签</p>
+                                                                </div>
+                                                            )}
+                                                        </AccordionContent>
+                                                    </AccordionItem>
+                                                );
+                                            })}
+                                        </Accordion>
+                                    ) : (
+                                        <div className="text-center py-12 text-gray-500">
+                                            <p className="text-sm">暂无标签数据</p>
+                                        </div>
+                                    )}
+                                </ScrollArea>
+                            </TabsContent>
+
+                            {/* 问答记录 Tab */}
+                            {hasInterview && selectedUser?.responseDetails?.answers && (
+                                <TabsContent value="interview" className="mt-4">
+                                    <ScrollArea className="h-[calc(100vh-350px)] pr-4">
+                                        {selectedUser.responseDetails.answers.map((section: any, sectionIndex: number) => (
+                                            <div key={sectionIndex} className="mb-6 last:mb-0">
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <div className="h-8 w-1 bg-primary rounded-full" />
+                                                    <h4 className="text-base font-semibold text-gray-900">
+                                                        {section.section_name}
+                                                    </h4>
                                                 </div>
-                                                <span className="text-sm text-gray-500">{category.tags.length}</span>
-                                            </div>
-                                            {category.tags.length > 0 ? (
-                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                                    {category.tags.map((tag, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className={`px-3 py-2 ${color.bg} rounded-lg`}
-                                                        >
-                                                            <div className={`text-xs ${color.text}`}>{tag.key}</div>
-                                                            <div className={`text-sm font-medium ${color.textDark}`}>{tag.value}</div>
+
+                                                {section.questions.map((question: any, qIndex: number) => (
+                                                    <div key={qIndex} className="ml-4 mb-5 last:mb-0">
+                                                        {/* 主要问题 */}
+                                                        <div className="mb-3">
+                                                            <div className="flex items-start gap-2 mb-2">
+                                                                <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-medium">
+                                                                    Q
+                                                                </span>
+                                                                <p className="text-sm font-medium text-gray-900 flex-1">
+                                                                    {question.main}
+                                                                </p>
+                                                            </div>
+                                                            <div className="flex items-start gap-2 ml-8">
+                                                                <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-medium">
+                                                                    A
+                                                                </span>
+                                                                <p className="text-sm text-gray-700 flex-1 leading-relaxed">
+                                                                    {question.answer}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-8 text-gray-500">
-                                                    <p className="text-sm">暂无{category.name}</p>
-                                                </div>
-                                            )}
-                                        </TabsContent>
-                                    );
-                                })}
-                            </Tabs>
-                        ) : (
-                            <div className="text-center py-12 text-gray-500">
-                                <p className="text-sm">暂无标签数据</p>
-                            </div>
-                        )}
 
-                        {/* 问答记录 */}
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">问答记录</h3>
-                            <div className="text-center py-12 text-gray-500">
-                                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                    </svg>
-                                </div>
-                                <p className="text-sm">暂无问答记录</p>
-                            </div>
-                        </div>
+                                                        {/* 追问 */}
+                                                        {question.probes && question.probes.length > 0 && (
+                                                            <div className="ml-8 space-y-2 border-l-2 border-gray-200 pl-4">
+                                                                {question.probes.map((probe: any, pIndex: number) => (
+                                                                    <div key={pIndex}>
+                                                                        <div className="flex items-start gap-2 mb-1">
+                                                                            <span className="flex-shrink-0 w-5 h-5 bg-primary/5 text-primary rounded-full flex items-center justify-center text-xs">
+                                                                                {pIndex + 1}
+                                                                            </span>
+                                                                            <p className="text-xs font-medium text-gray-600 flex-1">
+                                                                                {probe.probe}
+                                                                            </p>
+                                                                        </div>
+                                                                        <p className="text-xs text-gray-600 ml-7 leading-relaxed">
+                                                                            {probe.answer}
+                                                                        </p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+
+                                                {/* 推理说明 */}
+                                                {section.reasoning && (
+                                                    <div className="ml-4 mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                                        <p className="text-xs text-blue-800">
+                                                            <span className="font-semibold">💡 推理：</span>{section.reasoning}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+
+                                        {/* 总结 */}
+                                        {selectedUser.responseDetails.closing?.summary && (
+                                            <div className="mt-4 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                                                <h5 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                                                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    访谈总结
+                                                </h5>
+                                                <p className="text-sm text-gray-700 leading-relaxed">
+                                                    {selectedUser.responseDetails.closing.summary}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </ScrollArea>
+                                </TabsContent>
+                            )}
+                        </Tabs>
                     </div>
                 )}
             </SheetContent>

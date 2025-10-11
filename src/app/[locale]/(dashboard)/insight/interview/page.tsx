@@ -138,7 +138,7 @@ function transformPersonaToUser(persona: PersonaFromAPI): any {
 }
 
 
-function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void }) {
+function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void; canRemove?: boolean }) {
     const t = useTranslations('interview');
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -186,10 +186,14 @@ function UserCard({ user, onViewDetails, onRemoveUser }: { user: any; onViewDeta
                                     <DropdownMenuItem onClick={() => onViewDetails(user.id)} className="justify-center cursor-pointer">
                                         {t('userCard.actions.viewDetails')}
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center cursor-pointer">
-                                        {t('userCard.actions.remove')}
-                                    </DropdownMenuItem>
+                                    {canRemove && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center cursor-pointer">
+                                                {t('userCard.actions.remove')}
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -317,10 +321,16 @@ export default function InterviewPage() {
 
     // 从访谈详情中获取推荐人数
     const recommendedCount = interviewData?.participants?.recommended_total || 0;
+    const interviewState = interviewData?.state;
 
-    // 使用 SWR 获取推荐用户 - 使用访谈详情中的推荐人数
-    const { data: personasData, error, isLoading: isLoadingRecommended } = useSWR(
-        interviewData ? ['http://localhost:8000/api/v1/persona/recommend', recommendedCount] : null,
+    // 根据访谈状态决定调用哪个接口
+    // state === 0: 调用推荐接口
+    // state !== 0: 调用 originalsound 接口获取已访谈的模拟用户
+    const shouldUseRecommend = interviewState === 0;
+
+    // 使用 SWR 获取推荐用户 - 只在 state === 0 时调用
+    const { data: personasData, error: recommendError, isLoading: isLoadingRecommended } = useSWR(
+        interviewData && shouldUseRecommend ? ['http://localhost:8000/api/v1/persona/recommend', recommendedCount] : null,
         ([url, count]) => fetcher(url, count),
         {
             revalidateOnFocus: false,
@@ -328,27 +338,110 @@ export default function InterviewPage() {
         }
     );
 
+    // 使用 SWR 获取已访谈的模拟用户 - 只在 state !== 0 时调用
+    const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } = useSWR(
+        interviewData && !shouldUseRecommend
+            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}`
+            : null,
+        async (url: string) => {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('📝 获取已访谈用户数据:', data);
+            return data;
+        },
+        {
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+        }
+    );
+
+    // 转换已访谈用户数据
+    const interviewedUsers = responsesData?.success && responsesData?.items
+        ? responsesData.items
+            // 过滤出模拟用户 (source === 1)
+            .filter((item: any) => item.interviewee.source === 1)
+            .map((item: any) => {
+                const content = item.interviewee.content;
+                const attributes: Record<string, string> = {};
+
+                // 从 user_profile_tags 中提取所有标签
+                if (content && content.user_profile_tags) {
+                    Object.keys(content.user_profile_tags).forEach(categoryKey => {
+                        const category = content.user_profile_tags[categoryKey];
+
+                        // 遍历子分类
+                        if (category && category.subcategories) {
+                            Object.keys(category.subcategories).forEach(subKey => {
+                                const subcategory = category.subcategories[subKey];
+
+                                // 提取所有tags
+                                if (subcategory && subcategory.tags) {
+                                    Object.keys(subcategory.tags).forEach(tagKey => {
+                                        attributes[tagKey] = subcategory.tags[tagKey];
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+
+                return {
+                    id: `response-${item.response.id}`,
+                    name: item.interviewee.name,
+                    avatar: "😊",
+                    status: item.response.state === 2 ? "已完成" : "进行中",
+                    isReal: false,
+                    attributes: attributes,
+                    rawContent: content,
+                    source: item.interviewee.source,
+                    created_at: item.response.created_at,
+                    responseId: item.response.id,
+                    intervieweeId: item.interviewee.id,
+                    // 保存完整的 response 信息，包含问答记录
+                    responseDetails: item.response.details,
+                    hasInterviewData: true // 标记这是已访谈用户
+                };
+            })
+        : [];
+
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
         ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
         : [];
 
-    // 监听推荐用户数据加载
+    // 根据状态选择显示的用户列表
+    const displayedUsers = shouldUseRecommend ? recommendedUsers : interviewedUsers;
+
+    // 监听数据加载
     useEffect(() => {
-        if (personasData) {
+        if (personasData && shouldUseRecommend) {
             console.log('👥 推荐用户数据已加载:', {
                 请求数量: recommendedCount,
                 实际返回: personasData.total_count,
                 用户列表长度: recommendedUsers.length
             });
         }
-    }, [personasData, recommendedCount, recommendedUsers.length]);
+    }, [personasData, recommendedCount, recommendedUsers.length, shouldUseRecommend]);
+
+    useEffect(() => {
+        if (responsesData && !shouldUseRecommend) {
+            console.log('👥 已访谈用户数据已加载:', {
+                总数: responsesData.total,
+                返回数量: responsesData.items?.length,
+                用户列表长度: interviewedUsers.length
+            });
+        }
+    }, [responsesData, interviewedUsers.length, shouldUseRecommend]);
 
     // 处理错误
+    const error = recommendError || responsesError;
     useEffect(() => {
         if (error) {
-            console.error('获取推荐用户失败:', error);
-            toast.error('获取推荐用户失败', {
+            console.error('获取用户数据失败:', error);
+            toast.error('获取用户数据失败', {
                 description: '请检查后端服务是否正常运行'
             });
         }
@@ -435,8 +528,11 @@ export default function InterviewPage() {
     ];
 
     const realUsers: any[] = []; // 真人用户列表（暂时为空）
-    // 使用推荐用户和添加的用户，过滤掉已删除的
-    const simulatedUsers = [...recommendedUsers, ...addedSimulatedUsers.filter(user => !removedUserIds.includes(user.id))];
+    // 使用显示的用户和添加的用户，过滤掉已删除的
+    const simulatedUsers = [...displayedUsers, ...addedSimulatedUsers.filter(user => !removedUserIds.includes(user.id))];
+
+    // 合并加载状态
+    const isLoadingUsers = isLoadingRecommended || isLoadingResponses;
 
     const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
         ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -608,7 +704,7 @@ export default function InterviewPage() {
 
     // 处理用户菜单点击
     const handleViewDetails = (userId: string) => {
-        const user = [...recommendedUsers, ...addedSimulatedUsers, ...simulatedUserPoolData].find(u => u.id === userId);
+        const user = [...displayedUsers, ...addedSimulatedUsers, ...simulatedUserPoolData].find(u => u.id === userId);
         if (user) {
             setSelectedUser(user);
             setShowUserDetailSheet(true);
@@ -616,7 +712,15 @@ export default function InterviewPage() {
     };
 
     const handleRemoveUser = (userId: string) => {
-        const user = [...recommendedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
+        // 只在推荐模式下允许移除用户
+        if (!shouldUseRecommend) {
+            toast.error('无法移除', {
+                description: '访谈进行中或已结束，无法移除用户'
+            });
+            return;
+        }
+
+        const user = [...displayedUsers, ...addedSimulatedUsers].find(u => u.id === userId);
         if (user) {
             setSelectedUser(user);
             setShowRemoveConfirmDialog(true);
@@ -784,6 +888,7 @@ export default function InterviewPage() {
                                             user={user}
                                             onViewDetails={handleViewDetails}
                                             onRemoveUser={handleRemoveUser}
+                                            canRemove={shouldUseRecommend}
                                         />
                                     ))}
                                 </div>
@@ -814,22 +919,30 @@ export default function InterviewPage() {
                                         {t('users.simulatedUsers.title')} {simulatedUsers.length}
                                     </h3>
                                     <span className="text-sm text-gray-600">
-                                        {t('users.simulatedUsers.description', { count: simulatedUsers.length })}
+                                        {shouldUseRecommend
+                                            ? t('users.simulatedUsers.description', { count: simulatedUsers.length })
+                                            : '已完成访谈的模拟用户'
+                                        }
                                     </span>
                                 </div>
-                                <Button
-                                    onClick={handleOpenSimulatedUserPool}
-                                    variant="outline"
-                                    className="text-gray-600 hover:text-gray-800"
-                                >
-                                    {t('users.simulatedUsers.addButton')}
-                                </Button>
+                                {/* 只在未开始状态显示添加按钮 */}
+                                {shouldUseRecommend && (
+                                    <Button
+                                        onClick={handleOpenSimulatedUserPool}
+                                        variant="outline"
+                                        className="text-gray-600 hover:text-gray-800"
+                                    >
+                                        {t('users.simulatedUsers.addButton')}
+                                    </Button>
+                                )}
                             </div>
 
-                            {isLoadingRecommended ? (
+                            {isLoadingUsers ? (
                                 <div className="flex flex-col items-center justify-center py-12">
                                     <LoadingAnimation width={150} height={150} />
-                                    <p className="text-gray-600 mt-4">正在获取推荐用户...</p>
+                                    <p className="text-gray-600 mt-4">
+                                        {shouldUseRecommend ? '正在获取推荐用户...' : '正在获取已访谈用户...'}
+                                    </p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -839,6 +952,7 @@ export default function InterviewPage() {
                                             user={user}
                                             onViewDetails={handleViewDetails}
                                             onRemoveUser={handleRemoveUser}
+                                            canRemove={shouldUseRecommend}
                                         />
                                     ))}
                                 </div>
