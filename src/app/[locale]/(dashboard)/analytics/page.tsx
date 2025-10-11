@@ -6,17 +6,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useEffect, useState } from "react"
 import { Loader2, Eye } from "lucide-react"
 import { toast } from "sonner"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import {
   Table,
   TableBody,
@@ -25,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { UserDetailSheet } from "@/components/user-detail-sheet"
 import {
   Pagination,
   PaginationContent,
@@ -107,13 +99,57 @@ export default function Page() {
     pageSize: 10,
     total: 0
   })
-  const [selectedInterview, setSelectedInterview] = useState<InterviewResponse | null>(null)
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<any>(null)
+  const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
   const [interviewName, setInterviewName] = useState<string>('')
 
   const handleViewDetail = (item: InterviewResponse) => {
-    setSelectedInterview(item)
-    setDetailDialogOpen(true)
+    // 转换数据格式为 UserDetailSheet 期望的格式
+    const content = item.interviewee.content;
+    const attributes: Record<string, string> = {};
+
+    // 从 user_profile_tags 中提取所有标签
+    if (content && content.user_profile_tags) {
+      Object.keys(content.user_profile_tags).forEach(categoryKey => {
+        const category = content.user_profile_tags[categoryKey];
+
+        if (category && category.subcategories) {
+          Object.keys(category.subcategories).forEach(subKey => {
+            const subcategory = category.subcategories[subKey];
+
+            if (subcategory && subcategory.tags) {
+              Object.keys(subcategory.tags).forEach(tagKey => {
+                attributes[tagKey] = subcategory.tags[tagKey];
+              });
+            }
+          });
+        }
+      });
+    }
+
+    const userForSheet = {
+      id: `response-${item.response.id}`,
+      name: item.interviewee.name,
+      avatar: (() => {
+        const gender = content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['性别'];
+        if (gender === '男性' || gender === '男') return '👨';
+        if (gender === '女性' || gender === '女') return '👩';
+        return '😊';
+      })(),
+      status: item.response.state === 2 ? "已完成" : "进行中",
+      isReal: false,
+      attributes: attributes,
+      rawContent: content,
+      source: item.interviewee.source,
+      created_at: item.response.created_at,
+      responseId: item.response.id,
+      intervieweeId: item.interviewee.id,
+      responseDetails: item.response.details,
+      hasInterviewData: true
+    };
+
+    setSelectedUser(userForSheet)
+    setShowUserDetailSheet(true)
   }
 
   const handlePageChange = (page: number) => {
@@ -465,125 +501,12 @@ export default function Page() {
                   </div>
                 </div>
 
-                {/* 详情弹窗 */}
-                <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
-                  <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-                    {selectedInterview && (
-                      <>
-                        <DialogHeader className="p-6 pb-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
-                          <DialogTitle className="text-xl flex items-center gap-2">
-                            <span className="text-primary">访谈详情</span>
-                            <span className="text-gray-400">|</span>
-                            <span className="text-gray-900">{selectedInterview.interviewee.name}</span>
-                            <Badge
-                              variant={selectedInterview.interviewee.source === 0 ? "default" : "outline"}
-                              className={selectedInterview.interviewee.source === 0 ? "bg-blue-500" : ""}
-                            >
-                              {selectedInterview.interviewee.source === 0 ? "真人" : "模拟"}
-                            </Badge>
-                          </DialogTitle>
-                          <DialogDescription className="text-sm mt-2">
-                            {selectedInterview.response.details.meta.profile_brief}
-                          </DialogDescription>
-                          <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                            <span>访谈ID: {selectedInterview.response.id}</span>
-                            <span>•</span>
-                            <span>
-                              时间: {new Date(selectedInterview.response.created_at).toLocaleString('zh-CN')}
-                            </span>
-                            <span>•</span>
-                            <Badge variant={selectedInterview.response.state === 2 ? "default" : "secondary"} className="text-xs">
-                              {selectedInterview.response.state === 2 ? "已完成" : "进行中"}
-                            </Badge>
-                          </div>
-                        </DialogHeader>
-
-                        <ScrollArea className="h-[calc(90vh-180px)] px-6 py-4">
-                          {/* 访谈回答 */}
-                          {selectedInterview.response.details.answers.map((section, sectionIndex) => (
-                            <div key={sectionIndex} className="mb-8 last:mb-0">
-                              <div className="flex items-center gap-2 mb-4">
-                                <div className="h-8 w-1 bg-primary rounded-full" />
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                  {section.section_name}
-                                </h3>
-                              </div>
-
-                              {section.questions.map((question, qIndex) => (
-                                <div key={qIndex} className="ml-4 mb-6 last:mb-0">
-                                  {/* 主要问题 */}
-                                  <div className="mb-4">
-                                    <div className="flex items-start gap-2 mb-2">
-                                      <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-medium">
-                                        Q
-                                      </span>
-                                      <p className="text-sm font-medium text-gray-900 flex-1">
-                                        {question.main}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-start gap-2 ml-8">
-                                      <span className="flex-shrink-0 w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs font-medium">
-                                        A
-                                      </span>
-                                      <p className="text-sm text-gray-700 flex-1 leading-relaxed">
-                                        {question.answer}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* 追问 */}
-                                  {question.probes && question.probes.length > 0 && (
-                                    <div className="ml-8 space-y-3 border-l-2 border-gray-200 pl-4">
-                                      {question.probes.map((probe, pIndex) => (
-                                        <div key={pIndex}>
-                                          <div className="flex items-start gap-2 mb-1">
-                                            <span className="flex-shrink-0 w-5 h-5 bg-primary/5 text-primary rounded-full flex items-center justify-center text-xs">
-                                              {pIndex + 1}
-                                            </span>
-                                            <p className="text-xs font-medium text-gray-600 flex-1">
-                                              {probe.probe}
-                                            </p>
-                                          </div>
-                                          <p className="text-xs text-gray-600 ml-7 leading-relaxed">
-                                            {probe.answer}
-                                          </p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-
-                              {/* 推理说明 */}
-                              {section.reasoning && (
-                                <div className="ml-4 mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                  <p className="text-xs text-blue-800">
-                                    <span className="font-semibold">推理：</span>{section.reasoning}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-
-                          {/* 总结 */}
-                          {selectedInterview.response.details.closing?.summary && (
-                            <div className="mt-6 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                              <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                访谈总结
-                              </h4>
-                              <p className="text-sm text-gray-700 leading-relaxed">
-                                {selectedInterview.response.details.closing.summary}
-                              </p>
-                            </div>
-                          )}
-                        </ScrollArea>
-                      </>
-                    )}
-                  </DialogContent>
-                </Dialog>
+                {/* 用户详情抽屉 */}
+                <UserDetailSheet
+                  open={showUserDetailSheet}
+                  onOpenChange={setShowUserDetailSheet}
+                  selectedUser={selectedUser}
+                />
               </>
             )}
           </div>
