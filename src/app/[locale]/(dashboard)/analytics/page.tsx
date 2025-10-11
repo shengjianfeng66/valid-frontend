@@ -38,6 +38,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useSearchParams } from "next/navigation"
+import ReactMarkdown from 'react-markdown'
+import useSWR from 'swr'
 
 interface InterviewResponse {
   response: {
@@ -88,6 +90,23 @@ interface ApiResponse {
   items: InterviewResponse[]
 }
 
+interface Report {
+  type: number // 0: 真人用户报告, 1: 模拟用户报告
+  report: string // markdown 格式的报告内容
+}
+
+interface InterviewDetail {
+  id: number
+  name: string
+  description: string | null
+  state: number
+  created_at: string
+  analysis?: {
+    reports: Report[]
+  }
+  [key: string]: any
+}
+
 export default function Page() {
   const searchParams = useSearchParams()
   const urlInterviewId = searchParams.get('interview_id')
@@ -107,6 +126,22 @@ export default function Page() {
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
   const [interviewName, setInterviewName] = useState<string>('')
   const [filterSource, setFilterSource] = useState<string>('all') // all | 0 | 1
+
+  // 使用 SWR 获取访谈详情（包含分析报告）
+  const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
+    interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
+    async (url: string) => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
 
   // 筛选数据
   const filteredData = data.filter(item => {
@@ -136,6 +171,9 @@ export default function Page() {
   useEffect(() => {
     setCurrentPage(1)
   }, [filterSource])
+
+  // 获取可用的报告
+  const availableReports = interviewDetail?.analysis?.reports || [];
 
   const handleViewDetail = (item: InterviewResponse) => {
     // 转换数据格式为 UserDetailSheet 期望的格式
@@ -170,7 +208,7 @@ export default function Page() {
         if (gender === '女性' || gender === '女') return '👩';
         return '😊';
       })(),
-      status: item.response.state === 2 ? "已完成" : "进行中",
+      status: item.response.state === 3 ? "已完成" : "进行中",
       isReal: false,
       attributes: attributes,
       rawContent: content,
@@ -210,7 +248,7 @@ export default function Page() {
         interviewee_name: item.interviewee.name,
         profile_brief: item.response.details.meta.profile_brief,
         source: item.interviewee.source === 0 ? '真人' : '模拟',
-        state: item.response.state === 2 ? '已完成' : '进行中',
+        state: item.response.state === 3 ? '已完成' : '进行中',
         answers_summary: item.response.details.answers.map(section => ({
           section: section.section_name,
           question_count: section.questions.length
@@ -327,17 +365,102 @@ export default function Page() {
 
               {/* 数据报告 Tab */}
               <TabsContent value="report" className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
-                <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
+                {isLoadingDetail ? (
+                  <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <p className="text-sm text-gray-500">加载报告中...</p>
                     </div>
-                    <p className="text-base font-medium text-gray-900">数据报告</p>
-
                   </div>
-                </div>
+                ) : detailError ? (
+                  <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">加载失败</p>
+                      <p className="text-xs text-gray-500">请检查后端服务是否正常运行</p>
+                    </div>
+                  </div>
+                ) : availableReports.length === 0 ? (
+                  <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                      <p className="text-base font-medium text-gray-900">暂无分析报告</p>
+                      <p className="text-sm text-gray-500">报告生成中，请稍后查看</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-b-lg shadow-sm flex flex-col h-full">
+                    {/* 嵌套 Tab - 报告类型 */}
+                    <Tabs defaultValue="simulated" className="flex flex-col h-full">
+                      <div className="px-6 pt-4 border-b">
+                        <TabsList className="w-full grid grid-cols-2">
+                          <TabsTrigger
+                            value="simulated"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white"
+                            disabled={!availableReports.some(r => r.type === 1)}
+                          >
+                            🤖 模拟用户报告
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="real"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-white"
+                            disabled={!availableReports.some(r => r.type === 0)}
+                          >
+                            👤 真人用户报告
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
+
+                      {/* 模拟用户报告 */}
+                      <TabsContent value="simulated" className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
+                        {availableReports.find(r => r.type === 1) ? (
+                          <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
+                            <ReactMarkdown>{availableReports.find(r => r.type === 1)!.report}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-20">
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                              <p className="text-sm text-gray-600">暂无模拟用户报告</p>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      {/* 真人用户报告 */}
+                      <TabsContent value="real" className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
+                        {availableReports.find(r => r.type === 0) ? (
+                          <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
+                            <ReactMarkdown>{availableReports.find(r => r.type === 0)!.report}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-20">
+                            <div className="flex flex-col items-center gap-3">
+                              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                              </div>
+                              <p className="text-sm text-gray-600">暂无真人用户报告</p>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                )}
               </TabsContent>
 
               {/* 用户原声 Tab */}
@@ -518,12 +641,12 @@ export default function Page() {
                               </TableCell>
                               <TableCell className="py-5">
                                 <Badge
-                                  variant={item.response.state === 2 ? "default" : "secondary"}
-                                  className={item.response.state === 2
+                                  variant={item.response.state === 3 ? "default" : "secondary"}
+                                  className={item.response.state === 3
                                     ? "bg-green-500 hover:bg-green-600 text-white"
                                     : "bg-yellow-500 hover:bg-yellow-600 text-white"}
                                 >
-                                  {item.response.state === 2 ? "✓ 已完成" : "⏳ 进行中"}
+                                  {item.response.state === 3 ? "✓ 已完成" : "⏳ 进行中"}
                                 </Badge>
                               </TableCell>
                               <TableCell className="py-5">

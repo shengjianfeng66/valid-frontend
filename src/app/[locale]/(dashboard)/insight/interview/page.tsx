@@ -461,14 +461,6 @@ export default function InterviewPage() {
         }
     }, [shouldUseRecommend, interviewData?.id]);
 
-    // 当状态从推荐模式切换到已访谈模式时，关闭加载弹窗
-    useEffect(() => {
-        if (!shouldUseRecommend && allInterviewedUsers.length > 0) {
-            // 有数据了，关闭加载弹窗
-            setShowLoadingModal(false);
-        }
-    }, [shouldUseRecommend, allInterviewedUsers.length]);
-
     // 处理错误
     const error = recommendError || responsesError;
     useEffect(() => {
@@ -806,8 +798,8 @@ export default function InterviewPage() {
                 await mutateInterview();
                 console.log('✅ 访谈状态已刷新为已结束');
 
-                // 刷新后，状态会变成 3，接口会自动切换
-                // 加载弹窗会在数据加载完成后自动关闭
+                // 关闭加载弹窗
+                setShowLoadingModal(false);
             }, 1000); // 等待 1 秒
 
         } catch (error) {
@@ -815,6 +807,7 @@ export default function InterviewPage() {
             toast.error('结束访谈失败', {
                 description: error instanceof Error ? error.message : '请检查后端服务是否正常运行'
             });
+            setShowLoadingModal(false); // 出错时也要关闭弹窗
         }
     };
 
