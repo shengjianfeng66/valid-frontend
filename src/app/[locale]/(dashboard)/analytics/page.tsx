@@ -9,6 +9,9 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CopilotChat, CopilotKitCSSProperties } from "@copilotkit/react-ui"
+import { useCopilotReadable } from "@copilotkit/react-core"
+import "@copilotkit/react-ui/styles.css"
 import {
   Table,
   TableBody,
@@ -164,6 +167,27 @@ export default function Page() {
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
 
+  // 让 AI 能够读取访谈数据
+  useCopilotReadable({
+    description: "当前访谈的所有响应数据，包括受访者信息、问答记录、用户画像等",
+    value: {
+      interview_id: interviewId,
+      total_responses: pagination.total,
+      current_page_data: data.map(item => ({
+        interviewee_name: item.interviewee.name,
+        profile_brief: item.response.details.meta.profile_brief,
+        source: item.interviewee.source === 0 ? '真人' : '模拟',
+        state: item.response.state === 2 ? '已完成' : '进行中',
+        answers_summary: item.response.details.answers.map(section => ({
+          section: section.section_name,
+          question_count: section.questions.length
+        })),
+        closing_summary: item.response.details.closing?.summary
+      })),
+      all_data: data // 完整数据供 AI 深度分析
+    }
+  })
+
   // 监听 URL 参数变化
   useEffect(() => {
     if (urlInterviewId) {
@@ -221,324 +245,325 @@ export default function Page() {
   }, [interviewId, currentPage, pageSize])
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex flex-col h-screen">
-        <div className="flex flex-1 flex-col bg-gray-100 min-h-0">
-          {/* 可滚动区域 */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
-            {/* Tab 导航 */}
-            <Tabs defaultValue="original" className="w-full">
-              <div className="bg-white rounded-lg shadow-sm">
-                <TabsList className="w-full h-auto p-0 bg-transparent border-b rounded-none">
-                  <TabsTrigger
-                    value="report"
-                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
-                  >
-                    数据报告
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="original"
-                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
-                  >
-                    用户原声
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="insights"
-                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
-                  >
-                    深度洞察
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              {/* 数据报告 Tab */}
-              <TabsContent value="report" className="mt-0">
-                <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    </div>
-                    <p className="text-base font-medium text-gray-900">数据报告</p>
-                    <p className="text-sm text-gray-500">功能开发中...</p>
-                  </div>
+    <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="flex flex-col h-screen">
+          <div className="flex flex-1 flex-col bg-gray-100 min-h-0">
+            {/* 可滚动区域 */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+              {/* Tab 导航 */}
+              <Tabs defaultValue="original" className="w-full">
+                <div className="bg-white rounded-lg shadow-sm">
+                  <TabsList className="w-full h-auto p-0 bg-transparent border-b rounded-none">
+                    <TabsTrigger
+                      value="report"
+                      className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
+                    >
+                      数据报告
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="original"
+                      className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
+                    >
+                      用户原声
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="insights"
+                      className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none py-4 text-base font-medium"
+                    >
+                      深度洞察
+                    </TabsTrigger>
+                  </TabsList>
                 </div>
-              </TabsContent>
 
-              {/* 用户原声 Tab */}
-              <TabsContent value="original" className="mt-0">
-                {loading ? (
+                {/* 数据报告 Tab */}
+                <TabsContent value="report" className="mt-0">
                   <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
                     <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                      <p className="text-sm text-gray-500">加载数据中...</p>
-                    </div>
-                  </div>
-                ) : error ? (
-                  <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
-                    <div className="flex flex-col items-center gap-3 max-w-md">
-                      <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                        <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                       </div>
-                      <p className="text-sm font-medium text-gray-900">数据加载失败</p>
-                      <p className="text-xs text-gray-500 text-center">{error}</p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
-                      >
-                        重新加载
-                      </button>
+                      <p className="text-base font-medium text-gray-900">数据报告</p>
+                      <p className="text-sm text-gray-500">功能开发中...</p>
                     </div>
                   </div>
-                ) : data.length === 0 ? (
-                  <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                        </svg>
-                      </div>
-                      <p className="text-sm font-medium text-gray-900">暂无数据</p>
-                      <p className="text-xs text-gray-500">当前访谈没有相关数据</p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {/* 表格展示 */}
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-[60px]">序号</TableHead>
-                            <TableHead>受访者</TableHead>
-                            <TableHead>用户画像</TableHead>
-                            <TableHead className="w-[100px]">类型</TableHead>
-                            <TableHead className="w-[120px]">状态</TableHead>
-                            <TableHead className="w-[180px]">访谈时间</TableHead>
-                            <TableHead className="w-[100px]">问答数</TableHead>
-                            <TableHead className="w-[100px] text-center">操作</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {data.map((item, index) => (
-                            <TableRow key={item.response.id} className="hover:bg-muted/50">
-                              <TableCell className="font-medium text-primary">
-                                #{(currentPage - 1) * pageSize + index + 1}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex flex-col">
-                                  <span className="font-medium text-gray-900">
-                                    {item.interviewee.name}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    ID: {item.response.id}
-                                  </span>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div className="max-w-[300px]">
-                                  <p className="text-sm text-gray-600 line-clamp-2">
-                                    {item.response.details.meta.profile_brief}
-                                  </p>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant={item.interviewee.source === 0 ? "default" : "outline"}
-                                  className={item.interviewee.source === 0 ? "bg-blue-500" : ""}
-                                >
-                                  {item.interviewee.source === 0 ? "真人" : "模拟"}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <Badge variant={item.response.state === 2 ? "default" : "secondary"}>
-                                  {item.response.state === 2 ? "已完成" : "进行中"}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <span className="text-sm text-gray-600">
-                                  {new Date(item.response.created_at).toLocaleString('zh-CN', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                              </TableCell>
-                              <TableCell>
-                                <div className="text-center">
-                                  <span className="text-sm font-medium text-gray-900">
-                                    {item.response.details.answers.reduce(
-                                      (total, section) => total + section.questions.length,
-                                      0
-                                    )}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground ml-1">个</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleViewDetail(item)}
-                                  className="hover:bg-primary/10 hover:text-primary"
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  详情
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                </TabsContent>
 
-                      {/* 分页器 */}
-                      <div className="flex items-center justify-between px-6 py-4 border-t">
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">每页显示</span>
-                            <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                              <SelectTrigger className="w-[70px]">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="5">5</SelectItem>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="20">20</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <span className="text-sm text-muted-foreground">条</span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            显示 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, pagination.total)} 条，
-                            共 {pagination.total} 条
-                          </span>
+                {/* 用户原声 Tab */}
+                <TabsContent value="original" className="mt-0">
+                  {loading ? (
+                    <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
+                      <div className="flex flex-col items-center gap-3">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <p className="text-sm text-gray-500">加载数据中...</p>
+                      </div>
+                    </div>
+                  ) : error ? (
+                    <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
+                      <div className="flex flex-col items-center gap-3 max-w-md">
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </div>
-
-                        <Pagination>
-                          <PaginationContent>
-                            <PaginationItem>
-                              <PaginationPrevious
-                                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                              />
-                            </PaginationItem>
-
-                            {/* 第一页 */}
-                            {currentPage > 2 && (
-                              <PaginationItem>
-                                <PaginationLink size="icon" onClick={() => handlePageChange(1)} className="cursor-pointer">
-                                  1
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 省略号 */}
-                            {currentPage > 3 && (
-                              <PaginationItem>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            )}
-
-                            {/* 当前页前一页 */}
-                            {currentPage > 1 && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(currentPage - 1)}
-                                  className="cursor-pointer"
-                                >
-                                  {currentPage - 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 当前页 */}
-                            <PaginationItem>
-                              <PaginationLink size="icon" isActive className="cursor-default">
-                                {currentPage}
-                              </PaginationLink>
-                            </PaginationItem>
-
-                            {/* 当前页后一页 */}
-                            {currentPage < totalPages && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(currentPage + 1)}
-                                  className="cursor-pointer"
-                                >
-                                  {currentPage + 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            {/* 省略号 */}
-                            {currentPage < totalPages - 2 && (
-                              <PaginationItem>
-                                <PaginationEllipsis />
-                              </PaginationItem>
-                            )}
-
-                            {/* 最后一页 */}
-                            {currentPage < totalPages - 1 && (
-                              <PaginationItem>
-                                <PaginationLink
-                                  size="icon"
-                                  onClick={() => handlePageChange(totalPages)}
-                                  className="cursor-pointer"
-                                >
-                                  {totalPages}
-                                </PaginationLink>
-                              </PaginationItem>
-                            )}
-
-                            <PaginationItem>
-                              <PaginationNext
-                                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                              />
-                            </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
+                        <p className="text-sm font-medium text-gray-900">数据加载失败</p>
+                        <p className="text-xs text-gray-500 text-center">{error}</p>
+                        <button
+                          onClick={() => window.location.reload()}
+                          className="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
+                        >
+                          重新加载
+                        </button>
                       </div>
                     </div>
-
-                  </>
-                )}
-              </TabsContent>
-
-              {/* 深度洞察 Tab */}
-              <TabsContent value="insights" className="mt-0">
-                <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
+                  ) : data.length === 0 ? (
+                    <div className="bg-white rounded-lg shadow-sm flex items-center justify-center py-20">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                          </svg>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">暂无数据</p>
+                        <p className="text-xs text-gray-500">当前访谈没有相关数据</p>
+                      </div>
                     </div>
-                    <p className="text-base font-medium text-gray-900">深度洞察</p>
-                    <p className="text-sm text-gray-500">功能开发中...</p>
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+                  ) : (
+                    <>
+                      {/* 表格展示 */}
+                      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-[60px]">序号</TableHead>
+                              <TableHead>受访者</TableHead>
+                              <TableHead>用户画像</TableHead>
+                              <TableHead className="w-[100px]">类型</TableHead>
+                              <TableHead className="w-[120px]">状态</TableHead>
+                              <TableHead className="w-[180px]">访谈时间</TableHead>
+                              <TableHead className="w-[100px]">问答数</TableHead>
+                              <TableHead className="w-[100px] text-center">操作</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {data.map((item, index) => (
+                              <TableRow key={item.response.id} className="hover:bg-muted/50">
+                                <TableCell className="font-medium text-primary">
+                                  #{(currentPage - 1) * pageSize + index + 1}
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium text-gray-900">
+                                      {item.interviewee.name}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      ID: {item.response.id}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="max-w-[300px]">
+                                    <p className="text-sm text-gray-600 line-clamp-2">
+                                      {item.response.details.meta.profile_brief}
+                                    </p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant={item.interviewee.source === 0 ? "default" : "outline"}
+                                    className={item.interviewee.source === 0 ? "bg-blue-500" : ""}
+                                  >
+                                    {item.interviewee.source === 0 ? "真人" : "模拟"}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant={item.response.state === 2 ? "default" : "secondary"}>
+                                    {item.response.state === 2 ? "已完成" : "进行中"}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="text-sm text-gray-600">
+                                    {new Date(item.response.created_at).toLocaleString('zh-CN', {
+                                      year: 'numeric',
+                                      month: '2-digit',
+                                      day: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="text-center">
+                                    <span className="text-sm font-medium text-gray-900">
+                                      {item.response.details.answers.reduce(
+                                        (total, section) => total + section.questions.length,
+                                        0
+                                      )}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground ml-1">个</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleViewDetail(item)}
+                                    className="hover:bg-primary/10 hover:text-primary"
+                                  >
+                                    <Eye className="w-4 h-4 mr-1" />
+                                    详情
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
 
-            {/* 用户详情抽屉 */}
-            <UserDetailSheet
-              open={showUserDetailSheet}
-              onOpenChange={setShowUserDetailSheet}
-              selectedUser={selectedUser}
-            />
+                        {/* 分页器 */}
+                        <div className="flex items-center justify-between px-6 py-4 border-t">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">每页显示</span>
+                              <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                                <SelectTrigger className="w-[70px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="5">5</SelectItem>
+                                  <SelectItem value="10">10</SelectItem>
+                                  <SelectItem value="20">20</SelectItem>
+                                  <SelectItem value="50">50</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <span className="text-sm text-muted-foreground">条</span>
+                            </div>
+                            <span className="text-sm text-muted-foreground">
+                              显示 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, pagination.total)} 条，
+                              共 {pagination.total} 条
+                            </span>
+                          </div>
+
+                          <Pagination>
+                            <PaginationContent>
+                              <PaginationItem>
+                                <PaginationPrevious
+                                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                              </PaginationItem>
+
+                              {/* 第一页 */}
+                              {currentPage > 2 && (
+                                <PaginationItem>
+                                  <PaginationLink size="icon" onClick={() => handlePageChange(1)} className="cursor-pointer">
+                                    1
+                                  </PaginationLink>
+                                </PaginationItem>
+                              )}
+
+                              {/* 省略号 */}
+                              {currentPage > 3 && (
+                                <PaginationItem>
+                                  <PaginationEllipsis />
+                                </PaginationItem>
+                              )}
+
+                              {/* 当前页前一页 */}
+                              {currentPage > 1 && (
+                                <PaginationItem>
+                                  <PaginationLink
+                                    size="icon"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    className="cursor-pointer"
+                                  >
+                                    {currentPage - 1}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              )}
+
+                              {/* 当前页 */}
+                              <PaginationItem>
+                                <PaginationLink size="icon" isActive className="cursor-default">
+                                  {currentPage}
+                                </PaginationLink>
+                              </PaginationItem>
+
+                              {/* 当前页后一页 */}
+                              {currentPage < totalPages && (
+                                <PaginationItem>
+                                  <PaginationLink
+                                    size="icon"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    className="cursor-pointer"
+                                  >
+                                    {currentPage + 1}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              )}
+
+                              {/* 省略号 */}
+                              {currentPage < totalPages - 2 && (
+                                <PaginationItem>
+                                  <PaginationEllipsis />
+                                </PaginationItem>
+                              )}
+
+                              {/* 最后一页 */}
+                              {currentPage < totalPages - 1 && (
+                                <PaginationItem>
+                                  <PaginationLink
+                                    size="icon"
+                                    onClick={() => handlePageChange(totalPages)}
+                                    className="cursor-pointer"
+                                  >
+                                    {totalPages}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              )}
+
+                              <PaginationItem>
+                                <PaginationNext
+                                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                              </PaginationItem>
+                            </PaginationContent>
+                          </Pagination>
+                        </div>
+                      </div>
+
+                    </>
+                  )}
+                </TabsContent>
+
+                {/* 深度洞察 Tab */}
+                <TabsContent value="insights" className="mt-0">
+                  <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ height: 'calc(100vh - 280px)' }}>
+                    <CopilotChat
+                      className="h-full"
+                      labels={{
+                        title: "深度洞察分析",
+                        initial: "你好！我是 AI 分析助手。我已经了解了当前访谈的所有数据，包括受访者信息和完整的问答记录。\n\n我可以帮你：\n• 分析用户反馈的共性和差异\n• 提取关键洞察和痛点\n• 生成用户画像总结\n• 提供产品优化建议\n\n请告诉我你想了解什么？"
+                      }}
+                      instructions="你是一个专业的用户研究分析助手。基于提供的访谈数据，进行深度分析并提供有价值的洞察。请用中文回答，语言要专业且易懂。"
+                    />
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {/* 用户详情抽屉 */}
+              <UserDetailSheet
+                open={showUserDetailSheet}
+                onOpenChange={setShowUserDetailSheet}
+                selectedUser={selectedUser}
+              />
+            </div>
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   )
 }
