@@ -16,7 +16,7 @@ import {
     StepperDescription,
     StepperNav
 } from "@/components/stepper";
-import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight, Eye, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
 import useSWR from "swr";
@@ -293,6 +293,9 @@ export default function InterviewPage() {
     const [removedUserIds, setRemovedUserIds] = useState<string[]>([]);
     const [simulatedUserPoolData, setSimulatedUserPoolData] = useState<any[]>([]);
     const [isLoadingUserPool, setIsLoadingUserPool] = useState(false);
+    const [currentResponsePage, setCurrentResponsePage] = useState(1);
+    const [hasMoreResponses, setHasMoreResponses] = useState(true);
+    const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
 
     // 使用 SWR 获取访谈详情
     const { data: interviewData, error: interviewError, isLoading: isLoadingInterview } = useSWR(
@@ -338,10 +341,10 @@ export default function InterviewPage() {
         }
     );
 
-    // 使用 SWR 获取已访谈的模拟用户 - 只在 state !== 0 时调用
+    // 使用 SWR 获取已访谈的模拟用户 - 只在 state !== 0 时调用，支持分页
     const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } = useSWR(
-        interviewData && !shouldUseRecommend
-            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}`
+        interviewData && !shouldUseRecommend && hasMoreResponses
+            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}&page=${currentResponsePage}&page_size=10`
             : null,
         async (url: string) => {
             const response = await fetch(url);
@@ -358,62 +361,13 @@ export default function InterviewPage() {
         }
     );
 
-    // 转换已访谈用户数据
-    const interviewedUsers = responsesData?.success && responsesData?.items
-        ? responsesData.items
-            // 过滤出模拟用户 (source === 1)
-            .filter((item: any) => item.interviewee.source === 1)
-            .map((item: any) => {
-                const content = item.interviewee.content;
-                const attributes: Record<string, string> = {};
-
-                // 从 user_profile_tags 中提取所有标签
-                if (content && content.user_profile_tags) {
-                    Object.keys(content.user_profile_tags).forEach(categoryKey => {
-                        const category = content.user_profile_tags[categoryKey];
-
-                        // 遍历子分类
-                        if (category && category.subcategories) {
-                            Object.keys(category.subcategories).forEach(subKey => {
-                                const subcategory = category.subcategories[subKey];
-
-                                // 提取所有tags
-                                if (subcategory && subcategory.tags) {
-                                    Object.keys(subcategory.tags).forEach(tagKey => {
-                                        attributes[tagKey] = subcategory.tags[tagKey];
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-
-                return {
-                    id: `response-${item.response.id}`,
-                    name: item.interviewee.name,
-                    avatar: "😊",
-                    status: item.response.state === 2 ? "已完成" : "进行中",
-                    isReal: false,
-                    attributes: attributes,
-                    rawContent: content,
-                    source: item.interviewee.source,
-                    created_at: item.response.created_at,
-                    responseId: item.response.id,
-                    intervieweeId: item.interviewee.id,
-                    // 保存完整的 response 信息，包含问答记录
-                    responseDetails: item.response.details,
-                    hasInterviewData: true // 标记这是已访谈用户
-                };
-            })
-        : [];
-
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
         ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
         : [];
 
     // 根据状态选择显示的用户列表
-    const displayedUsers = shouldUseRecommend ? recommendedUsers : interviewedUsers;
+    const displayedUsers = shouldUseRecommend ? recommendedUsers : allInterviewedUsers;
 
     // 监听数据加载
     useEffect(() => {
@@ -426,15 +380,80 @@ export default function InterviewPage() {
         }
     }, [personasData, recommendedCount, recommendedUsers.length, shouldUseRecommend]);
 
+    // 处理分页数据加载
     useEffect(() => {
-        if (responsesData && !shouldUseRecommend) {
+        if (responsesData && !shouldUseRecommend && responsesData.success) {
             console.log('👥 已访谈用户数据已加载:', {
+                当前页: responsesData.page,
                 总数: responsesData.total,
                 返回数量: responsesData.items?.length,
-                用户列表长度: interviewedUsers.length
+                已加载总数: allInterviewedUsers.length + (responsesData.items?.length || 0)
             });
+
+            // 转换新数据
+            const newUsers = responsesData.items
+                .filter((item: any) => item.interviewee.source === 1)
+                .map((item: any) => {
+                    const content = item.interviewee.content;
+                    const attributes: Record<string, string> = {};
+
+                    // 从 user_profile_tags 中提取所有标签
+                    if (content && content.user_profile_tags) {
+                        Object.keys(content.user_profile_tags).forEach(categoryKey => {
+                            const category = content.user_profile_tags[categoryKey];
+
+                            if (category && category.subcategories) {
+                                Object.keys(category.subcategories).forEach(subKey => {
+                                    const subcategory = category.subcategories[subKey];
+
+                                    if (subcategory && subcategory.tags) {
+                                        Object.keys(subcategory.tags).forEach(tagKey => {
+                                            attributes[tagKey] = subcategory.tags[tagKey];
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    return {
+                        id: `response-${item.response.id}`,
+                        name: item.interviewee.name,
+                        avatar: "😊",
+                        status: item.response.state === 2 ? "已完成" : "进行中",
+                        isReal: false,
+                        attributes: attributes,
+                        rawContent: content,
+                        source: item.interviewee.source,
+                        created_at: item.response.created_at,
+                        responseId: item.response.id,
+                        intervieweeId: item.interviewee.id,
+                        responseDetails: item.response.details,
+                        hasInterviewData: true
+                    };
+                });
+
+            // 追加新数据（去重）
+            setAllInterviewedUsers(prev => {
+                const existingIds = new Set(prev.map(u => u.id));
+                const uniqueNewUsers = newUsers.filter((u: any) => !existingIds.has(u.id));
+                return [...prev, ...uniqueNewUsers];
+            });
+
+            // 检查是否还有更多数据
+            const loadedCount = allInterviewedUsers.length + newUsers.length;
+            setHasMoreResponses(loadedCount < responsesData.total);
         }
-    }, [responsesData, interviewedUsers.length, shouldUseRecommend]);
+    }, [responsesData, shouldUseRecommend]);
+
+    // 重置分页状态（当访谈状态改变时）
+    useEffect(() => {
+        if (!shouldUseRecommend) {
+            setAllInterviewedUsers([]);
+            setCurrentResponsePage(1);
+            setHasMoreResponses(true);
+        }
+    }, [shouldUseRecommend, interviewData?.id]);
 
     // 处理错误
     const error = recommendError || responsesError;
@@ -739,15 +758,26 @@ export default function InterviewPage() {
         setSelectedUser(null);
     };
 
-    // 监听滚动显示回到顶部按钮
+    // 监听滚动显示回到顶部按钮 + 无限滚动加载
     useEffect(() => {
         const handleScroll = () => {
             setShowScrollTop(window.scrollY > 300);
+
+            // 无限滚动：检测是否滚动到底部
+            if (!shouldUseRecommend && hasMoreResponses && !isLoadingResponses) {
+                const scrollPosition = window.innerHeight + window.scrollY;
+                const bottomPosition = document.documentElement.scrollHeight - 300; // 距离底部 300px 时开始加载
+
+                if (scrollPosition >= bottomPosition) {
+                    console.log('🔄 触发分页加载，当前页:', currentResponsePage);
+                    setCurrentResponsePage(prev => prev + 1);
+                }
+            }
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [shouldUseRecommend, hasMoreResponses, isLoadingResponses, currentResponsePage]);
 
     return (
         <SidebarProvider>
@@ -917,6 +947,11 @@ export default function InterviewPage() {
                                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                         <Bot className="w-5 h-5 text-primary" />
                                         {t('users.simulatedUsers.title')} {simulatedUsers.length}
+                                        {!shouldUseRecommend && responsesData?.total && (
+                                            <span className="text-sm text-gray-500 font-normal">
+                                                / {responsesData.total} 个
+                                            </span>
+                                        )}
                                     </h3>
                                     <span className="text-sm text-gray-600">
                                         {shouldUseRecommend
@@ -937,7 +972,7 @@ export default function InterviewPage() {
                                 )}
                             </div>
 
-                            {isLoadingUsers ? (
+                            {isLoadingUsers && simulatedUsers.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12">
                                     <LoadingAnimation width={150} height={150} />
                                     <p className="text-gray-600 mt-4">
@@ -945,17 +980,34 @@ export default function InterviewPage() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    {simulatedUsers.map((user) => (
-                                        <UserCard
-                                            key={user.id}
-                                            user={user}
-                                            onViewDetails={handleViewDetails}
-                                            onRemoveUser={handleRemoveUser}
-                                            canRemove={shouldUseRecommend}
-                                        />
-                                    ))}
-                                </div>
+                                <>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                        {simulatedUsers.map((user) => (
+                                            <UserCard
+                                                key={user.id}
+                                                user={user}
+                                                onViewDetails={handleViewDetails}
+                                                onRemoveUser={handleRemoveUser}
+                                                canRemove={shouldUseRecommend}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    {/* 加载更多指示器 */}
+                                    {!shouldUseRecommend && isLoadingResponses && simulatedUsers.length > 0 && (
+                                        <div className="flex justify-center items-center py-8">
+                                            <Loader2 className="w-6 h-6 animate-spin text-primary mr-2" />
+                                            <span className="text-sm text-gray-600">加载更多...</span>
+                                        </div>
+                                    )}
+
+                                    {/* 已加载全部数据提示 */}
+                                    {!shouldUseRecommend && !hasMoreResponses && simulatedUsers.length > 0 && (
+                                        <div className="flex justify-center items-center py-8">
+                                            <span className="text-sm text-gray-500">已加载全部数据</span>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
