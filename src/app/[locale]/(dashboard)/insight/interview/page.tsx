@@ -1210,8 +1210,9 @@ export default function InterviewPage() {
 
                 {/* 模拟用户池弹窗 */}
                 <Dialog open={showSimulatedUserPool} onOpenChange={setShowSimulatedUserPool}>
-                    <DialogContent className="max-w-6xl w-full max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
+                    <DialogContent className="max-w-6xl w-full max-h-[85vh] flex flex-col p-0">
+                        {/* 顶部 - 固定 */}
+                        <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b">
                             <DialogTitle className="text-2xl font-semibold text-gray-900 mb-2">
                                 {t('modals.simulatedUserPool.title')}
                             </DialogTitle>
@@ -1232,8 +1233,8 @@ export default function InterviewPage() {
                             </div>
                         </DialogHeader>
 
-                        {/* 用户池网格 */}
-                        <div className="py-6">
+                        {/* 用户池网格 - 可滚动 */}
+                        <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
                             {isLoadingUserPool ? (
                                 <div className="flex flex-col items-center justify-center py-12">
                                     <LoadingAnimation width={150} height={150} />
@@ -1313,8 +1314,8 @@ export default function InterviewPage() {
                             )}
                         </div>
 
-                        {/* 底部按钮 */}
-                        <div className="flex justify-center items-center gap-3 pt-4 border-t border-gray-200">
+                        {/* 底部按钮 - 固定 */}
+                        <div className="flex-shrink-0 flex justify-center items-center gap-3 px-6 py-4 border-t bg-gray-50/50">
                             <Button
                                 variant="outline"
                                 onClick={() => {
