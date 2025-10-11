@@ -41,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useSearchParams } from "next/navigation"
 
 interface InterviewResponse {
   response: {
@@ -92,10 +93,13 @@ interface ApiResponse {
 }
 
 export default function Page() {
+  const searchParams = useSearchParams()
+  const urlInterviewId = searchParams.get('interview_id')
+
   const [data, setData] = useState<InterviewResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [interviewId, setInterviewId] = useState(20) // 默认 interview_id
+  const [interviewId, setInterviewId] = useState(urlInterviewId ? Number(urlInterviewId) : 20) // 从 URL 获取或默认 20
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [pagination, setPagination] = useState({
@@ -105,6 +109,7 @@ export default function Page() {
   })
   const [selectedInterview, setSelectedInterview] = useState<InterviewResponse | null>(null)
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
+  const [interviewName, setInterviewName] = useState<string>('')
 
   const handleViewDetail = (item: InterviewResponse) => {
     setSelectedInterview(item)
@@ -122,6 +127,17 @@ export default function Page() {
 
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
 
+  // 监听 URL 参数变化
+  useEffect(() => {
+    if (urlInterviewId) {
+      const id = Number(urlInterviewId)
+      if (id !== interviewId) {
+        setInterviewId(id)
+        setCurrentPage(1)
+      }
+    }
+  }, [urlInterviewId, interviewId])
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -129,7 +145,7 @@ export default function Page() {
         setError(null)
 
         const response = await fetch(
-          `http://localhost:8000/api/v1/response/originalsound?interview_id=${interviewId}&page=${currentPage}&page_size=${pageSize}`
+          `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=${currentPage}&page_size=${pageSize}`
         )
 
         if (!response.ok) {
@@ -182,7 +198,10 @@ export default function Page() {
                     orientation="vertical"
                     className="mr-2 data-[orientation=vertical]:h-4"
                   />
-                  <h1 className="text-xl font-semibold text-gray-900">访谈数据分析</h1>
+                  <div className="flex flex-col">
+                    <h1 className="text-xl font-semibold text-gray-900">访谈数据分析</h1>
+                    <span className="text-xs text-gray-500 mt-0.5">访谈 ID: {interviewId}</span>
+                  </div>
                   {!loading && data.length > 0 && (
                     <Badge variant="secondary" className="ml-2">
                       共 {pagination.total} 条记录
@@ -192,7 +211,7 @@ export default function Page() {
 
                 {/* Interview ID 选择器 */}
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-600">访谈ID:</label>
+                  <label className="text-sm text-gray-600">切换访谈:</label>
                   <input
                     type="number"
                     value={interviewId}

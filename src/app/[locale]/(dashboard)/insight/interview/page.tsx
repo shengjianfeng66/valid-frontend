@@ -19,6 +19,7 @@ import {
 import { Check, Users, Bot, ArrowUp, Copy, X, ChevronLeft, ChevronRight, Eye, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from "@/i18n/navigation";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -276,6 +277,7 @@ function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }: { use
 export default function InterviewPage() {
     const t = useTranslations('interview');
     const searchParams = useSearchParams();
+    const router = useRouter();
     const interviewId = searchParams.get('id');
 
     const realUsersRef = useRef<HTMLDivElement>(null);
@@ -809,6 +811,13 @@ export default function InterviewPage() {
         }
     };
 
+    // 跳转到分析页面
+    const handleViewAnalytics = () => {
+        if (interviewId) {
+            router.push(`/analytics?interview_id=${interviewId}`);
+        }
+    };
+
     const handleRemoveUser = (userId: string) => {
         // 只在推荐模式下允许移除用户
         if (!shouldUseRecommend) {
@@ -940,21 +949,38 @@ export default function InterviewPage() {
                                             </button>
                                         </div>
                                     </div>
-                                    <Button
-                                        className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
-                                        onClick={() => {
-                                            if (interviewData.state === 0) {
-                                                handleStartInterview();
-                                            } else if (interviewData.state === 1) {
-                                                handleFinishInterview();
-                                            }
-                                        }}
-                                        disabled={interviewData.state === 2}
-                                    >
-                                        {interviewData.state === 0 ? t('interview.startInterview') :
-                                            interviewData.state === 1 ? t('interview.endInterview') :
-                                                t('interview.interviewEnded')}
-                                    </Button>
+                                    <div className="flex items-center gap-3">
+                                        {/* 查看分析报告按钮 - 只在已结束状态显示 */}
+                                        {interviewData.state === 2 && (
+                                            <Button
+                                                variant="outline"
+                                                className="border-primary text-primary hover:bg-primary/10 px-6 py-2 flex items-center gap-2"
+                                                onClick={handleViewAnalytics}
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                </svg>
+                                                查看分析报告
+                                            </Button>
+                                        )}
+
+                                        {/* 开始/结束访谈按钮 */}
+                                        <Button
+                                            className="bg-primary hover:bg-primary/90 text-white px-6 py-2"
+                                            onClick={() => {
+                                                if (interviewData.state === 0) {
+                                                    handleStartInterview();
+                                                } else if (interviewData.state === 1) {
+                                                    handleFinishInterview();
+                                                }
+                                            }}
+                                            disabled={interviewData.state === 2}
+                                        >
+                                            {interviewData.state === 0 ? t('interview.startInterview') :
+                                                interviewData.state === 1 ? t('interview.endInterview') :
+                                                    t('interview.interviewEnded')}
+                                        </Button>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="text-center py-4 text-gray-500">
