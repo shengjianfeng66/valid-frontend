@@ -345,7 +345,7 @@ export default function InterviewPage() {
     // 使用 SWR 获取已访谈的模拟用户 - 只在 state !== 0 时调用，支持分页
     const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } = useSWR(
         interviewData && !shouldUseRecommend && hasMoreResponses
-            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}&page=${currentResponsePage}&page_size=10`
+            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}&page=${currentResponsePage}&page_size=20`
             : null,
         async (url: string) => {
             const response = await fetch(url);
