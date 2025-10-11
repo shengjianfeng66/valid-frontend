@@ -284,6 +284,7 @@ export default function InterviewPage() {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
     const [showLoadingModal, setShowLoadingModal] = useState(false);
+    const [loadingModalType, setLoadingModalType] = useState<'start' | 'finish'>('start');
     const [showUserDetailSheet, setShowUserDetailSheet] = useState(false);
     const [showRemoveConfirmDialog, setShowRemoveConfirmDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -708,6 +709,7 @@ export default function InterviewPage() {
             });
 
             // 显示加载弹窗
+            setLoadingModalType('start');
             setShowLoadingModal(true);
 
             // TODO: 可以考虑重新获取访谈详情以更新状态
@@ -717,6 +719,64 @@ export default function InterviewPage() {
             console.error('开始访谈失败:', error);
             toast.error('开始访谈失败', {
                 description: '请检查后端服务是否正常运行'
+            });
+        }
+    };
+
+    // 结束访谈
+    const handleFinishInterview = async () => {
+        if (!interviewData) {
+            toast.error('无法结束访谈', {
+                description: '访谈数据未加载'
+            });
+            return;
+        }
+
+        try {
+            // TODO: 从认证系统获取真实的 user_id
+            const userId = 1; // 临时硬编码，后续需要从 session 或 context 中获取
+
+            console.log('结束访谈，参数:', {
+                interview_id: interviewData.id,
+                user_id: userId
+            });
+
+            const response = await fetch('http://localhost:8000/api/v1/interview/finish', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    interview_id: interviewData.id,
+                    user_id: userId
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('访谈结束成功:', data);
+
+            toast.success('访谈已结束', {
+                description: '访谈状态已更新为已完成'
+            });
+
+            // 显示加载弹窗（用于等待AI分析）
+            setLoadingModalType('finish');
+            setShowLoadingModal(true);
+
+            // 刷新页面或重新获取访谈详情
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+
+        } catch (error) {
+            console.error('结束访谈失败:', error);
+            toast.error('结束访谈失败', {
+                description: error instanceof Error ? error.message : '请检查后端服务是否正常运行'
             });
         }
     };
@@ -867,8 +927,7 @@ export default function InterviewPage() {
                                             if (interviewData.state === 0) {
                                                 handleStartInterview();
                                             } else if (interviewData.state === 1) {
-                                                // TODO: 实现结束访谈接口
-                                                setShowLoadingModal(true);
+                                                handleFinishInterview();
                                             }
                                         }}
                                         disabled={interviewData.state === 2}
@@ -1238,10 +1297,12 @@ export default function InterviewPage() {
                     <DialogContent className="max-w-md">
                         <DialogHeader>
                             <DialogTitle className="text-center text-xl font-semibold">
-                                {t('loading.title')}
+                                {loadingModalType === 'start' ? t('loading.title') : '正在结束访谈'}
                             </DialogTitle>
                             <DialogDescription className="text-center text-gray-600">
-                                {t('loading.description')}
+                                {loadingModalType === 'start'
+                                    ? t('loading.description')
+                                    : '正在生成访谈分析报告，请稍候...'}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="flex justify-center py-2">
