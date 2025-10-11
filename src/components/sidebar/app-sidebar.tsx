@@ -3,6 +3,7 @@
 import * as React from "react"
 import useSWR from "swr"
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 import {
   Home,
@@ -62,6 +63,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAppContext()
   const { hasDraft, clearDraft } = useDraft()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // 获取当前 URL 中的 interview ID
+  const currentInterviewId = searchParams.get('id') ? Number(searchParams.get('id')) : null
 
   // 使用 SWR 获取项目列表
   const { data: interviews, error, isLoading } = useSWR(
@@ -157,21 +162,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     day: '2-digit'
                   }).replace(/\//g, '/');
 
+                  const isActive = currentInterviewId === interview.id;
+
                   return (
                     <SidebarMenuItem key={interview.id}>
-                      <SidebarMenuButton className="text-gray-900" asChild>
+                      <SidebarMenuButton
+                        className={`text-gray-900 ${isActive ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
+                        asChild
+                      >
                         <NavigationLink
                           href={`/insight/interview?id=${interview.id}`}
                           hasDraft={hasDraft}
                           onLeave={clearDraft}
-                          className="flex items-center gap-3 px-3 py-6"
+                          className={`flex items-center gap-3 px-3 py-6 ${isActive ? 'relative' : ''}`}
                         >
-                          <FileText className="w-4 h-4 text-gray-500" />
+                          {isActive && (
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
+                          )}
+                          <FileText className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-gray-500'}`} />
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate leading-5">
+                            <div className={`text-sm font-medium truncate leading-5 ${isActive ? 'text-primary font-semibold' : ''}`}>
                               {interview.name}
                             </div>
-                            <div className="flex items-center justify-between text-xs text-gray-500 mt-1 leading-4">
+                            <div className={`flex items-center justify-between text-xs mt-1 leading-4 ${isActive ? 'text-primary/70' : 'text-gray-500'}`}>
                               <span>访谈 #{interview.id}</span>
                               <span>{date}</span>
                             </div>

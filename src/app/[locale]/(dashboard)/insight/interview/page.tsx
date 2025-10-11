@@ -41,6 +41,7 @@ import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 import { useTranslations } from "next-intl";
+import { useDraft } from "@/contexts/draft";
 
 // API 数据类型定义
 interface PersonaContent {
@@ -278,6 +279,7 @@ export default function InterviewPage() {
     const t = useTranslations('interview');
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { setHasDraft } = useDraft();
     const interviewId = searchParams.get('id');
 
     const realUsersRef = useRef<HTMLDivElement>(null);
@@ -503,6 +505,15 @@ export default function InterviewPage() {
             console.log('📊 推荐用户数量:', interviewData.participants?.recommended_total || 2);
         }
     }, [interviewData]);
+
+    // 清除草稿状态（interview 页面不需要草稿提示）
+    useEffect(() => {
+        setHasDraft(false);
+        return () => {
+            // 组件卸载时保持清除状态
+            setHasDraft(false);
+        };
+    }, [setHasDraft]);
 
     // 根据 state 获取访谈状态
     const getInterviewStatus = (state: number) => {
