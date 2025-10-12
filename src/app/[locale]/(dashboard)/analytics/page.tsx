@@ -100,17 +100,8 @@ export default function Page() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [interviewId, setInterviewId] = useState(urlInterviewId ? Number(urlInterviewId) : 20) // 从 URL 获取或默认 20
-  const [currentPage, setCurrentPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 10,
-    total: 0
-  })
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
-  const [interviewName, setInterviewName] = useState<string>('')
-  const [filterSource, setFilterSource] = useState<string>('all') // all | 0 | 1
 
   // 使用 SWR 获取访谈详情（包含分析报告）
   const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
@@ -127,35 +118,6 @@ export default function Page() {
       revalidateOnReconnect: false,
     }
   );
-
-  // 筛选数据
-  const filteredData = data.filter(item => {
-    // 确保数据完整性
-    if (!item || !item.interviewee) {
-      return false
-    }
-
-    // 类型筛选
-    if (filterSource !== 'all' && item.interviewee.source !== Number(filterSource)) {
-      return false
-    }
-
-    return true
-  })
-
-  // 客户端分页
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  )
-
-  // 计算总页数
-  const filteredTotalPages = Math.ceil(filteredData.length / pageSize)
-
-  // 筛选条件改变时重置到第一页
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [filterSource])
 
   // 获取可用的报告
   const availableReports = interviewDetail?.analysis?.reports || [];
@@ -209,26 +171,12 @@ export default function Page() {
     setShowUserDetailSheet(true)
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
-
-  const handlePageSizeChange = (size: string) => {
-    setPageSize(Number(size))
-    setCurrentPage(1) // 重置到第一页
-  }
-
-  const totalPages = Math.ceil(pagination.total / pagination.pageSize)
-
-  // 使用筛选后的总页数
-  const displayTotalPages = filteredTotalPages || totalPages
-
   // 让 AI 能够读取访谈数据
   useCopilotReadable({
     description: "当前访谈的所有响应数据，包括受访者信息、问答记录、用户画像等",
     value: {
       interview_id: interviewId,
-      total_responses: pagination.total,
+      total_responses: data.length,
       current_page_data: data.map(item => ({
         interviewee_name: item.interviewee.name,
         profile_brief: item.response.details.meta.profile_brief,
@@ -250,19 +198,20 @@ export default function Page() {
       const id = Number(urlInterviewId)
       if (id !== interviewId) {
         setInterviewId(id)
-        setCurrentPage(1)
       }
     }
   }, [urlInterviewId, interviewId])
 
+  // 获取访谈数据
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
 
+        // 一次性加载100条数据
         const response = await fetch(
-          `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=${currentPage}&page_size=${pageSize}`
+          `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
         )
 
         if (!response.ok) {
@@ -274,11 +223,6 @@ export default function Page() {
 
         if (result.success && result.items) {
           setData(result.items)
-          setPagination({
-            page: result.page,
-            pageSize: result.page_size,
-            total: result.total
-          })
 
           toast.success('数据加载成功', {
             description: `已加载 ${result.items.length} 条记录，共 ${result.total} 条`
@@ -298,7 +242,7 @@ export default function Page() {
     }
 
     fetchData()
-  }, [interviewId, currentPage, pageSize])
+  }, [interviewId])
 
   return (
     <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
@@ -364,15 +308,6 @@ export default function Page() {
                   loading={loading}
                   error={error}
                   data={data}
-                  filteredData={filteredData}
-                  paginatedData={paginatedData}
-                  currentPage={currentPage}
-                  pageSize={pageSize}
-                  totalPages={displayTotalPages}
-                  filterSource={filterSource}
-                  onFilterChange={setFilterSource}
-                  onPageChange={handlePageChange}
-                  onPageSizeChange={handlePageSizeChange}
                   onViewDetail={handleViewDetail}
                 />
               </TabsContent>
