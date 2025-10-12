@@ -9,14 +9,13 @@ import { ArrowUp } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from "@/i18n/navigation";
-import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
-import { getStatusConfig } from "@/utils/interview";
+import { getStatusConfig, transformPersonaToUser, extractNumericId } from "@/utils/interview";
 import {
     InterviewHeader,
     InterviewStepper,
@@ -27,102 +26,8 @@ import {
     RealUsersSection,
     SimulatedUsersSection
 } from "@/components/interview";
-
-// API 数据类型定义
-interface PersonaContent {
-    meta?: any;
-    user_profile_tags?: {
-        [categoryKey: string]: {
-            name: string;
-            description?: string;
-            subcategories?: {
-                [subKey: string]: {
-                    name: string;
-                    tags: {
-                        [tagKey: string]: string;
-                    }
-                }
-            }
-        }
-    };
-    [key: string]: any;
-}
-
-interface PersonaFromAPI {
-    id: number;
-    name: string;
-    content: PersonaContent;
-    source: number;
-    created_at: string;
-    updated_at: string | null;
-}
-
-interface PersonasResponse {
-    personas: PersonaFromAPI[];
-    total_count: number;
-    requested_count: number;
-}
-
-// SWR fetcher 函数
-const fetcher = async (url: string, count: number): Promise<PersonasResponse> => {
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            persona_count: count
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log(`获取到 ${data.total_count} 个人物画像`);
-
-    return data;
-}
-
-// 将 API 返回的数据转换为组件需要的格式
-function transformPersonaToUser(persona: PersonaFromAPI): any {
-    const content = persona.content;
-    const attributes: Record<string, string> = {};
-
-    // 提取所有标签 - 添加 null 检查
-    if (content && content.user_profile_tags) {
-        Object.keys(content.user_profile_tags).forEach(categoryKey => {
-            const category = content.user_profile_tags![categoryKey];
-
-            // 遍历子分类
-            if (category && category.subcategories) {
-                Object.keys(category.subcategories).forEach(subKey => {
-                    const subcategory = category.subcategories![subKey];
-
-                    // 提取所有tags
-                    if (subcategory && subcategory.tags) {
-                        Object.keys(subcategory.tags).forEach(tagKey => {
-                            attributes[tagKey] = subcategory.tags[tagKey];
-                        });
-                    }
-                });
-            }
-        });
-    }
-
-    return {
-        id: `api-${persona.id}`,
-        name: persona.name || '未命名用户',
-        avatar: "😊",
-        status: "等待中",
-        isReal: false,
-        attributes: attributes,
-        rawContent: content, // 保存原始 content 供详情页使用
-        source: persona.source,
-        created_at: persona.created_at
-    };
-}
+import { useInterviewDetail, useRecommendedPersonas, useInterviewResponses } from "@/hooks/useInterview";
+import { startInterview, finishInterview, fetchSimulatedUserPool } from "@/services/interview";
 
 export default function InterviewPage() {
     const t = useTranslations('interview');
@@ -150,30 +55,9 @@ export default function InterviewPage() {
     const [hasMoreResponses, setHasMoreResponses] = useState(true);
     const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
 
-    // 使用 SWR 获取访谈详情
-    const { data: interviewData, error: interviewError, isLoading: isLoadingInterview, mutate: mutateInterview } = useSWR(
-        interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
-        async (url: string) => {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('📝 获取到访谈详情:', data);
-            return data;
-        },
-        {
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-        }
-    );
+    // 使用自定义 hooks 获取访谈详情
+    const { data: interviewData, error: interviewError, isLoading: isLoadingInterview, mutate: mutateInterview } =
+        useInterviewDetail(interviewId);
 
     // 从访谈详情中获取推荐人数
     const recommendedCount = interviewData?.participants?.recommended_total || 0;
@@ -184,35 +68,17 @@ export default function InterviewPage() {
     // state !== 0: 调用 originalsound 接口获取已访谈的模拟用户
     const shouldUseRecommend = interviewState === 0;
 
-    // 使用 SWR 获取推荐用户 - 只在 state === 0 时调用
-    const { data: personasData, error: recommendError, isLoading: isLoadingRecommended } = useSWR(
-        interviewData && shouldUseRecommend ? ['http://localhost:8000/api/v1/persona/recommend', recommendedCount] : null,
-        ([url, count]) => fetcher(url, count),
-        {
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-        }
-    );
+    // 使用自定义 hooks 获取推荐用户 - 只在 state === 0 时调用
+    const { data: personasData, error: recommendError, isLoading: isLoadingRecommended } =
+        useRecommendedPersonas(recommendedCount, !!interviewData && shouldUseRecommend);
 
-    // 使用 SWR 获取已访谈的模拟用户 - 只在 state !== 0 时调用，支持分页
-    const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } = useSWR(
-        interviewData && !shouldUseRecommend && hasMoreResponses
-            ? `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewData.id}&page=${currentResponsePage}&page_size=20`
-            : null,
-        async (url: string) => {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            console.log('📝 获取已访谈用户数据:', data);
-            return data;
-        },
-        {
-            revalidateOnFocus: false,
-            revalidateOnReconnect: false,
-        }
-    );
+    // 使用自定义 hooks 获取已访谈的模拟用户 - 只在 state !== 0 时调用，支持分页
+    const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } =
+        useInterviewResponses(
+            interviewData?.id || null,
+            currentResponsePage,
+            !!interviewData && !shouldUseRecommend && hasMoreResponses
+        );
 
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
@@ -369,32 +235,10 @@ export default function InterviewPage() {
     };
 
     // 获取模拟用户池数据
-    const fetchSimulatedUserPool = async () => {
+    const handleFetchSimulatedUserPool = async () => {
         setIsLoadingUserPool(true);
         try {
-            const response = await fetch('http://localhost:8000/api/v1/interviewee/list_simulated_users', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // 转换数据格式 - 支持两种数据结构
-            let personasArray: PersonaFromAPI[] = [];
-
-            if (Array.isArray(data.personas)) {
-                // 如果返回的是 { personas: [...] } 格式
-                personasArray = data.personas;
-            } else if (Array.isArray(data)) {
-                // 如果直接返回数组格式
-                personasArray = data;
-            }
+            const personasArray = await fetchSimulatedUserPool();
 
             if (personasArray.length > 0) {
                 const transformedUsers = personasArray.map(transformPersonaToUser);
@@ -413,7 +257,7 @@ export default function InterviewPage() {
     // 打开模拟用户池弹窗
     const handleOpenSimulatedUserPool = () => {
         setShowSimulatedUserPool(true);
-        fetchSimulatedUserPool();
+        handleFetchSimulatedUserPool();
     };
 
     const handleConfirmAdd = () => {
@@ -441,11 +285,7 @@ export default function InterviewPage() {
         console.log('模拟用户列表:', simulatedUsers.map(u => ({ id: u.id, name: u.name })));
 
         const intervieweeIds = simulatedUsers
-            .map(user => {
-                // user.id 格式是 "api-123"，需要提取数字部分
-                const match = user.id.match(/^api-(\d+)$/);
-                return match ? parseInt(match[1], 10) : null;
-            })
+            .map(user => extractNumericId(user.id))
             .filter((id): id is number => id !== null);
 
         console.log('提取的 interviewee IDs:', intervieweeIds);
@@ -458,28 +298,10 @@ export default function InterviewPage() {
         }
 
         try {
-            console.log('开始访谈，参数:', {
+            await startInterview({
                 interview_id: interviewData.id,
                 interviewee_ids: intervieweeIds
             });
-
-            const response = await fetch('http://localhost:8000/api/v1/interview/start', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    interview_id: interviewData.id,
-                    interviewee_ids: intervieweeIds
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('访谈开始成功:', data);
 
             toast.success('访谈已开始', {
                 description: `正在访谈 ${intervieweeIds.length} 位用户`
@@ -519,29 +341,10 @@ export default function InterviewPage() {
             // TODO: 从认证系统获取真实的 user_id
             const userId = 1; // 临时硬编码，后续需要从 session 或 context 中获取
 
-            console.log('结束访谈，参数:', {
+            await finishInterview({
                 interview_id: interviewData.id,
                 user_id: userId
             });
-
-            const response = await fetch('http://localhost:8000/api/v1/interview/finish', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    interview_id: interviewData.id,
-                    user_id: userId
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('访谈结束成功:', data);
 
             toast.success('访谈已结束', {
                 description: '访谈状态已更新为已完成'
