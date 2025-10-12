@@ -6,5 +6,4 @@ export { LoadingModal } from './loading-modal';
 export { RemoveUserDialog } from './remove-user-dialog';
 export { RealUsersSection } from './real-users-section';
 export { SimulatedUsersSection } from './simulated-users-section';
-export { InterviewStepper } from './interview-stepper';
 

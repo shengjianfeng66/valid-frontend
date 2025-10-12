@@ -1,39 +1,46 @@
 "use client";
 
-import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { Separator } from "@/components/ui/separator"
+// ==================== React 相关 ====================
+import { useState, useRef, useEffect, useCallback } from "react";
+
+// ==================== Next.js 相关 ====================
+import { useRouter } from "@/i18n/navigation";
+
+// ==================== 第三方库 ====================
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
+
+// ==================== CopilotKit ====================
+import { useCopilotAction, useCopilotReadable, useCopilotChatInternal, useCoAgent } from "@copilotkit/react-core";
+import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
+
+// ==================== UI 基础组件 ====================
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
-} from "@/components/ui/sidebar"
-import {
-  Stepper,
-  StepperItem,
-  StepperTrigger,
-  StepperIndicator,
-  StepperSeparator,
-  StepperTitle,
-  StepperDescription,
-  StepperNav
-} from "@/components/stepper";
-import { Check } from "lucide-react";
-import { useCopilotAction, useCopilotReadable, useCopilotChatInternal, useCoAgent } from "@copilotkit/react-core";
-import { CopilotKitCSSProperties, CopilotSidebar, useCopilotChatSuggestions } from "@copilotkit/react-ui";
-import { useState, useRef, useEffect, useCallback } from "react";
-import { FileText, ArrowRight, ArrowLeft, Plus } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { useDraft } from "@/contexts/draft";
-import { toast } from "sonner";
-import { useSurveyStore } from "@/stores/survey-store";
+} from "@/components/ui/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
+// ==================== 布局组件 ====================
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+
+// ==================== 业务组件 ====================
+import { InsightStepper } from "@/components/insight";
+
+// ==================== Contexts ====================
+import { useDraft } from "@/contexts/draft";
+
+// ==================== Stores ====================
+import { useSurveyStore } from "@/stores/survey-store";
 
 interface SurveyData {
   surveyIntro: string;
@@ -513,61 +520,11 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
             {/* 可滚动区域 - 包含顶部和中间内容 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
               {/* 顶部 - 流程状态栏 */}
-              <div className="bg-white rounded-lg shadow-sm px-6 py-6">
-                <Stepper value={currentStep} className="w-full">
-                  <StepperNav className="flex justify-between items-center">
-                    <StepperItem step={1} completed={currentStep > 1}>
-                      <StepperTrigger
-                        className="flex flex-col items-center gap-3"
-                        canNavigate={1 < currentStep}
-                        onClick={() => handleStepNavigation(1)}
-                      >
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-primary text-white">
-                          <Check className="w-5 h-5" />
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step1.title')}</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step1.description')}</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                      <StepperSeparator className="mx-4 flex-1 bg-primary h-0.5" />
-                    </StepperItem>
-
-                    <StepperItem step={2} completed={currentStep > 2}>
-                      <StepperTrigger
-                        className="flex flex-col items-center gap-3"
-                        canNavigate={2 < currentStep}
-                        onClick={() => handleStepNavigation(2)}
-                      >
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-700 border-2 border-dashed border-primary">
-                          2
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-primary">{t('steps.step2.title')}</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step2.description')}</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                      <StepperSeparator className="mx-4 flex-1 bg-gray-200 h-0.5" />
-                    </StepperItem>
-
-                    <StepperItem step={3} completed={currentStep > 3}>
-                      <StepperTrigger
-                        className="flex flex-col items-center gap-3"
-                        canNavigate={3 < currentStep}
-                        onClick={() => handleStepNavigation(3)}
-                      >
-                        <StepperIndicator className="w-10 h-10 text-sm font-medium bg-gray-200 text-gray-500">
-                          3
-                        </StepperIndicator>
-                        <div className="text-center">
-                          <StepperTitle className="text-sm font-medium text-gray-500">{t('steps.step3.title')}</StepperTitle>
-                          <StepperDescription className="text-xs text-gray-500 mt-1">{t('steps.step3.description')}</StepperDescription>
-                        </div>
-                      </StepperTrigger>
-                    </StepperItem>
-                  </StepperNav>
-                </Stepper>
-              </div>
+              <InsightStepper
+                currentStep={currentStep}
+                onStepClick={handleStepNavigation}
+                translationNamespace="outline"
+              />
 
               {/* 中间内容区 */}
               <div className="bg-white rounded-lg shadow-sm p-6">

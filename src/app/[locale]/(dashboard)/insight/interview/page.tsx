@@ -24,7 +24,6 @@ import { UserDetailSheet } from "@/components/user-detail-sheet";
 // ==================== 业务组件 ====================
 import {
     InterviewHeader,
-    InterviewStepper,
     InviteRealUsersModal,
     SimulatedUserPoolModal,
     LoadingModal,
@@ -32,6 +31,7 @@ import {
     RealUsersSection,
     SimulatedUsersSection
 } from "@/components/interview";
+import { InsightStepper } from "@/components/insight";
 
 // ==================== 自定义 Hooks ====================
 import { useInterviewDetail, useRecommendedPersonas, useInterviewResponses } from "@/hooks/useInterview";
@@ -422,7 +422,7 @@ export default function InterviewPage() {
             <SidebarInset>
                 <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
                     {/* 顶部 - 流程状态栏 */}
-                    <InterviewStepper />
+                    <InsightStepper currentStep={3} />
                     {/* 用户访谈区域 */}
                     <div className="bg-white rounded-lg shadow-sm">
                         {/* 顶部标题和开始访谈按钮 */}
