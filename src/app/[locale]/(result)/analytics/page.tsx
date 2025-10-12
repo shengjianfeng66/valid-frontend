@@ -12,7 +12,7 @@ import useSWR from 'swr';
 
 // ==================== CopilotKit ====================
 import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
-import { useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotReadable, useCoAgent} from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
 
 // ==================== UI 基础组件 ====================
@@ -102,7 +102,26 @@ export default function Page() {
   const [interviewId, setInterviewId] = useState(urlInterviewId ? Number(urlInterviewId) : 20) // 从 URL 获取或默认 20
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
-
+  const { setState: setAgentState } = useCoAgent<{
+    interview_id: number;
+    interview_name?: string;
+    total_responses?: number;
+    current_page?: number;
+    page_size?: number;
+    filtered_data_count?: number;
+    has_reports?: boolean;
+  }>({
+    name: "user_agent",
+    initialState: {
+      interview_id: interviewId,
+      interview_name: '',
+      total_responses: 0,
+      current_page: 1,
+      page_size: 10,
+      filtered_data_count: 0,
+      has_reports: false,
+    },
+  });
   // 使用 SWR 获取访谈详情（包含分析报告）
   const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
     interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
@@ -172,25 +191,25 @@ export default function Page() {
   }
 
   // 让 AI 能够读取访谈数据
-  useCopilotReadable({
-    description: "当前访谈的所有响应数据，包括受访者信息、问答记录、用户画像等",
-    value: {
-      interview_id: interviewId,
-      total_responses: data.length,
-      current_page_data: data.map(item => ({
-        interviewee_name: item.interviewee.name,
-        profile_brief: item.response.details.meta.profile_brief,
-        source: item.interviewee.source === 0 ? '真人' : '模拟',
-        state: item.response.state === 3 ? '已完成' : '进行中',
-        answers_summary: item.response.details.answers.map(section => ({
-          section: section.section_name,
-          question_count: section.questions.length
-        })),
-        closing_summary: item.response.details.closing?.summary
-      })),
-      all_data: data // 完整数据供 AI 深度分析
-    }
-  })
+  // useCopilotReadable({
+  //   description: "当前访谈的所有响应数据，包括受访者信息、问答记录、用户画像等",
+  //   value: {
+  //     interview_id: interviewId,
+  //     total_responses: data.length,
+  //     current_page_data: data.map(item => ({
+  //       interviewee_name: item.interviewee.name,
+  //       profile_brief: item.response.details.meta.profile_brief,
+  //       source: item.interviewee.source === 0 ? '真人' : '模拟',
+  //       state: item.response.state === 3 ? '已完成' : '进行中',
+  //       answers_summary: item.response.details.answers.map(section => ({
+  //         section: section.section_name,
+  //         question_count: section.questions.length
+  //       })),
+  //       closing_summary: item.response.details.closing?.summary
+  //     })),
+  //     all_data: data // 完整数据供 AI 深度分析
+  //   }
+  // })
 
   // 监听 URL 参数变化
   useEffect(() => {
@@ -200,6 +219,11 @@ export default function Page() {
         setInterviewId(id)
       }
     }
+    setAgentState(prev => ({
+      ...prev,
+      interview_id: interviewId, // 使用当前的 interviewId 而不是 interviewDetail.id
+      interview_name: interviewDetail?.name || ''
+    }));
   }, [urlInterviewId, interviewId])
 
   // 获取访谈数据
@@ -242,6 +266,8 @@ export default function Page() {
     }
 
     fetchData()
+
+
   }, [interviewId])
 
   return (

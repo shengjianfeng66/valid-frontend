@@ -14,7 +14,8 @@ export default function Layout({ children }: { children: ReactNode }) {
             <CopilotKit
                 runtimeUrl={runtimeUrl}
                 publicApiKey={publicApiKey}
-            >
+                agent="user_agent"
+            >           
                 {children}
             </CopilotKit>
         </NuqsAdapter>
