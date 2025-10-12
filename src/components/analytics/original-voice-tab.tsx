@@ -9,6 +9,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
+import { getStatusConfig } from "@/utils/interview";
 
 interface InterviewResponse {
     response: {
@@ -75,14 +76,8 @@ export function OriginalVoiceTab({
                 ),
                 cell: ({ row }) => {
                     const item = row.original;
-                    const gender = item.interviewee.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['性别'];
-                    const avatar = gender === '男性' || gender === '男' ? '👨' : gender === '女性' || gender === '女' ? '👩' : '😊';
-
                     return (
                         <div className="flex items-center gap-3">
-                            <div className="w-11 h-11 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl flex items-center justify-center text-xl shadow-sm">
-                                {avatar}
-                            </div>
                             <span className="font-semibold text-gray-900 text-base">
                                 {item.interviewee.name}
                             </span>
@@ -117,7 +112,7 @@ export function OriginalVoiceTab({
                                 ? "bg-blue-500 hover:bg-blue-600 text-white"
                                 : "border-primary/40 text-primary bg-primary/5 hover:bg-primary/10"}
                         >
-                            {source === 0 ? "👤 真人" : "🤖 模拟用户"}
+                            {source === 0 ? "真人" : "模拟用户"}
                         </Badge>
                     );
                 },
@@ -144,12 +139,9 @@ export function OriginalVoiceTab({
                     const state = row.original.response.state;
                     return (
                         <Badge
-                            variant={state === 3 ? "default" : "secondary"}
-                            className={state === 3
-                                ? "bg-green-500 hover:bg-green-600 text-white"
-                                : "bg-yellow-500 hover:bg-yellow-600 text-white"}
+                            className={getStatusConfig(state).containerClassName}
                         >
-                            {state === 3 ? "✓ 已完成" : "⏳ 进行中"}
+                            {getStatusConfig(state).label}
                         </Badge>
                     );
                 },
@@ -198,7 +190,7 @@ export function OriginalVoiceTab({
                     );
                     return (
                         <div className="flex items-center justify-center">
-                            <div className="bg-primary/10 text-primary rounded-lg px-3 py-1.5 text-sm font-semibold min-w-[45px] text-center">
+                            <div className="rounded-lg px-3 py-1.5 text-sm font-semibold min-w-[45px] text-center">
                                 {count}
                             </div>
                         </div>
