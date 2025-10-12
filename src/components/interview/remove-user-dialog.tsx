@@ -26,7 +26,7 @@ export function RemoveUserDialog({ open, onOpenChange, userName, onConfirm }: Re
                 <DialogHeader>
                     <DialogTitle>{t('confirmDialog.removeUser.title')}</DialogTitle>
                     <DialogDescription>
-                        {t('confirmDialog.removeUser.description', { name: userName })}
+                        {t('confirmDialog.removeUser.description', { name: userName || '' })}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-3 mt-6">

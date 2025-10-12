@@ -76,14 +76,9 @@ export default function InterviewPage() {
     // ==================== 用户数据状态 ====================
     const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
     const [simulatedUserPoolData, setSimulatedUserPoolData] = useState<any[]>([]);
-    const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
 
     // ==================== 加载状态 ====================
     const [isLoadingUserPool, setIsLoadingUserPool] = useState(false);
-
-    // ==================== 分页状态 ====================
-    const [currentResponsePage, setCurrentResponsePage] = useState(1);
-    const [hasMoreResponses, setHasMoreResponses] = useState(true);
 
     // 使用自定义 hooks 获取访谈详情
     const { data: interviewData, error: interviewError, isLoading: isLoadingInterview, mutate: mutateInterview } =
@@ -102,12 +97,12 @@ export default function InterviewPage() {
     const { data: personasData, error: recommendError, isLoading: isLoadingRecommended } =
         useRecommendedPersonas(recommendedCount, !!interviewData && shouldUseRecommend);
 
-    // 使用自定义 hooks 获取已访谈的模拟用户 - 只在 state !== 0 时调用，支持分页
+    // 使用自定义 hooks 获取已访谈的模拟用户 - 一次性加载100条
     const { data: responsesData, error: responsesError, isLoading: isLoadingResponses } =
         useInterviewResponses(
             interviewData?.id || null,
-            currentResponsePage,
-            !!interviewData && !shouldUseRecommend && hasMoreResponses
+            1, // 固定第一页
+            !!interviewData && !shouldUseRecommend
         );
 
     // 转换推荐用户数据，并过滤掉已删除的
@@ -115,84 +110,53 @@ export default function InterviewPage() {
         ? personasData.personas.map(transformPersonaToUser).filter(user => !removedUserIds.includes(user.id))
         : [];
 
+    // 转换已访谈用户数据
+    const interviewedUsers = responsesData?.success && responsesData.items
+        ? responsesData.items
+            .filter((item: any) => item.interviewee.source === 1)
+            .map((item: any) => {
+                const content = item.interviewee.content;
+                const attributes: Record<string, string> = {};
+
+                // 从 user_profile_tags 中提取所有标签
+                if (content && content.user_profile_tags) {
+                    Object.keys(content.user_profile_tags).forEach(categoryKey => {
+                        const category = content.user_profile_tags[categoryKey];
+
+                        if (category && category.subcategories) {
+                            Object.keys(category.subcategories).forEach(subKey => {
+                                const subcategory = category.subcategories[subKey];
+
+                                if (subcategory && subcategory.tags) {
+                                    Object.keys(subcategory.tags).forEach(tagKey => {
+                                        attributes[tagKey] = subcategory.tags[tagKey];
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+
+                return {
+                    id: `response-${item.response.id}`,
+                    name: item.interviewee.name,
+                    avatar: "😊",
+                    status: getStatusConfig(item.response.state).label,
+                    isReal: false,
+                    attributes: attributes,
+                    rawContent: content,
+                    source: item.interviewee.source,
+                    created_at: item.response.created_at,
+                    responseId: item.response.id,
+                    intervieweeId: item.interviewee.id,
+                    responseDetails: item.response.details,
+                    hasInterviewData: true
+                };
+            })
+        : [];
+
     // 根据状态选择显示的用户列表
-    const displayedUsers = shouldUseRecommend ? recommendedUsers : allInterviewedUsers;
-
-    // 处理分页数据加载
-    useEffect(() => {
-        if (responsesData && !shouldUseRecommend && responsesData.success) {
-            console.log('👥 已访谈用户数据已加载:', {
-                当前页: responsesData.page,
-                总数: responsesData.total,
-                返回数量: responsesData.items?.length,
-                已加载总数: allInterviewedUsers.length + (responsesData.items?.length || 0)
-            });
-
-            // 转换新数据
-            const newUsers = responsesData.items
-                .filter((item: any) => item.interviewee.source === 1)
-                .map((item: any) => {
-                    const content = item.interviewee.content;
-                    const attributes: Record<string, string> = {};
-
-                    // 从 user_profile_tags 中提取所有标签
-                    if (content && content.user_profile_tags) {
-                        Object.keys(content.user_profile_tags).forEach(categoryKey => {
-                            const category = content.user_profile_tags[categoryKey];
-
-                            if (category && category.subcategories) {
-                                Object.keys(category.subcategories).forEach(subKey => {
-                                    const subcategory = category.subcategories[subKey];
-
-                                    if (subcategory && subcategory.tags) {
-                                        Object.keys(subcategory.tags).forEach(tagKey => {
-                                            attributes[tagKey] = subcategory.tags[tagKey];
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    return {
-                        id: `response-${item.response.id}`,
-                        name: item.interviewee.name,
-                        avatar: "😊",
-                        status: getStatusConfig(item.response.state).label,
-                        isReal: false,
-                        attributes: attributes,
-                        rawContent: content,
-                        source: item.interviewee.source,
-                        created_at: item.response.created_at,
-                        responseId: item.response.id,
-                        intervieweeId: item.interviewee.id,
-                        responseDetails: item.response.details,
-                        hasInterviewData: true
-                    };
-                });
-
-            // 追加新数据（去重）
-            setAllInterviewedUsers(prev => {
-                const existingIds = new Set(prev.map(u => u.id));
-                const uniqueNewUsers = newUsers.filter((u: any) => !existingIds.has(u.id));
-                return [...prev, ...uniqueNewUsers];
-            });
-
-            // 检查是否还有更多数据
-            const loadedCount = allInterviewedUsers.length + newUsers.length;
-            setHasMoreResponses(loadedCount < responsesData.total);
-        }
-    }, [responsesData, shouldUseRecommend]);
-
-    // 重置分页状态（当访谈状态改变时）
-    useEffect(() => {
-        if (!shouldUseRecommend) {
-            console.log('🔄 访谈状态切换，重置分页数据');
-            setAllInterviewedUsers([]);
-            setCurrentResponsePage(1);
-            setHasMoreResponses(true);
-        }
-    }, [shouldUseRecommend, interviewData?.id]);
+    const displayedUsers = shouldUseRecommend ? recommendedUsers : interviewedUsers;
 
     // 处理错误
     const error = recommendError || responsesError;
@@ -442,26 +406,15 @@ export default function InterviewPage() {
         setSelectedUser(null);
     };
 
-    // 监听滚动显示回到顶部按钮 + 无限滚动加载
+    // 监听滚动显示回到顶部按钮
     useEffect(() => {
         const handleScroll = () => {
             setShowScrollTop(window.scrollY > 300);
-
-            // 无限滚动：检测是否滚动到底部
-            if (!shouldUseRecommend && hasMoreResponses && !isLoadingResponses) {
-                const scrollPosition = window.innerHeight + window.scrollY;
-                const bottomPosition = document.documentElement.scrollHeight - 300; // 距离底部 300px 时开始加载
-
-                if (scrollPosition >= bottomPosition) {
-                    console.log('🔄 触发分页加载，当前页:', currentResponsePage);
-                    setCurrentResponsePage(prev => prev + 1);
-                }
-            }
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [shouldUseRecommend, hasMoreResponses, isLoadingResponses, currentResponsePage]);
+    }, []);
 
     return (
         <SidebarProvider>
@@ -511,9 +464,7 @@ export default function InterviewPage() {
                             <SimulatedUsersSection
                                 simulatedUsers={simulatedUsers}
                                 isLoadingUsers={isLoadingUsers}
-                                isLoadingResponses={isLoadingResponses}
                                 shouldUseRecommend={shouldUseRecommend}
-                                hasMoreResponses={hasMoreResponses}
                                 responsesTotal={responsesData?.total}
                                 onAddClick={handleOpenSimulatedUserPool}
                                 onViewDetails={handleViewDetails}

@@ -2,16 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
-import { Bot, Loader2 } from "lucide-react";
+import { Bot } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { UserCard } from "./user-card";
 
 interface SimulatedUsersSectionProps {
     simulatedUsers: any[];
     isLoadingUsers: boolean;
-    isLoadingResponses: boolean;
     shouldUseRecommend: boolean;
-    hasMoreResponses: boolean;
     responsesTotal?: number;
     onAddClick: () => void;
     onViewDetails: (userId: string) => void;
@@ -21,9 +19,7 @@ interface SimulatedUsersSectionProps {
 export function SimulatedUsersSection({
     simulatedUsers,
     isLoadingUsers,
-    isLoadingResponses,
     shouldUseRecommend,
-    hasMoreResponses,
     responsesTotal,
     onAddClick,
     onViewDetails,
@@ -47,7 +43,7 @@ export function SimulatedUsersSection({
                     <span className="text-sm text-gray-600">
                         {shouldUseRecommend
                             ? t('users.simulatedUsers.description', { count: simulatedUsers.length })
-                            : '已完成访谈的模拟用户'
+                            : ''
                         }
                     </span>
                 </div>
@@ -71,34 +67,17 @@ export function SimulatedUsersSection({
                     </p>
                 </div>
             ) : (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {simulatedUsers.map((user) => (
-                            <UserCard
-                                key={user.id}
-                                user={user}
-                                onViewDetails={onViewDetails}
-                                onRemoveUser={onRemoveUser}
-                                canRemove={shouldUseRecommend}
-                            />
-                        ))}
-                    </div>
-
-                    {/* 加载更多指示器 */}
-                    {!shouldUseRecommend && isLoadingResponses && simulatedUsers.length > 0 && (
-                        <div className="flex justify-center items-center py-8">
-                            <Loader2 className="w-6 h-6 animate-spin text-primary mr-2" />
-                            <span className="text-sm text-gray-600">加载更多...</span>
-                        </div>
-                    )}
-
-                    {/* 已加载全部数据提示 */}
-                    {!shouldUseRecommend && !hasMoreResponses && simulatedUsers.length > 0 && (
-                        <div className="flex justify-center items-center py-8">
-                            <span className="text-sm text-gray-500">已加载全部数据</span>
-                        </div>
-                    )}
-                </>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {simulatedUsers.map((user) => (
+                        <UserCard
+                            key={user.id}
+                            user={user}
+                            onViewDetails={onViewDetails}
+                            onRemoveUser={onRemoveUser}
+                            canRemove={shouldUseRecommend}
+                        />
+                    ))}
+                </div>
             )}
         </div>
     );

@@ -55,12 +55,12 @@ export async function fetchInterviewDetail(interviewId: string): Promise<Intervi
 }
 
 /**
- * 获取已访谈用户数据（分页）
+ * 获取已访谈用户数据（一次性加载100条）
  */
 export async function fetchInterviewResponses(
     interviewId: number,
     page: number = 1,
-    pageSize: number = 20
+    pageSize: number = 100
 ): Promise<InterviewResponsesData> {
     const url = `${API_BASE_URL}/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=${page}&page_size=${pageSize}`;
 
