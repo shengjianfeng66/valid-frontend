@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 
 // ==================== Next.js 相关 ====================
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/i18n/navigation";
+import { useRouterWithLoading as useRouter } from "@/hooks/useRouterWithLoading";
 
 // ==================== 第三方库 ====================
 import { useTranslations } from "next-intl";

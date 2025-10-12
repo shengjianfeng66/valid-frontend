@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import { getLocale, setRequestLocale } from "next-intl/server";
 import { locales } from "@/i18n/locale";
 import { cn } from "@/lib/utils";
+import { TopLoader } from "@/components/ui/top-loader";
 
 
 export default async function RootLayout({
@@ -38,7 +39,10 @@ export default async function RootLayout({
           ))}
         <link rel="alternate" hrefLang="x-default" href={webUrl} />
       </head>
-      <body>{children}</body>
+      <body>
+        <TopLoader />
+        {children}
+      </body>
     </html>
   );
 }
