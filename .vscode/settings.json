@@ -3,7 +3,9 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "i18n-ally.localesPaths": ["src/i18n/messages"],
+  "i18n-ally.localesPaths": [
+    "src/i18n/messages"
+  ],
   "i18n-ally.keystyle": "nested",
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
