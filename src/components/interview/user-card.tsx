@@ -133,4 +133,3 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
         </div>
     );
 }
-
