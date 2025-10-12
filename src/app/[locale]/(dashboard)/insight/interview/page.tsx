@@ -1,21 +1,30 @@
 "use client";
 
-import { AppSidebar } from "@/components/sidebar/app-sidebar"
+// ==================== React 相关 ====================
+import { useState, useRef, useEffect } from "react";
+
+// ==================== Next.js 相关 ====================
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from "@/i18n/navigation";
+
+// ==================== 第三方库 ====================
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { ArrowUp } from "lucide-react";
+
+// ==================== UI 基础组件 ====================
+import { Button } from "@/components/ui/button";
+import { LoadingAnimation } from "@/components/ui/loading-animation";
 import {
     SidebarInset,
     SidebarProvider,
-} from "@/components/ui/sidebar"
-import { ArrowUp } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/sidebar";
+
+// ==================== 布局组件 ====================
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { UserDetailSheet } from "@/components/user-detail-sheet";
-import { toast } from "sonner";
-import { LoadingAnimation } from "@/components/ui/loading-animation";
-import { useTranslations } from "next-intl";
-import { useDraft } from "@/contexts/draft";
-import { getStatusConfig, transformPersonaToUser, extractNumericId } from "@/utils/interview";
+
+// ==================== 业务组件 ====================
 import {
     InterviewHeader,
     InterviewStepper,
@@ -26,34 +35,58 @@ import {
     RealUsersSection,
     SimulatedUsersSection
 } from "@/components/interview";
+
+// ==================== 自定义 Hooks ====================
 import { useInterviewDetail, useRecommendedPersonas, useInterviewResponses } from "@/hooks/useInterview";
+
+// ==================== Contexts ====================
+import { useDraft } from "@/contexts/draft";
+
+// ==================== Services/API ====================
 import { startInterview, finishInterview, fetchSimulatedUserPool } from "@/services/interview";
 
+// ==================== Utils/工具函数 ====================
+import { getStatusConfig, transformPersonaToUser, extractNumericId } from "@/utils/interview";
+
 export default function InterviewPage() {
+    // ==================== Hooks/工具 ====================
     const t = useTranslations('interview');
     const searchParams = useSearchParams();
     const router = useRouter();
     const { setHasDraft } = useDraft();
     const interviewId = searchParams.get('id');
 
+    // ==================== Refs ====================
     const realUsersRef = useRef<HTMLDivElement>(null);
     const simulatedUsersRef = useRef<HTMLDivElement>(null);
+
+    // ==================== UI 状态 ====================
     const [showScrollTop, setShowScrollTop] = useState(false);
+
+    // ==================== 弹窗状态 ====================
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showSimulatedUserPool, setShowSimulatedUserPool] = useState(false);
-    const [showLoadingModal, setShowLoadingModal] = useState(false);
-    const [loadingModalType, setLoadingModalType] = useState<'start' | 'finish'>('start');
     const [showUserDetailSheet, setShowUserDetailSheet] = useState(false);
     const [showRemoveConfirmDialog, setShowRemoveConfirmDialog] = useState(false);
+    const [showLoadingModal, setShowLoadingModal] = useState(false);
+    const [loadingModalType, setLoadingModalType] = useState<'start' | 'finish'>('start');
+
+    // ==================== 用户选择/操作状态 ====================
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-    const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
     const [removedUserIds, setRemovedUserIds] = useState<string[]>([]);
+
+    // ==================== 用户数据状态 ====================
+    const [addedSimulatedUsers, setAddedSimulatedUsers] = useState<any[]>([]);
     const [simulatedUserPoolData, setSimulatedUserPoolData] = useState<any[]>([]);
+    const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
+
+    // ==================== 加载状态 ====================
     const [isLoadingUserPool, setIsLoadingUserPool] = useState(false);
+
+    // ==================== 分页状态 ====================
     const [currentResponsePage, setCurrentResponsePage] = useState(1);
     const [hasMoreResponses, setHasMoreResponses] = useState(true);
-    const [allInterviewedUsers, setAllInterviewedUsers] = useState<any[]>([]);
 
     // 使用自定义 hooks 获取访谈详情
     const { data: interviewData, error: interviewError, isLoading: isLoadingInterview, mutate: mutateInterview } =
@@ -217,10 +250,6 @@ export default function InterviewPage() {
 
     // 合并加载状态
     const isLoadingUsers = isLoadingRecommended || isLoadingResponses;
-
-    const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
-        ref.current?.scrollIntoView({ behavior: 'smooth' });
-    };
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
