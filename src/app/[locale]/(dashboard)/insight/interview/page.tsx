@@ -42,6 +42,8 @@ import { toast } from "sonner";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 import { useTranslations } from "next-intl";
 import { useDraft } from "@/contexts/draft";
+import { getStatusColorByLabel } from "@/utils/interview";
+import { getStatusConfig } from "@/utils/interview";
 
 // API 数据类型定义
 interface PersonaContent {
@@ -142,24 +144,6 @@ function transformPersonaToUser(persona: PersonaFromAPI): any {
 
 function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }: { user: any; onViewDetails: (userId: string) => void; onRemoveUser: (userId: string) => void; canRemove?: boolean }) {
     const t = useTranslations('interview');
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "视频通话中":
-            case "Video Calling":
-                return "text-green-600 bg-green-50";
-            case "准备中":
-            case "Preparing":
-                return "text-yellow-600 bg-yellow-50";
-            case "已完成":
-            case "Completed":
-                return "text-blue-600 bg-blue-50";
-            case "等待中":
-            case "Waiting":
-                return "text-gray-600 bg-gray-50";
-            default:
-                return "text-gray-600 bg-gray-50";
-        }
-    };
 
     // 模拟用户使用新的卡片样式
     if (!user.isReal) {
@@ -201,7 +185,7 @@ function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }: { use
                         </div>
 
                         {/* 状态标签 */}
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColorByLabel(user.status)}`}>
                             <div className="w-1.5 h-1.5 bg-current rounded-full"></div>
                             {user.status}
                         </span>
@@ -243,7 +227,7 @@ function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }: { use
             </div>
 
             <div className="mb-4">
-                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}>
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColorByLabel(user.status)}`}>
                     <div className="w-2 h-2 bg-current rounded-full"></div>
                     {user.status}
                 </span>
@@ -374,17 +358,6 @@ export default function InterviewPage() {
     // 根据状态选择显示的用户列表
     const displayedUsers = shouldUseRecommend ? recommendedUsers : allInterviewedUsers;
 
-    // 监听数据加载
-    useEffect(() => {
-        if (personasData && shouldUseRecommend) {
-            console.log('👥 推荐用户数据已加载:', {
-                请求数量: recommendedCount,
-                实际返回: personasData.total_count,
-                用户列表长度: recommendedUsers.length
-            });
-        }
-    }, [personasData, recommendedCount, recommendedUsers.length, shouldUseRecommend]);
-
     // 处理分页数据加载
     useEffect(() => {
         if (responsesData && !shouldUseRecommend && responsesData.success) {
@@ -425,7 +398,7 @@ export default function InterviewPage() {
                         id: `response-${item.response.id}`,
                         name: item.interviewee.name,
                         avatar: "😊",
-                        status: item.response.state === 3 ? "已完成" : "进行中",
+                        status: getStatusConfig(item.response.state).label,
                         isReal: false,
                         attributes: attributes,
                         rawContent: content,
