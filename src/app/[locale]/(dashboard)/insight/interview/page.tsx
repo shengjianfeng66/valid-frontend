@@ -1,9 +1,6 @@
 "use client";
 
-// ==================== React 相关 ====================
 import { useState, useRef, useEffect } from "react";
-
-// ==================== Next.js 相关 ====================
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from "@/i18n/navigation";
 
@@ -46,7 +43,7 @@ import { useDraft } from "@/contexts/draft";
 import { startInterview, finishInterview, fetchSimulatedUserPool } from "@/services/interview";
 
 // ==================== Utils/工具函数 ====================
-import { getStatusConfig, transformPersonaToUser, extractNumericId } from "@/utils/interview";
+import { getStatusConfig, transformPersonaToUser, extractNumericId, formatDate } from "@/utils/interview";
 
 export default function InterviewPage() {
     // ==================== Hooks/工具 ====================
@@ -473,9 +470,6 @@ export default function InterviewPage() {
                 <div className="flex flex-1 flex-col bg-gray-100 p-4 gap-4">
                     {/* 顶部 - 流程状态栏 */}
                     <InterviewStepper />
-
-
-
                     {/* 用户访谈区域 */}
                     <div className="bg-white rounded-lg shadow-sm">
                         {/* 顶部标题和开始访谈按钮 */}

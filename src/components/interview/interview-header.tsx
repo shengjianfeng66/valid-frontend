@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { getStatusConfig, formatDate } from "@/utils/interview";
 
 interface InterviewHeaderProps {
     interviewData: any;
@@ -9,49 +10,6 @@ interface InterviewHeaderProps {
     onFinishInterview: () => void;
     onViewAnalytics: () => void;
 }
-
-// 根据 state 获取访谈状态
-const getInterviewStatus = (state: number) => {
-    switch (state) {
-        case 0:
-            return {
-                text: '未开始',
-                className: 'bg-gray-100 text-gray-700'
-            };
-        case 1:
-            return {
-                text: '访谈中',
-                className: 'bg-green-100 text-green-700'
-            };
-        case 2:
-            return {
-                text: '暂停访谈',
-                className: 'bg-yellow-100 text-yellow-700'
-            };
-        case 3:
-            return {
-                text: '访谈结束',
-                className: 'bg-blue-100 text-blue-700'
-            };
-        default:
-            return {
-                text: '未知',
-                className: 'bg-gray-100 text-gray-700'
-            };
-    }
-};
-
-// 格式化日期
-const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).replace(/\//g, '.');
-};
 
 export function InterviewHeader({
     interviewData,
@@ -68,8 +26,8 @@ export function InterviewHeader({
                     {interviewData.name}
                 </h2>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span className={`${getInterviewStatus(interviewData.state).className} px-2 py-1 rounded-full text-xs font-medium`}>
-                        {getInterviewStatus(interviewData.state).text}
+                    <span className={`${getStatusConfig(interviewData.state).containerClassName} px-2 py-1 rounded-full text-xs font-medium`}>
+                        {getStatusConfig(interviewData.state).label}
                     </span>
                     <span>{t('interview.info.createdTime')}: {formatDate(interviewData.created_at)}</span>
                     <span>{t('interview.info.expectedUsers')} {interviewData.participants?.recommended_total || 0}人</span>

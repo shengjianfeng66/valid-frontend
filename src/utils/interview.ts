@@ -3,7 +3,11 @@ import type { PersonaFromAPI } from "@/types/interview";
 
 // 获取状态配置（带默认值）
 export const getStatusConfig = (state: number) => {
-    return RESPONSE_STATUS_CONFIG[state] || { label: "", color: "text-gray-600 bg-gray-50" };
+    return RESPONSE_STATUS_CONFIG[state] || {
+        label: "",
+        color: "text-gray-600 bg-gray-50",
+        containerClassName: "bg-gray-100 text-gray-700"
+    };
 };
 
 // 根据状态标签获取颜色样式
@@ -59,4 +63,18 @@ export function transformPersonaToUser(persona: PersonaFromAPI): any {
 export function extractNumericId(userId: string): number | null {
     const match = userId.match(/^api-(\d+)$/);
     return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * 格式化日期为中文格式
+ */
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).replace(/\//g, '.');
 }
