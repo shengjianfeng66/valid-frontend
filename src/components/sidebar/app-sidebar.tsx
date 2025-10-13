@@ -4,6 +4,7 @@ import * as React from "react"
 import useSWR from "swr"
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
+import { createClient } from "@/lib/supabase/client"
 
 import {
   Home,
@@ -49,13 +50,21 @@ interface Interview {
   created_at: string;
 }
 
-// fetcher 函数 - 直接返回数组
+// fetcher 函数 - 携带 Supabase 会话 Token
 const fetcher = async (url: string): Promise<Interview[]> => {
-  const response = await fetch(url);
+  const supabase = createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+
+  const response = await fetch(url, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return response.json();
+  return response.json()
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
