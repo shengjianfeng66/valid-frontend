@@ -468,7 +468,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
 
       console.log('创建访谈参数:', { name: '产品用户体验访谈', user_id: userId, goal, outline });
 
-      const response = await fetch('http://localhost:8000/api/v1/interview/create', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

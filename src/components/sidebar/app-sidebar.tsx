@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // 使用 SWR 获取项目列表
   const { data: interviews, error, isLoading } = useSWR(
-    'http://localhost:8000/api/v1/interview/list',
+    `${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/list`,
     fetcher,
     {
       revalidateOnFocus: false,

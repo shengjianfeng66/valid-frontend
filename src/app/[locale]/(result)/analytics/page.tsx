@@ -124,7 +124,7 @@ export default function Page() {
   });
   // 使用 SWR 获取访谈详情（包含分析报告）
   const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
-    interviewId ? `http://localhost:8000/api/v1/interview/get/${interviewId}` : null,
+    interviewId ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/get/${interviewId}` : null,
     async (url: string) => {
       const response = await fetch(url);
       if (!response.ok) {
@@ -235,7 +235,7 @@ export default function Page() {
 
         // 一次性加载100条数据
         const response = await fetch(
-          `http://localhost:8000/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
         )
 
         if (!response.ok) {
