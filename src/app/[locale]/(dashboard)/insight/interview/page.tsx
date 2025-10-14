@@ -43,7 +43,7 @@ import { useDraft } from "@/contexts/draft";
 import { startInterview, finishInterview, fetchSimulatedUserPool } from "@/services/interview";
 
 // ==================== Utils/工具函数 ====================
-import { getStatusConfig, transformPersonaToUser, extractNumericId, formatDate } from "@/utils/interview";
+import { transformPersonaToUser, extractNumericId, formatDate } from "@/utils/interview";
 
 export default function InterviewPage() {
     // ==================== Hooks/工具 ====================
@@ -147,6 +147,7 @@ export default function InterviewPage() {
                     rawContent: content,
                     source: item.interviewee.source,
                     created_at: item.response.created_at,
+                    duration: item.response.duration,
                     responseId: item.response.id,
                     intervieweeId: item.interviewee.id,
                     responseDetails: item.response.details,

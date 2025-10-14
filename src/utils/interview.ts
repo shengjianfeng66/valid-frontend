@@ -72,3 +72,14 @@ export function formatDate(dateString: string): string {
         minute: '2-digit'
     }).replace(/\//g, '.');
 }
+
+/**
+ * 将时长（秒）格式化为“xx分钟”
+ */
+export function formatDurationMinutes(durationSeconds: number): string {
+    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+        return "0分钟";
+    }
+    const minutes = Math.round(durationSeconds / 60);
+    return `${minutes}分钟`;
+}

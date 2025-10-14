@@ -15,6 +15,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import { getStatusConfig, formatDurationMinutes } from "@/utils/interview";
 
 interface UserDetailSheetProps {
     open: boolean;
@@ -23,7 +24,6 @@ interface UserDetailSheetProps {
 }
 
 export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetailSheetProps) {
-    console.log("🚀 ~ UserDetailSheet ~ selectedUser:", selectedUser)
     // 动态提取所有分类
     const getCategories = () => {
         const content = (selectedUser as any)?.rawContent;
@@ -81,14 +81,12 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
                                 <div className="text-sm text-gray-600 mb-1">状态</div>
                                 <div className="text-lg font-semibold text-gray-900">
-                                    {selectedUser.status === "视频通话中" ? "进行中" :
-                                        selectedUser.status === "准备中" ? "未开始" :
-                                            selectedUser.status === "已完成" ? "已完成" : "未开始"}
+                                    {getStatusConfig(selectedUser.status, true).label}
                                 </div>
                             </div>
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
                                 <div className="text-sm text-gray-600 mb-1">调研时间</div>
-                                <div className="text-lg font-semibold text-gray-900">-</div>
+                                <div className="text-lg font-semibold text-gray-900">{formatDurationMinutes(selectedUser.duration)}</div>
                             </div>
                         </div>
 

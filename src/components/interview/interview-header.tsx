@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { getStatusConfig, formatDate } from "@/utils/interview";
+import { getStatusConfig, formatDate, formatDurationMinutes } from "@/utils/interview";
 
 interface InterviewHeaderProps {
     interviewData: any;
@@ -32,7 +32,7 @@ export function InterviewHeader({
                     <span>{t('interview.info.createdTime')}: {formatDate(interviewData.created_at)}</span>
                     <span>{t('interview.info.expectedUsers')} {interviewData.participants?.recommended_total || 0}人</span>
                     {interviewData.duration && (
-                        <span>预计时长: {Math.round(interviewData.duration / 60)}分钟</span>
+                        <span>预计时长: {formatDurationMinutes(interviewData.duration)}</span>
                     )}
                     <button className="text-gray-400 hover:text-gray-600">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
