@@ -88,11 +88,12 @@ export function OriginalVoiceTab({
             },
             {
                 id: "profile",
-                accessorFn: (row) => row.response.details.meta.profile_brief,
+                accessorFn: (row) => row.response?.details?.meta?.profile_brief,
+                accessorKey: "profile_brief",
                 header: "用户画像",
                 cell: ({ row }) => (
                     <p className="text-sm text-gray-700 leading-relaxed break-words whitespace-normal">
-                        {row.original.response.details.meta.profile_brief}
+                        {row.original?.response?.details?.meta?.profile_brief}
                     </p>
                 ),
                 enableColumnFilter: false,

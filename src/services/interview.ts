@@ -6,17 +6,31 @@ import {
     FinishInterviewParams,
     PersonaFromAPI
 } from '@/types/interview';
+import { createClient } from "@/lib/supabase/client";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+    try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        return token ? { Authorization: `Bearer ${token}` } : {};
+    } catch {
+        return {};
+    }
+}
 
 /**
  * 获取推荐的人物画像
  */
 export async function fetchRecommendedPersonas(count: number): Promise<PersonasResponse> {
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/persona/recommend`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
         },
         body: JSON.stringify({
             persona_count: count
@@ -37,10 +51,12 @@ export async function fetchRecommendedPersonas(count: number): Promise<PersonasR
  * 获取访谈详情
  */
 export async function fetchInterviewDetail(interviewId: string): Promise<InterviewDetail> {
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/interview/get/${interviewId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
         }
     });
 
@@ -63,8 +79,12 @@ export async function fetchInterviewResponses(
     pageSize: number = 100
 ): Promise<InterviewResponsesData> {
     const url = `${API_BASE_URL}/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=${page}&page_size=${pageSize}`;
-
-    const response = await fetch(url);
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(url, {
+        headers: {
+            ...authHeaders,
+        }
+    });
 
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -80,10 +100,12 @@ export async function fetchInterviewResponses(
  * 获取模拟用户池
  */
 export async function fetchSimulatedUserPool(): Promise<PersonaFromAPI[]> {
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/interviewee/list_simulated_users`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
         }
     });
 
@@ -110,11 +132,12 @@ export async function fetchSimulatedUserPool(): Promise<PersonaFromAPI[]> {
  */
 export async function startInterview(params: StartInterviewParams): Promise<any> {
     console.log('开始访谈，参数:', params);
-
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/interview/start`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
         },
         body: JSON.stringify(params)
     });
@@ -134,11 +157,12 @@ export async function startInterview(params: StartInterviewParams): Promise<any>
  */
 export async function finishInterview(params: FinishInterviewParams): Promise<any> {
     console.log('结束访谈，参数:', params);
-
+    const authHeaders = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/api/v1/interview/finish`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            ...authHeaders,
         },
         body: JSON.stringify(params)
     });
