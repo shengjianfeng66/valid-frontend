@@ -1,5 +1,5 @@
 // 状态配置映射
-export const RESPONSE_STATUS_CONFIG: Record<number, {
+export const INTERVIEW_STATUS_CONFIG: Record<number, {
     label: string;
     color: string;
     containerClassName: string;
@@ -20,6 +20,19 @@ export const RESPONSE_STATUS_CONFIG: Record<number, {
         containerClassName: "bg-yellow-100 text-yellow-700"
     },
     3: {
+        label: "已完成",
+        color: "text-blue-600 bg-blue-50",
+        containerClassName: "bg-blue-100 text-blue-700"
+    }
+};
+
+export const INTERVIEWEE_STATUS_CONFIG: Record<number, {
+    label: string;
+    color: string;
+    containerClassName: string;
+}> = {
+    ...INTERVIEW_STATUS_CONFIG,
+    2: {
         label: "已完成",
         color: "text-blue-600 bg-blue-50",
         containerClassName: "bg-blue-100 text-blue-700"

@@ -139,9 +139,9 @@ export function OriginalVoiceTab({
                     const state = row.original.response.state;
                     return (
                         <Badge
-                            className={getStatusConfig(state).containerClassName}
+                            className={getStatusConfig(state, true).containerClassName}
                         >
-                            {getStatusConfig(state).label}
+                            {getStatusConfig(state, true).label}
                         </Badge>
                     );
                 },

@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslations } from "next-intl";
-import { getStatusColorByLabel } from "@/utils/interview";
+import { getStatusConfig } from "@/utils/interview";
 
 interface UserCardProps {
     user: any;
@@ -60,7 +60,7 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
                         </div>
 
                         {/* 状态标签 */}
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColorByLabel(user.status)}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusConfig(user.status, true).color}`}>
                             <div className="w-1.5 h-1.5 bg-current rounded-full"></div>
                             {user.status}
                         </span>
@@ -102,7 +102,7 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
             </div>
 
             <div className="mb-4">
-                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColorByLabel(user.status)}`}>
+                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusConfig(user.status, true).color}`}>
                     <div className="w-2 h-2 bg-current rounded-full"></div>
                     {user.status}
                 </span>

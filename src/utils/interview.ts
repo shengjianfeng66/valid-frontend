@@ -1,19 +1,13 @@
-import { RESPONSE_STATUS_CONFIG } from "@/config";
+import { INTERVIEW_STATUS_CONFIG, INTERVIEWEE_STATUS_CONFIG } from "@/config";
 import type { PersonaFromAPI } from "@/types/interview";
 
 // 获取状态配置（带默认值）
-export const getStatusConfig = (state: number) => {
-    return RESPONSE_STATUS_CONFIG[state] || {
+export const getStatusConfig = (state: number, isInterviewee?: boolean) => {
+    return isInterviewee ? INTERVIEWEE_STATUS_CONFIG[state] : INTERVIEW_STATUS_CONFIG[state] || {
         label: "",
         color: "text-gray-600 bg-gray-50",
         containerClassName: "bg-gray-100 text-gray-700"
     };
-};
-
-// 根据状态标签获取颜色样式
-export const getStatusColorByLabel = (statusLabel: string) => {
-    const config = Object.values(RESPONSE_STATUS_CONFIG).find(c => c.label === statusLabel);
-    return config?.color || "text-gray-600 bg-gray-50";
 };
 
 /**

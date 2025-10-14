@@ -23,6 +23,7 @@ interface UserDetailSheetProps {
 }
 
 export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetailSheetProps) {
+    console.log("🚀 ~ UserDetailSheet ~ selectedUser:", selectedUser)
     // 动态提取所有分类
     const getCategories = () => {
         const content = (selectedUser as any)?.rawContent;

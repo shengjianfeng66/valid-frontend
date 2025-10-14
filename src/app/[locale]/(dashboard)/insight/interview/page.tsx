@@ -103,7 +103,7 @@ export default function InterviewPage() {
             interviewData?.id || null,
             1, // 固定第一页
             !!interviewData && !shouldUseRecommend
-    );
+        );
 
     // 转换推荐用户数据，并过滤掉已删除的
     const recommendedUsers = personasData?.personas
@@ -113,45 +113,45 @@ export default function InterviewPage() {
     // 转换已访谈用户数据
     const interviewedUsers = responsesData?.success && responsesData.items
         ? responsesData.items
-                .filter((item: any) => item.interviewee.source === 1)
-                .map((item: any) => {
-                    const content = item.interviewee.content;
-                    const attributes: Record<string, string> = {};
+            .filter((item: any) => item.interviewee.source === 1)
+            .map((item: any) => {
+                const content = item.interviewee.content;
+                const attributes: Record<string, string> = {};
 
-                    // 从 user_profile_tags 中提取所有标签
-                    if (content && content.user_profile_tags) {
-                        Object.keys(content.user_profile_tags).forEach(categoryKey => {
-                            const category = content.user_profile_tags[categoryKey];
+                // 从 user_profile_tags 中提取所有标签
+                if (content && content.user_profile_tags) {
+                    Object.keys(content.user_profile_tags).forEach(categoryKey => {
+                        const category = content.user_profile_tags[categoryKey];
 
-                            if (category && category.subcategories) {
-                                Object.keys(category.subcategories).forEach(subKey => {
-                                    const subcategory = category.subcategories[subKey];
+                        if (category && category.subcategories) {
+                            Object.keys(category.subcategories).forEach(subKey => {
+                                const subcategory = category.subcategories[subKey];
 
-                                    if (subcategory && subcategory.tags) {
-                                        Object.keys(subcategory.tags).forEach(tagKey => {
-                                            attributes[tagKey] = subcategory.tags[tagKey];
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
+                                if (subcategory && subcategory.tags) {
+                                    Object.keys(subcategory.tags).forEach(tagKey => {
+                                        attributes[tagKey] = subcategory.tags[tagKey];
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
 
-                    return {
-                        id: `response-${item.response.id}`,
-                        name: item.interviewee.name,
-                        avatar: "😊",
-                    status: getStatusConfig(item.response.state).label,
-                        isReal: false,
-                        attributes: attributes,
-                        rawContent: content,
-                        source: item.interviewee.source,
-                        created_at: item.response.created_at,
-                        responseId: item.response.id,
-                        intervieweeId: item.interviewee.id,
-                        responseDetails: item.response.details,
-                        hasInterviewData: true
-                    };
+                return {
+                    id: `response-${item.response.id}`,
+                    name: item.interviewee.name,
+                    avatar: "😊",
+                    status: item.response.state,
+                    isReal: false,
+                    attributes: attributes,
+                    rawContent: content,
+                    source: item.interviewee.source,
+                    created_at: item.response.created_at,
+                    responseId: item.response.id,
+                    intervieweeId: item.interviewee.id,
+                    responseDetails: item.response.details,
+                    hasInterviewData: true
+                };
             })
         : [];
 
@@ -451,8 +451,8 @@ export default function InterviewPage() {
                                 realUsers={realUsers}
                                 shouldUseRecommend={shouldUseRecommend}
                                 onInviteClick={() => setShowInviteModal(true)}
-                                            onViewDetails={handleViewDetails}
-                                            onRemoveUser={handleRemoveUser}
+                                onViewDetails={handleViewDetails}
+                                onRemoveUser={handleRemoveUser}
                             />
                         </div>
 
@@ -467,10 +467,10 @@ export default function InterviewPage() {
                                 shouldUseRecommend={shouldUseRecommend}
                                 responsesTotal={responsesData?.total}
                                 onAddClick={handleOpenSimulatedUserPool}
-                                                onViewDetails={handleViewDetails}
-                                                onRemoveUser={handleRemoveUser}
-                                            />
-                                    </div>
+                                onViewDetails={handleViewDetails}
+                                onRemoveUser={handleRemoveUser}
+                            />
+                        </div>
                     </div>
 
                     {/* 回到顶部按钮 */}
