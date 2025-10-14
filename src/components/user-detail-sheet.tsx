@@ -16,6 +16,8 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { getStatusConfig, formatDurationMinutes } from "@/utils/interview";
+import React from "react";
+import { useRunningElapsed } from "@/hooks/useRunningElapsed";
 
 interface UserDetailSheetProps {
     open: boolean;
@@ -24,6 +26,7 @@ interface UserDetailSheetProps {
 }
 
 export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetailSheetProps) {
+    const runningElapsed = useRunningElapsed(selectedUser?.created_at, selectedUser?.status === 1, 1000);
     // 动态提取所有分类
     const getCategories = () => {
         const content = (selectedUser as any)?.rawContent;
@@ -86,7 +89,11 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                             </div>
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
                                 <div className="text-sm text-gray-600 mb-1">调研时间</div>
-                                <div className="text-lg font-semibold text-gray-900">{formatDurationMinutes(selectedUser.duration)}</div>
+                                <div className="text-lg font-semibold text-gray-900">
+                                    {selectedUser.status === 2 && formatDurationMinutes(selectedUser.duration)}
+                                    {selectedUser.status === 1 && (runningElapsed || "0分0秒")}
+                                    {selectedUser.status !== 1 && selectedUser.status !== 2 && "-"}
+                                </div>
                             </div>
                         </div>
 
