@@ -96,6 +96,160 @@ export function OriginalVoiceTab({
                 enableColumnFilter: false,
             },
             {
+                id: "age",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['年龄'],
+                header: () => <div className="font-semibold text-sm">年龄</div>,
+                cell: ({ row }) => {
+                    const age = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['年龄'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {age ? `${age}岁` : '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "gender",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['性别'],
+                header: () => <div className="font-semibold text-sm">性别</div>,
+                cell: ({ row }) => {
+                    const gender = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['性别'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {gender || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "birth_year",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['出生年代'],
+                header: () => <div className="font-semibold text-sm">出生年代</div>,
+                cell: ({ row }) => {
+                    const birthYear = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['出生年代'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {birthYear ? `${birthYear}年` : '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "marital_status",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.family_structure?.tags?.['婚恋状态'],
+                header: () => <div className="font-semibold text-sm">婚恋状态</div>,
+                cell: ({ row }) => {
+                    const status = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.family_structure?.tags?.['婚恋状态'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {status || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "children_count",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.family_structure?.tags?.['子女数量'],
+                header: () => <div className="font-semibold text-sm">子女数量</div>,
+                cell: ({ row }) => {
+                    const count = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.family_structure?.tags?.['子女数量'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {count !== undefined && count !== null ? count : '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "nationality",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.cultural_background?.tags?.['国籍'],
+                header: () => <div className="font-semibold text-sm">国籍</div>,
+                cell: ({ row }) => {
+                    const nationality = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.cultural_background?.tags?.['国籍'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {nationality || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "religion",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.cultural_background?.tags?.['宗教信仰'],
+                header: () => <div className="font-semibold text-sm">宗教信仰</div>,
+                cell: ({ row }) => {
+                    const religion = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.cultural_background?.tags?.['宗教信仰'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {religion || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "occupation",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['职业'],
+                header: () => <div className="font-semibold text-sm">职业</div>,
+                cell: ({ row }) => {
+                    const occupation = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['职业'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {occupation || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "industry",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['行业'],
+                header: () => <div className="font-semibold text-sm">行业</div>,
+                cell: ({ row }) => {
+                    const industry = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['行业'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {industry || '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "annual_income",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['年收入'],
+                header: () => <div className="font-semibold text-sm">年收入</div>,
+                cell: ({ row }) => {
+                    const income = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['年收入'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {income !== undefined && income !== null && income !== '' && income !== '0' ? `${income}` : '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
+                id: "monthly_income",
+                accessorFn: (row) => row.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['月收入'],
+                header: () => <div className="font-semibold text-sm">月收入</div>,
+                cell: ({ row }) => {
+                    const income = row.original.interviewee?.content?.user_profile_tags?.demographics?.subcategories?.socioeconomic_status?.tags?.['月收入'];
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {income !== undefined && income !== null && income !== '' && income !== '0' ? `${income}` : '-'}
+                        </span>
+                    );
+                },
+                enableColumnFilter: false,
+            },
+            {
                 id: "source",
                 accessorFn: (row) => row.interviewee.source,
                 header: () => <div className="font-semibold text-sm">类型</div>,
