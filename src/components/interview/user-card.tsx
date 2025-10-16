@@ -60,10 +60,10 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
                         </div>
 
                         {/* 状态标签 */}
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusConfig(user.status, true).color}`}>
+                        {getStatusConfig(user.status, true)?.label ? <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusConfig(user.status, true)?.color}`}>
                             <div className="w-1.5 h-1.5 bg-current rounded-full"></div>
-                            {getStatusConfig(user.status, true).label}
-                        </span>
+                            {getStatusConfig(user.status, true)?.label}
+                        </span> : null}
                     </div>
                 </div>
 

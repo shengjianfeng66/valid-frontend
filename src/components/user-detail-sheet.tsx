@@ -84,7 +84,7 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
                                 <div className="text-sm text-gray-600 mb-1">状态</div>
                                 <div className="text-lg font-semibold text-gray-900">
-                                    {getStatusConfig(selectedUser.status, true).label}
+                                    {getStatusConfig(selectedUser.status, true)?.label || "-"}
                                 </div>
                             </div>
                             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -101,11 +101,11 @@ export function UserDetailSheet({ open, onOpenChange, selectedUser }: UserDetail
                         <Tabs defaultValue={hasInterview ? "interview" : "profile"} className="w-full">
                             <TabsList className={`grid w-full ${hasInterview ? 'grid-cols-2' : 'grid-cols-1'}`}>
                                 <TabsTrigger value="profile">
-                                    👤 用户画像
+                                    用户画像
                                 </TabsTrigger>
                                 {hasInterview && (
                                     <TabsTrigger value="interview">
-                                        📝 问答记录
+                                        问答记录
                                     </TabsTrigger>
                                 )}
                             </TabsList>

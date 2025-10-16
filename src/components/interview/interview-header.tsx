@@ -28,8 +28,8 @@ export function InterviewHeader({
                     {interviewData.name}
                 </h2>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span className={`${getStatusConfig(interviewData.state).containerClassName} px-2 py-1 rounded-full text-xs font-medium`}>
-                        {getStatusConfig(interviewData.state).label}
+                    <span className={`${getStatusConfig(interviewData.state)?.containerClassName} px-2 py-1 rounded-full text-xs font-medium`}>
+                        {getStatusConfig(interviewData.state)?.label}
                     </span>
                     <span>{t('interview.info.createdTime')}: {formatDate(interviewData.created_at)}</span>
                     <span>{t('interview.info.expectedUsers')} {interviewData.participants?.recommended_total || 0}人</span>
