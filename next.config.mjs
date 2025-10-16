@@ -23,6 +23,17 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/api/v1/:path*",
+          destination: "http://validflow.airelief.cn/api/v1/:path*",
+        },
+      ];
+    }
+    return [];
+  },
   async redirects() {
     return [];
   },

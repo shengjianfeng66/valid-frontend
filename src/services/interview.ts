@@ -8,12 +8,13 @@ import {
 } from '@/types/interview';
 import { createClient } from "@/lib/supabase/client";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
     try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("🚀 ~ getAuthHeaders ~ session:", session)
         const token = session?.access_token;
         return token ? { Authorization: `Bearer ${token}` } : {};
     } catch {

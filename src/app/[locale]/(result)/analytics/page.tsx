@@ -12,7 +12,7 @@ import useSWR from 'swr';
 
 // ==================== CopilotKit ====================
 import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
-import { useCopilotReadable, useCoAgent} from "@copilotkit/react-core";
+import { useCopilotReadable, useCoAgent } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
 
 // ==================== UI 基础组件 ====================
@@ -124,7 +124,7 @@ export default function Page() {
   });
   // 使用 SWR 获取访谈详情（包含分析报告）
   const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
-    interviewId ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/get/${interviewId}` : null,
+    interviewId ? `/api/v1/interview/get/${interviewId}` : null,
     async (url: string) => {
       const response = await fetch(url);
       if (!response.ok) {
@@ -235,7 +235,7 @@ export default function Page() {
 
         // 一次性加载100条数据
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
+          `/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
         )
 
         if (!response.ok) {
