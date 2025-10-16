@@ -14,124 +14,75 @@ import { ContextValue } from "@/types/context";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { User } from "@/types/user";
 import moment from "moment";
-import useOneTapLogin from "@/hooks/useOneTapLogin";
 import { createClient } from "@/lib/supabase/client";
-import { isAuthEnabled, isGoogleOneTapEnabled } from "@/lib/auth";
+import { isAuthEnabled } from "@/lib/auth";
 
 const AppContext = createContext({} as ContextValue);
 
 export const useAppContext = () => useContext(AppContext);
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
-  if (isAuthEnabled() && isGoogleOneTapEnabled()) {
-    useOneTapLogin();
-  }
+  // Google One Tap 已禁用（NextAuth 已移除）
+  // 如需重新启用，需基于 Supabase Auth 重新实现
 
   const supabase = createClient();
-  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
+  const [showSignModal, setShowSignModal] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [showFeedback, setShowFeedback] = useState<boolean>(false);
+
+  // 将 Supabase User 转换为应用 User 类型
+  const convertSupabaseUserToAppUser = (supabaseUser: SupabaseUser): User => {
+    console.log("🚀 ~ convertSupabaseUserToAppUser ~ supabaseUser:", supabaseUser)
+    const metadata = supabaseUser.user_metadata || {};
+    const email = supabaseUser.email || '';
+
+    // 检查是否为管理员（基于环境变量邮箱白名单）
+    const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || [];
+    const isAdmin = adminEmails.includes(email);
+
+    return {
+      uuid: supabaseUser.id,
+      email: email,
+      nickname: metadata.name || metadata.full_name || email.split('@')[0] || 'User',
+      avatar_url: metadata.avatar_url || metadata.picture || '',
+      created_at: supabaseUser.created_at,
+      // 默认值，如需积分等信息可后续扩展
+      credits: {
+        left_credits: 0,
+      },
+      is_admin: isAdmin,
+    };
+  };
 
   // 监听 Supabase Auth 状态变化
   useEffect(() => {
+    console.log("🚀 ~ useEffect ~ isAuthEnabled:", isAuthEnabled())
+
     if (!isAuthEnabled()) return;
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setSupabaseUser(user);
+    // 获取当前用户
+    supabase.auth.getUser().then(({ data: { user: supabaseUser } }) => {
+      if (supabaseUser) {
+        const appUser = convertSupabaseUserToAppUser(supabaseUser);
+        console.log("🚀 ~ supabase.auth.getUser ~ appUser:", appUser)
+        setUser(appUser);
+      }
     });
 
+    // 监听认证状态变化
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSupabaseUser(session?.user ?? null);
+      if (session?.user) {
+        const appUser = convertSupabaseUserToAppUser(session.user);
+        setUser(appUser);
+      } else {
+        setUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const [showSignModal, setShowSignModal] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  const [showFeedback, setShowFeedback] = useState<boolean>(false);
-
-  const fetchUserInfo = async function () {
-    try {
-      const resp = await fetch("/api/get-user-info", {
-        method: "POST",
-      });
-
-      if (!resp.ok) {
-        throw new Error("fetch user info failed with status: " + resp.status);
-      }
-
-      const { code, message, data } = await resp.json();
-      if (code !== 0) {
-        throw new Error(message);
-      }
-
-      setUser(data);
-
-      updateInvite(data);
-    } catch (e) {
-      console.log("fetch user info failed");
-    }
-  };
-
-  const updateInvite = async (user: User) => {
-    try {
-      if (user.invited_by) {
-        // user already been invited
-        console.log("user already been invited", user.invited_by);
-        return;
-      }
-
-      const inviteCode = cacheGet(CacheKey.InviteCode);
-      if (!inviteCode) {
-        // no invite code
-        return;
-      }
-
-      const userCreatedAt = moment(user.created_at).unix();
-      const currentTime = moment().unix();
-      const timeDiff = Number(currentTime - userCreatedAt);
-
-      if (timeDiff <= 0 || timeDiff > 7200) {
-        // user created more than 2 hours
-        console.log("user created more than 2 hours");
-        return;
-      }
-
-      // update invite relation
-      console.log("update invite", inviteCode, user.uuid);
-      const req = {
-        invite_code: inviteCode,
-        user_uuid: user.uuid,
-      };
-      const resp = await fetch("/api/update-invite", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req),
-      });
-      if (!resp.ok) {
-        throw new Error("update invite failed with status: " + resp.status);
-      }
-      const { code, message, data } = await resp.json();
-      if (code !== 0) {
-        throw new Error(message);
-      }
-
-      setUser(data);
-      cacheRemove(CacheKey.InviteCode);
-    } catch (e) {
-      console.log("update invite failed: ", e);
-    }
-  };
-
-  useEffect(() => {
-    if (supabaseUser) {
-      fetchUserInfo();
-    }
-  }, [supabaseUser]);
 
   return (
     <AppContext.Provider
