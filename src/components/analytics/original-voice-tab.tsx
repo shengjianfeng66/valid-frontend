@@ -6,10 +6,9 @@ import React, { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table/data-table";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
-import { getStatusConfig } from "@/utils/interview";
+import { getStatusConfig, formatDurationMinutes, formatDate } from "@/utils/interview";
 
 interface InterviewResponse {
     response: {
@@ -71,14 +70,12 @@ export function OriginalVoiceTab({
             {
                 id: "name",
                 accessorFn: (row) => row.interviewee.name,
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="受访者" />
-                ),
+                header: () => <div className="pl-4 font-semibold text-sm">受访者</div>,
                 cell: ({ row }) => {
                     const item = row.original;
                     return (
-                        <div className="flex items-center gap-3">
-                            <span className="font-semibold text-gray-900 text-base">
+                        <div className="flex items-center gap-3 pl-4">
+                            <span className="text-sm text-gray-900">
                                 {item.interviewee.name}
                             </span>
                         </div>
@@ -90,9 +87,9 @@ export function OriginalVoiceTab({
                 id: "profile",
                 accessorFn: (row) => row.response?.details?.meta?.profile_brief,
                 accessorKey: "profile_brief",
-                header: "用户画像",
+                header: () => <div className="font-semibold text-sm">用户画像</div>,
                 cell: ({ row }) => (
-                    <p className="text-sm text-gray-700 leading-relaxed break-words whitespace-normal">
+                    <p className="text-sm text-gray-900 leading-relaxed break-words whitespace-normal">
                         {row.original?.response?.details?.meta?.profile_brief}
                     </p>
                 ),
@@ -101,20 +98,13 @@ export function OriginalVoiceTab({
             {
                 id: "source",
                 accessorFn: (row) => row.interviewee.source,
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="类型" />
-                ),
+                header: () => <div className="font-semibold text-sm">类型</div>,
                 cell: ({ row }) => {
                     const source = row.original.interviewee.source;
                     return (
-                        <Badge
-                            variant={source === 0 ? "default" : "outline"}
-                            className={source === 0
-                                ? "bg-blue-500 hover:bg-blue-600 text-white"
-                                : "border-primary/40 text-primary bg-primary/5 hover:bg-primary/10"}
-                        >
+                        <span className="text-sm text-gray-900">
                             {source === 0 ? "真人" : "模拟用户"}
-                        </Badge>
+                        </span>
                     );
                 },
                 meta: {
@@ -133,17 +123,13 @@ export function OriginalVoiceTab({
             {
                 id: "state",
                 accessorFn: (row) => row.response.state,
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="状态" />
-                ),
+                header: () => <div className="font-semibold text-sm">状态</div>,
                 cell: ({ row }) => {
                     const state = row.original.response.state;
                     return (
-                        <Badge
-                            className={getStatusConfig(state, true)?.containerClassName}
-                        >
+                        <span className="text-sm text-gray-900">
                             {getStatusConfig(state, true)?.label}
-                        </Badge>
+                        </span>
                     );
                 },
                 enableColumnFilter: false,
@@ -151,26 +137,12 @@ export function OriginalVoiceTab({
             {
                 id: "created_at",
                 accessorFn: (row) => row.response.created_at,
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="访谈时间" />
-                ),
+                header: () => <div className="font-semibold text-sm">访谈开始时间</div>,
                 cell: ({ row }) => {
-                    const date = new Date(row.original.response.created_at);
                     return (
-                        <div className="flex flex-col gap-0.5">
-                            <span className="text-sm font-medium text-gray-900">
-                                {date.toLocaleDateString('zh-CN', {
-                                    month: '2-digit',
-                                    day: '2-digit'
-                                })}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                                {date.toLocaleTimeString('zh-CN', {
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
-                            </span>
-                        </div>
+                        <span className="text-sm text-gray-900">
+                            {formatDate(row.original.response.created_at)}
+                        </span>
                     );
                 },
                 enableSorting: true,
@@ -181,20 +153,30 @@ export function OriginalVoiceTab({
                     (total, section) => total + section.questions.length,
                     0
                 ),
-                header: ({ column }) => (
-                    <DataTableColumnHeader column={column} title="问答数" />
-                ),
+                header: () => <div className="font-semibold text-sm">问答数</div>,
                 cell: ({ row }) => {
                     const count = row.original.response.details.answers.reduce(
                         (total, section) => total + section.questions.length,
                         0
                     );
                     return (
-                        <div className="flex items-center justify-center">
-                            <div className="rounded-lg px-3 py-1.5 text-sm font-semibold min-w-[45px] text-center">
-                                {count}
-                            </div>
-                        </div>
+                        <span className="text-sm text-gray-900">
+                            {count}
+                        </span>
+                    );
+                },
+                enableSorting: true,
+            },
+            {
+                id: "duration",
+                accessorFn: (row) => row.response.duration,
+                header: () => <div className="font-semibold text-sm">访谈时长</div>,
+                cell: ({ row }) => {
+                    const duration = row.original.response.duration;
+                    return (
+                        <span className="text-sm text-gray-900">
+                            {duration != null ? formatDurationMinutes(duration) : '-'}
+                        </span>
                     );
                 },
                 enableSorting: true,
