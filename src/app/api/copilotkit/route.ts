@@ -3,9 +3,11 @@ import {
   OpenAIAdapter,
   langGraphPlatformEndpoint,
   copilotRuntimeNextJSAppRouterEndpoint,
+  GraphQLContext,
 } from "@copilotkit/runtime";
 import OpenAI from "openai";
 import { NextRequest } from "next/server";
+import { createServerClient } from "@/lib/supabase";
 
 const deploymentUrl = process.env.NEXT_PUBLIC_COPILOTKIT_LANGGRAPH_DEPLOYMENT_URL || "http://127.0.0.1:8000/copilotkit";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -24,12 +26,24 @@ export const POST = async (req: NextRequest) => {
   //   ]
   // });
 
+  const supabase = await createServerClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const supabaseBearer = session?.access_token ? `Bearer ${session.access_token}` : '';
+  const authHeader = req.headers.get("authorization") || supabaseBearer;
+
   const runtime = new CopilotRuntime({
-      remoteEndpoints: [{
-        url: deploymentUrl,
-      }],
-    });
-  
+    remoteEndpoints: [{
+      url: deploymentUrl,
+      onBeforeRequest: ({ ctx }: { ctx: GraphQLContext }) => {
+        return {
+          headers: {
+            Authorization: authHeader,
+          },
+        };
+      },
+    }],
+  });
+
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
     runtime,
     serviceAdapter: llmAdapter,
