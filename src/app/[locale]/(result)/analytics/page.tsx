@@ -3,6 +3,9 @@
 // ==================== React 相关 ====================
 import { useEffect, useState } from "react";
 
+// ==================== Supabase ====================
+import { createClient } from "@/lib/supabase/client";
+
 // ==================== Next.js 相关 ====================
 import { useSearchParams } from "next/navigation";
 
@@ -27,26 +30,24 @@ import { UserDetailSheet } from "@/components/user-detail-sheet";
 import { ReportTab, OriginalVoiceTab, InsightsTab } from "@/components/analytics";
 
 // ==================== 服务层 ====================
-import { fetchInterviewResponses } from "@/services/interview";
+import { fetchInterviewResponses, fetchInterviewDetail } from "@/services/interview";
 import type { InterviewResponseWithInterviewee, InterviewResponsesData } from "@/types/interview";
 
 // 使用导入的 InterviewResponseWithInterviewee 类型，不再需要本地定义
+
+// 使用导入的 InterviewDetail 类型
+import type { InterviewDetail as ImportedInterviewDetail } from "@/types/interview";
 
 interface Report {
   type: number // 0: 真人用户报告, 1: 模拟用户报告
   report: string // markdown 格式的报告内容
 }
 
-interface InterviewDetail {
-  id: number
-  name: string
-  description: string | null
-  state: number
-  created_at: string
+// 扩展 InterviewDetail 类型以包含分析报告
+interface InterviewDetailWithAnalysis extends ImportedInterviewDetail {
   analysis?: {
     reports: Report[]
   }
-  [key: string]: any
 }
 
 export default function Page() {
@@ -59,6 +60,7 @@ export default function Page() {
   const [interviewId, setInterviewId] = useState(urlInterviewId ? Number(urlInterviewId) : 20) // 从 URL 获取或默认 20
   const [selectedUser, setSelectedUser] = useState<any>(null)
   const [showUserDetailSheet, setShowUserDetailSheet] = useState(false)
+  const [isAuthReady, setIsAuthReady] = useState(false) // 认证是否准备好
   const { setState: setAgentState } = useCoAgent<{
     interview_id: number;
     interview_name?: string;
@@ -79,15 +81,29 @@ export default function Page() {
       has_reports: false,
     },
   });
-  // 使用 SWR 获取访谈详情（包含分析报告）
-  const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetail>(
-    interviewId ? `/api/v1/interview/get/${interviewId}` : null,
-    async (url: string) => {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  // 检查认证状态
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("🔐 认证状态检查:", session ? "已登录" : "未登录");
+        setIsAuthReady(true);
+      } catch (error) {
+        console.error("认证检查失败:", error);
+        setIsAuthReady(true); // 即使失败也继续，让后续请求处理错误
       }
-      return response.json();
+    };
+    checkAuth();
+  }, []);
+
+  // 使用 SWR 获取访谈详情（包含分析报告），使用带 Authorization 的请求
+  // 只有在认证准备好后才启用
+  const { data: interviewDetail, error: detailError, isLoading: isLoadingDetail } = useSWR<InterviewDetailWithAnalysis>(
+    interviewId && isAuthReady ? `interview-detail-${interviewId}` : null,
+    async () => {
+      const detail = await fetchInterviewDetail(String(interviewId));
+      return detail as InterviewDetailWithAnalysis;
     },
     {
       revalidateOnFocus: false,
@@ -184,7 +200,13 @@ export default function Page() {
   }, [urlInterviewId, interviewId])
 
   // 获取访谈数据
+  // 只有在认证准备好后才发起请求
   useEffect(() => {
+    if (!isAuthReady) {
+      console.log("⏳ 等待认证完成...");
+      return;
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true)
@@ -221,7 +243,7 @@ export default function Page() {
     fetchData()
 
 
-  }, [interviewId])
+  }, [interviewId, isAuthReady])
 
   return (
     <div style={{ "--copilot-kit-primary-color": "oklch(0.6 0.2 300)" } as CopilotKitCSSProperties}>
