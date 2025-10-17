@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
 /**
- * 基于 created_at 实时计算经过时间，返回“X分Y秒”字符串。
+ * 基于 created_at 实时计算经过时间
+ * - 小于60分钟：返回"X分Y秒"
+ * - 大于等于60分钟：返回"X小时Y分Z秒"
  * @param createdAtIso ISO 时间字符串（例如：2025-10-12T15:27:44.333075+00:00）
- * @param enabled 是否启用计时（通常等于“进行中”状态）
+ * @param enabled 是否启用计时（通常等于"进行中"状态）
  * @param tickMs 更新频率，默认 1000ms
  */
 export function useRunningElapsed(
@@ -28,9 +30,17 @@ export function useRunningElapsed(
         const update = () => {
             const now = Date.now();
             const diffSec = Math.max(0, Math.floor((now - createdTime) / 1000));
-            const minutes = Math.floor(diffSec / 60);
+            const totalMinutes = Math.floor(diffSec / 60);
             const seconds = diffSec % 60;
-            setLabel(`${minutes}分${seconds}秒`);
+            
+            // 如果超过60分钟，显示小时
+            if (totalMinutes >= 60) {
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+                setLabel(`${hours}小时${minutes}分${seconds}秒`);
+            } else {
+                setLabel(`${totalMinutes}分${seconds}秒`);
+            }
         };
 
         update();
