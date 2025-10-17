@@ -52,7 +52,10 @@ export interface InterviewDetail {
 // 访谈响应
 export interface InterviewResponse {
     id: number;
+    interview_id: number;
+    interviewee_id: number;
     state: number;
+    duration: number | null;
     details: any;
     created_at: string;
 }

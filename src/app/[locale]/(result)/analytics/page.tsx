@@ -26,54 +26,11 @@ import { UserDetailSheet } from "@/components/user-detail-sheet";
 // ==================== 业务组件 ====================
 import { ReportTab, OriginalVoiceTab, InsightsTab } from "@/components/analytics";
 
-interface InterviewResponse {
-  response: {
-    id: number
-    created_at: string
-    interview_id: number
-    duration: number | null
-    details: {
-      meta: {
-        model: string
-        language: string
-        timestamp: string
-        persona_name: string
-        profile_brief: string
-      }
-      answers: Array<{
-        section_name: string
-        questions: Array<{
-          main: string
-          answer: string
-          probes?: Array<{
-            probe: string
-            answer: string
-          }>
-        }>
-        reasoning: string
-      }>
-      closing: {
-        summary: string
-      }
-    }
-    interviewee_id: number
-    state: number
-  }
-  interviewee: {
-    id: number
-    name: string
-    source: number
-    content: any
-  }
-}
+// ==================== 服务层 ====================
+import { fetchInterviewResponses } from "@/services/interview";
+import type { InterviewResponseWithInterviewee, InterviewResponsesData } from "@/types/interview";
 
-interface ApiResponse {
-  success: boolean
-  page: number
-  page_size: number
-  total: number
-  items: InterviewResponse[]
-}
+// 使用导入的 InterviewResponseWithInterviewee 类型，不再需要本地定义
 
 interface Report {
   type: number // 0: 真人用户报告, 1: 模拟用户报告
@@ -96,7 +53,7 @@ export default function Page() {
   const searchParams = useSearchParams()
   const urlInterviewId = searchParams.get('interview_id')
 
-  const [data, setData] = useState<InterviewResponse[]>([])
+  const [data, setData] = useState<InterviewResponseWithInterviewee[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [interviewId, setInterviewId] = useState(urlInterviewId ? Number(urlInterviewId) : 20) // 从 URL 获取或默认 20
@@ -141,7 +98,7 @@ export default function Page() {
   // 获取可用的报告
   const availableReports = interviewDetail?.analysis?.reports || [];
 
-  const handleViewDetail = (item: InterviewResponse) => {
+  const handleViewDetail = (item: InterviewResponseWithInterviewee) => {
     // 转换数据格式为 UserDetailSheet 期望的格式
     const content = item.interviewee.content;
     const attributes: Record<string, string> = {};
@@ -149,11 +106,11 @@ export default function Page() {
     // 从 user_profile_tags 中提取所有标签
     if (content && content.user_profile_tags) {
       Object.keys(content.user_profile_tags).forEach(categoryKey => {
-        const category = content.user_profile_tags[categoryKey];
+        const category = content.user_profile_tags?.[categoryKey];
 
         if (category && category.subcategories) {
           Object.keys(category.subcategories).forEach(subKey => {
-            const subcategory = category.subcategories[subKey];
+            const subcategory = category.subcategories?.[subKey];
 
             if (subcategory && subcategory.tags) {
               Object.keys(subcategory.tags).forEach(tagKey => {
@@ -233,16 +190,12 @@ export default function Page() {
         setLoading(true)
         setError(null)
 
-        // 一次性加载100条数据
-        const response = await fetch(
-          `/api/v1/interview/get_responses_and_interviewees?interview_id=${interviewId}&page=1&page_size=100`
+        // 一次性加载100条数据，使用带 Authorization 的请求
+        const result: InterviewResponsesData = await fetchInterviewResponses(
+          Number(interviewId),
+          1,
+          100
         )
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const result: ApiResponse = await response.json()
         console.log("🚀 ~ fetchData ~ result:", result)
 
         if (result.success && result.items) {

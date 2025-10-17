@@ -9,53 +9,13 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 import { getStatusConfig, formatDurationMinutes, formatDate } from "@/utils/interview";
-
-interface InterviewResponse {
-    response: {
-        id: number;
-        created_at: string;
-        interview_id: number;
-        duration: number | null;
-        details: {
-            meta: {
-                model: string;
-                language: string;
-                timestamp: string;
-                persona_name: string;
-                profile_brief: string;
-            };
-            answers: Array<{
-                section_name: string;
-                questions: Array<{
-                    main: string;
-                    answer: string;
-                    probes?: Array<{
-                        probe: string;
-                        answer: string;
-                    }>;
-                }>;
-                reasoning: string;
-            }>;
-            closing: {
-                summary: string;
-            };
-        };
-        interviewee_id: number;
-        state: number;
-    };
-    interviewee: {
-        id: number;
-        name: string;
-        source: number;
-        content: any;
-    };
-}
+import type { InterviewResponseWithInterviewee } from "@/types/interview";
 
 interface OriginalVoiceTabProps {
     loading: boolean;
     error: string | null;
-    data: InterviewResponse[];
-    onViewDetail: (item: InterviewResponse) => void;
+    data: InterviewResponseWithInterviewee[];
+    onViewDetail: (item: InterviewResponseWithInterviewee) => void;
 }
 
 export function OriginalVoiceTab({
@@ -65,7 +25,7 @@ export function OriginalVoiceTab({
     onViewDetail
 }: OriginalVoiceTabProps) {
     // 定义列配置
-    const columns = useMemo<ColumnDef<InterviewResponse>[]>(
+    const columns = useMemo<ColumnDef<InterviewResponseWithInterviewee>[]>(
         () => [
             {
                 id: "name",
@@ -304,13 +264,13 @@ export function OriginalVoiceTab({
             {
                 id: "questions",
                 accessorFn: (row) => row.response.details.answers.reduce(
-                    (total, section) => total + section.questions.length,
+                    (total: number, section: any) => total + section.questions.length,
                     0
                 ),
                 header: () => <div className="font-semibold text-sm">问答数</div>,
                 cell: ({ row }) => {
                     const count = row.original.response.details.answers.reduce(
-                        (total, section) => total + section.questions.length,
+                        (total: number, section: any) => total + section.questions.length,
                         0
                     );
                     return (
