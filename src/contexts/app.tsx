@@ -16,6 +16,7 @@ import { User } from "@/types/user";
 import moment from "moment";
 import { createClient } from "@/lib/supabase/client";
 import { isAuthEnabled } from "@/lib/auth";
+import SignModal from "@/components/sign/modal";
 
 const AppContext = createContext({} as ContextValue);
 
@@ -78,11 +79,28 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         setUser(appUser);
       } else {
         setUser(null);
+        // 用户退出时，重置登录模态框状态，确保能重新触发自动显示
+        setShowSignModal(false);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // 全局自动登录检测逻辑
+  useEffect(() => {
+    if (!isAuthEnabled()) return;
+
+    // 添加延迟，避免在认证状态加载时显示登录窗，防止闪烁
+    const timer = setTimeout(() => {
+      // 只有在用户未登录且登录窗未显示时才自动显示登录窗
+      if (user === null && !showSignModal) {
+        setShowSignModal(true);
+      }
+    }, 1000); // 1秒延迟，给认证系统足够时间加载
+
+    return () => clearTimeout(timer);
+  }, [user, showSignModal]);
 
   return (
     <AppContext.Provider
@@ -96,6 +114,9 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
+      
+      {/* 全局登录模态框 */}
+      <SignModal />
     </AppContext.Provider>
   );
 };

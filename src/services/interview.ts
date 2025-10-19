@@ -154,6 +154,36 @@ export async function startInterview(params: StartInterviewParams): Promise<any>
 }
 
 /**
+ * 创建访谈
+ */
+export async function createInterview(params: {
+    user_id: number;
+    goal?: any;
+    outline?: any;
+}): Promise<any> {
+    console.log('创建访谈，参数:', params);
+    const authHeaders = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/api/v1/interview/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+        },
+        body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('访谈创建成功:', data);
+
+    return data;
+}
+
+/**
  * 结束访谈
  */
 export async function finishInterview(params: FinishInterviewParams): Promise<any> {

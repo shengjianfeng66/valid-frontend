@@ -55,7 +55,7 @@ const fetcher = async (url: string): Promise<Interview[]> => {
   const supabase = createClient()
   const { data: { session } } = await supabase.auth.getSession()
   const token = session?.access_token
-
+  url = process.env.NEXT_PUBLIC_API_URL + url
   const response = await fetch(url, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -77,9 +77,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // 获取当前 URL 中的 interview ID
   const currentInterviewId = searchParams.get('id') ? Number(searchParams.get('id')) : null
 
-  // 使用 SWR 获取项目列表
+  // 使用 SWR 获取项目列表 - 只有登录用户才发起请求
   const { data: interviews, error, isLoading } = useSWR(
-    `/api/v1/interview/list`,
+    user ? `/api/v1/interview/list` : null,
     fetcher,
     {
       revalidateOnFocus: false,
@@ -152,65 +152,67 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 分割线 */}
         <div className="border-t border-gray-200 my-4"></div>
 
-        {/* 项目列表 */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sm font-medium text-gray-600">
-            {t('recentItems.title')}
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="p-2">
-            <SidebarMenu>
-              {isLoading ? (
-                <div className="px-3 py-6 text-center text-sm text-gray-500">
-                  加载中...
-                </div>
-              ) : interviews && interviews.length > 0 ? (
-                interviews.map((interview) => {
-                  const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
-                    year: '2-digit',
-                    month: '2-digit',
-                    day: '2-digit'
-                  }).replace(/\//g, '/');
+        {/* 项目列表 - 只有登录用户才显示 */}
+        {user && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-sm font-medium text-gray-600">
+              {t('recentItems.title')}
+            </SidebarGroupLabel>
+            <SidebarGroupContent className="p-2">
+              <SidebarMenu>
+                {isLoading ? (
+                  <div className="px-3 py-6 text-center text-sm text-gray-500">
+                    加载中...
+                  </div>
+                ) : interviews && interviews.length > 0 ? (
+                  interviews.map((interview) => {
+                    const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
+                      year: '2-digit',
+                      month: '2-digit',
+                      day: '2-digit'
+                    }).replace(/\//g, '/');
 
-                  const isActive = currentInterviewId === interview.id;
+                    const isActive = currentInterviewId === interview.id;
 
-                  return (
-                    <SidebarMenuItem key={interview.id}>
-                      <SidebarMenuButton
-                        className={`text-gray-900 ${isActive ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
-                        asChild
-                      >
-                        <NavigationLink
-                          href={`/insight/interview?id=${interview.id}`}
-                          hasDraft={hasDraft}
-                          onLeave={clearDraft}
-                          className={`flex items-center gap-3 px-3 py-6 ${isActive ? 'relative' : ''}`}
+                    return (
+                      <SidebarMenuItem key={interview.id}>
+                        <SidebarMenuButton
+                          className={`text-gray-900 ${isActive ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
+                          asChild
                         >
-                          {isActive && (
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
-                          )}
-                          <FileText className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-gray-500'}`} />
-                          <div className="flex-1 min-w-0">
-                            <div className={`text-sm font-medium truncate leading-5 ${isActive ? 'text-primary font-semibold' : ''}`}>
-                              {interview.name}
+                          <NavigationLink
+                            href={`/insight/interview?id=${interview.id}`}
+                            hasDraft={hasDraft}
+                            onLeave={clearDraft}
+                            className={`flex items-center gap-3 px-3 py-6 ${isActive ? 'relative' : ''}`}
+                          >
+                            {isActive && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
+                            )}
+                            <FileText className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-gray-500'}`} />
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-sm font-medium truncate leading-5 ${isActive ? 'text-primary font-semibold' : ''}`}>
+                                {interview.name}
+                              </div>
+                              <div className={`flex items-center justify-between text-xs mt-1 leading-4 ${isActive ? 'text-primary/70' : 'text-gray-500'}`}>
+                                <span>访谈 #{interview.id}</span>
+                                <span>{date}</span>
+                              </div>
                             </div>
-                            <div className={`flex items-center justify-between text-xs mt-1 leading-4 ${isActive ? 'text-primary/70' : 'text-gray-500'}`}>
-                              <span>访谈 #{interview.id}</span>
-                              <span>{date}</span>
-                            </div>
-                          </div>
-                        </NavigationLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })
-              ) : (
-                <div className="px-3 py-6 text-center text-sm text-gray-500">
-                  暂无项目
-                </div>
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                          </NavigationLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })
+                ) : (
+                  <div className="px-3 py-6 text-center text-sm text-gray-500">
+                    暂无项目
+                  </div>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>

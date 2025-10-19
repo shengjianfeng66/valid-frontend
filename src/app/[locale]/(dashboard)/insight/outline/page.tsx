@@ -38,9 +38,15 @@ import { InsightStepper } from "@/components/insight";
 
 // ==================== Contexts ====================
 import { useDraft } from "@/contexts/draft";
+import { useAppContext } from "@/contexts/app";
 
 // ==================== Stores ====================
 import { useSurveyStore } from "@/stores/survey-store";
+
+// ==================== Services ====================
+import { createInterview } from "@/services/interview";
+
+
 
 interface SurveyData {
   surveyIntro: string;
@@ -262,6 +268,7 @@ export default function CheckPage() {
   const t = useTranslations('outline');
   const router = useRouter();
   const { setHasDraft } = useDraft();
+  const { user, setShowSignModal } = useAppContext();
   const [currentStep, setCurrentStep] = useState(2);
   const [isCreatingInterview, setIsCreatingInterview] = useState(false);
   const { name, nodeName, state, running, setState, start, stop, run } = useCoAgent<{
@@ -293,18 +300,38 @@ export default function CheckPage() {
   const interviewData = useSurveyStore((state) => state.interviewData);
 
   useEffect(() => {
+    // 如果用户未登录，跳过草稿状态检查
+    if (user === null) {
+      console.log('用户未登录，跳过草稿状态检查');
+      return;
+    }
+
     const hasDraft = !!surveyInfo || !!interviewData;
     setHasDraft(hasDraft);
-  }, [surveyInfo, interviewData, setHasDraft]);
+  }, [surveyInfo, interviewData, setHasDraft, user]);
+
+
 
   useEffect(() => {
+    // 如果用户未登录，跳过运行状态检查
+    if (user === null) {
+      console.log('用户未登录，跳过运行状态检查');
+      return;
+    }
+
     if (!running) {
 
     }
-  }, [running])
+  }, [running, user])
 
   // 从 sessionStorage 读取调研信息并发送给 copilot
   useEffect(() => {
+    // 如果用户未登录，跳过数据加载
+    if (user === null) {
+      console.log('用户未登录，跳过调研信息加载');
+      return;
+    }
+
     if (hasSentInitialRef.current) return;
 
     const sendSurveyInfo = (surveyInfo: any) => {
@@ -343,7 +370,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
     if (currentSurveyInfo) {
       sendSurveyInfo(currentSurveyInfo);
     }
-  }, [sendMessage]);
+  }, [sendMessage, user]);
 
   // 处理步骤导航 - 只能返回不能往前跳
   const handleStepNavigation = (targetStep: number) => {
@@ -378,6 +405,12 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
 
 
   useEffect(() => {
+    // 如果用户未登录，跳过 Agent 状态同步
+    if (user === null) {
+      console.log('用户未登录，跳过 Agent 状态同步');
+      return;
+    }
+
     try {
       // 检查是否有有效的 tool_result
       if (!state?.tool_result) return;
@@ -412,7 +445,7 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
       }));
     } catch (error) {
     }
-  }, [state?.tool_result]); // 监听 tool_result 变化
+  }, [state?.tool_result, user]); // 监听 tool_result 变化和用户状态
 
   // ✅ 失焦时同步：前端 → Agent
   const syncToAgent = useCallback(() => {
@@ -468,23 +501,13 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
 
       console.log('创建访谈参数:', { name: '产品用户体验访谈', user_id: userId, goal, outline });
 
-      const response = await fetch(`/api/v1/interview/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          goal: goal,
-          outline: outline
-        })
+      // 使用 services/interview.ts 中的 createInterview 函数，包含认证 header
+      const data: CreateInterviewResponse = await createInterview({
+        user_id: userId,
+        goal: goal,
+        outline: outline
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: CreateInterviewResponse = await response.json();
+      
       console.log('访谈创建成功:', data);
 
       toast.success('访谈创建成功', {
@@ -577,6 +600,9 @@ ${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolu
           imageUploadsEnabled={true}
         />
       </SidebarProvider>
+      
+      {/* 登录模态框 */}
+
     </div>
   )
 }
