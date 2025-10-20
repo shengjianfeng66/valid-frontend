@@ -168,7 +168,7 @@ CREATE TABLE "user" (
 	"updated_at" timestamp with time zone,
 	"invited_by" varchar(255) DEFAULT '' NOT NULL,
 	"is_affiliate" boolean DEFAULT false NOT NULL,
-	"organization_id" bigint NULL，
+	"organization_id" bigint NULL,
 	CONSTRAINT "users_uuid_unique" UNIQUE("uuid")
 );
 
