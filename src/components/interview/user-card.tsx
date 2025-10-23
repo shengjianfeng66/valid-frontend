@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +33,10 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
       >
         {/* 用户基本信息 */}
         <div className="flex items-start gap-3 mb-4">
-          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl">{user.avatar}</div>
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className="text-xl">{user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>

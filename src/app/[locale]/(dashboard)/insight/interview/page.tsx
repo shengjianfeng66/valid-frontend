@@ -1,5 +1,7 @@
 "use client"
 
+import { notionists } from "@dicebear/collection"
+import { createAvatar } from "@dicebear/core"
 import { ArrowUp } from "lucide-react"
 // ==================== 第三方库 ====================
 import { useTranslations } from "next-intl"
@@ -145,10 +147,15 @@ export default function InterviewPage() {
               })
             }
 
+            // 使用 intervieweeId 生成唯一的头像
+            const avatarSvg = createAvatar(notionists, {
+              seed: `${item.interviewee.id}`,
+            }).toDataUri()
+
             return {
               id: `response-${item.response.id}`,
               name: item.interviewee.name,
-              avatar: "😊",
+              avatar: avatarSvg,
               status: item.response.state,
               isReal: false,
               attributes,
