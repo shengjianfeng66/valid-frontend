@@ -101,6 +101,7 @@
     "nuqs": "^2.7.1",
     "openai": "^4.78.1",
     "postgres": "^3.4.7",
+    "radash": "^12.1.1",
     "radix-ui": "^1.4.3",
     "react": "^19.0.0",
     "react-copy-to-clipboard": "^5.1.0",
