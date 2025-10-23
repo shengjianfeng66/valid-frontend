@@ -5,4 +5,7 @@ export default antfu({
   markdown: false,
   jsonc: false,
   stylistic: false,
+  rules: {
+    "node/prefer-global/process": false,
+  },
 })
