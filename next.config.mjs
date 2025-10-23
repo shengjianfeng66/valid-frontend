@@ -28,8 +28,12 @@ const nextConfig = {
     if (process.env.NODE_ENV === "development") {
       return [
         {
+          source: "/api/v1/copilotkit/:path*",
+          destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
+        },
+        {
           source: "/api/v1/:path*",
-          destination: "http://validflow.airelief.cn/api/v1/:path*",
+          destination: "https://validflow.airelief.cn/api/v1/:path*",
         },
       ];
     }
