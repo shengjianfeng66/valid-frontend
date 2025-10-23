@@ -12,6 +12,8 @@ import { useSearchParams } from "next/navigation";
 // ==================== 第三方库 ====================
 import { toast } from "sonner";
 import useSWR from 'swr';
+import { createAvatar } from "@dicebear/core";
+import { notionists } from "@dicebear/collection";
 
 // ==================== CopilotKit ====================
 import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
@@ -138,15 +140,15 @@ export default function Page() {
       });
     }
 
+    // 基于 intervieweeId 生成唯一头像
+    const avatarSvg = createAvatar(notionists, {
+      seed: `${item.interviewee.id}`,
+    }).toDataUri();
+
     const userForSheet = {
       id: `response-${item.response.id}`,
       name: item.interviewee.name,
-      avatar: (() => {
-        const gender = content?.user_profile_tags?.demographics?.subcategories?.basic_identity?.tags?.['性别'];
-        if (gender === '男性' || gender === '男') return '👨';
-        if (gender === '女性' || gender === '女') return '👩';
-        return '😊';
-      })(),
+      avatar: avatarSvg,
       status: item.response.state === 3 ? "已完成" : "进行中",
       isReal: false,
       attributes: attributes,

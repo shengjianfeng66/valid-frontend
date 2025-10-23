@@ -1,18 +1,21 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Clock, MapPin, Star, MessageCircle, Phone, Video, UserPlus } from "lucide-react";
+import { notionists } from "@dicebear/collection"
+import { createAvatar } from "@dicebear/core"
+import { MapPin, MessageCircle, Phone, UserPlus, Video } from "lucide-react"
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface User {
-  id: string;
-  name: string;
-  age: number;
-  location: string;
-  avatar: string;
-  status: "视频通话中" | "准备中" | "已完成" | "等待中";
-  rating?: number;
-  tags: string[];
-  isReal: boolean;
+  id: string
+  name: string
+  age: number
+  location: string
+  avatar: string
+  status: "视频通话中" | "准备中" | "已完成" | "等待中"
+  rating?: number
+  tags: string[]
+  isReal: boolean
 }
 
 const mockUsers: User[] = [
@@ -24,7 +27,7 @@ const mockUsers: User[] = [
     avatar: "🤗",
     status: "视频通话中",
     tags: ["创意爱好", "上班族", "数码爱好者", "理想主义"],
-    isReal: true
+    isReal: true,
   },
   {
     id: "2",
@@ -34,7 +37,7 @@ const mockUsers: User[] = [
     avatar: "😊",
     status: "视频通话中",
     tags: ["通勤族", "实用", "时间敏感", "精致生活"],
-    isReal: true
+    isReal: true,
   },
   {
     id: "3",
@@ -44,7 +47,7 @@ const mockUsers: User[] = [
     avatar: "😄",
     status: "准备中",
     tags: ["品质生活", "细致", "追求完美", "社交达人"],
-    isReal: true
+    isReal: true,
   },
   {
     id: "4",
@@ -54,7 +57,7 @@ const mockUsers: User[] = [
     avatar: "🤗",
     status: "已完成",
     tags: ["创意爱好", "上班族", "追求品质", "精致生活"],
-    isReal: true
+    isReal: true,
   },
   {
     id: "5",
@@ -64,7 +67,7 @@ const mockUsers: User[] = [
     avatar: "😎",
     status: "等待中",
     tags: ["效率", "实用", "文艺青年", "追求品质"],
-    isReal: true
+    isReal: true,
   },
   {
     id: "6",
@@ -74,7 +77,7 @@ const mockUsers: User[] = [
     avatar: "😊",
     status: "视频通话中",
     tags: ["品质生活", "细致", "文艺青年", "社交达人"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "7",
@@ -84,7 +87,7 @@ const mockUsers: User[] = [
     avatar: "🙂",
     status: "准备中",
     tags: ["游戏爱好者", "科技控", "夜猫子", "创新思维"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "8",
@@ -94,7 +97,7 @@ const mockUsers: User[] = [
     avatar: "😍",
     status: "已完成",
     tags: ["美食达人", "旅行爱好者", "摄影师", "生活记录者"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "9",
@@ -104,7 +107,7 @@ const mockUsers: User[] = [
     avatar: "🤓",
     status: "等待中",
     tags: ["历史爱好者", "读书人", "传统文化", "深度思考"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "10",
@@ -114,7 +117,7 @@ const mockUsers: User[] = [
     avatar: "😋",
     status: "视频通话中",
     tags: ["健身达人", "营养师", "早起族", "正能量"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "11",
@@ -124,7 +127,7 @@ const mockUsers: User[] = [
     avatar: "🤔",
     status: "准备中",
     tags: ["投资理财", "商业思维", "效率专家", "目标导向"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "12",
@@ -134,7 +137,7 @@ const mockUsers: User[] = [
     avatar: "🥰",
     status: "已完成",
     tags: ["艺术创作", "手工制作", "小清新", "治愈系"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "13",
@@ -144,7 +147,7 @@ const mockUsers: User[] = [
     avatar: "😃",
     status: "等待中",
     tags: ["音乐制作", "创意工作者", "夜生活", "潮流追随者"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "14",
@@ -154,7 +157,7 @@ const mockUsers: User[] = [
     avatar: "😌",
     status: "视频通话中",
     tags: ["瑜伽教练", "冥想", "慢生活", "内心平静"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "15",
@@ -164,7 +167,7 @@ const mockUsers: User[] = [
     avatar: "😏",
     status: "准备中",
     tags: ["创业者", "风险投资", "商业洞察", "领导力"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "16",
@@ -174,7 +177,7 @@ const mockUsers: User[] = [
     avatar: "🤩",
     status: "已完成",
     tags: ["二次元", "动漫爱好者", "cosplay", "萌系文化"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "17",
@@ -184,7 +187,7 @@ const mockUsers: User[] = [
     avatar: "😤",
     status: "等待中",
     tags: ["户外运动", "登山爱好者", "冒险精神", "自然主义"],
-    isReal: false
+    isReal: false,
   },
   {
     id: "18",
@@ -194,44 +197,48 @@ const mockUsers: User[] = [
     avatar: "🥳",
     status: "视频通话中",
     tags: ["派对达人", "社交媒体", "时尚博主", "生活分享"],
-    isReal: false
-  }
-];
+    isReal: false,
+  },
+]
 
 interface UserCardProps {
-  user: User;
+  user: User
 }
 
 function UserCard({ user }: UserCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "视频通话中":
-        return "text-green-600 bg-green-50";
+        return "text-green-600 bg-green-50"
       case "准备中":
-        return "text-yellow-600 bg-yellow-50";
+        return "text-yellow-600 bg-yellow-50"
       case "已完成":
-        return "text-blue-600 bg-blue-50";
+        return "text-blue-600 bg-blue-50"
       case "等待中":
-        return "text-gray-600 bg-gray-50";
+        return "text-gray-600 bg-gray-50"
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-gray-600 bg-gray-50"
     }
-  };
+  }
+
+  // 基于用户 ID 生成唯一头像
+  const avatarSvg = createAvatar(notionists, {
+    seed: user.id,
+  }).toDataUri()
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       {/* 头像和基本信息 */}
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl">
-          {user.avatar}
-        </div>
+        <Avatar className="w-16 h-16">
+          <AvatarImage src={avatarSvg} alt={user.name} />
+          <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-semibold text-gray-900">{user.name}</h3>
             {user.isReal && (
-              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
-                真实用户
-              </span>
+              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">真实用户</span>
             )}
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -246,7 +253,9 @@ function UserCard({ user }: UserCardProps) {
 
       {/* 状态 */}
       <div className="mb-4">
-        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}>
+        <span
+          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}
+        >
           <div className="w-2 h-2 bg-current rounded-full"></div>
           {user.status}
         </span>
@@ -255,10 +264,7 @@ function UserCard({ user }: UserCardProps) {
       {/* 标签 */}
       <div className="flex flex-wrap gap-2 mb-4">
         {user.tags.map((tag, index) => (
-          <span
-            key={index}
-            className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md"
-          >
+          <span key={index} className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">
             {tag}
           </span>
         ))}
@@ -280,23 +286,21 @@ function UserCard({ user }: UserCardProps) {
         </button>
       </div>
     </div>
-  );
+  )
 }
 
 export function InterviewCardList() {
-  const [activeTab, setActiveTab] = useState<"real" | "simulated">("real");
+  const [activeTab, setActiveTab] = useState<"real" | "simulated">("real")
 
-  const realUsers = mockUsers.filter(user => user.isReal);
-  const simulatedUsers = mockUsers.filter(user => !user.isReal);
-  const currentUsers = activeTab === "real" ? realUsers : simulatedUsers;
+  const realUsers = mockUsers.filter((user) => user.isReal)
+  const simulatedUsers = mockUsers.filter((user) => !user.isReal)
+  const currentUsers = activeTab === "real" ? realUsers : simulatedUsers
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
       {/* 标题和时间信息 */}
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">
-          用户对淘宝宝贝记忆功能的使用情况和看法
-        </h1>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">用户对淘宝宝贝记忆功能的使用情况和看法</h1>
         <div className="flex items-center gap-4 text-sm text-gray-600">
           <span className="flex items-center gap-1 text-green-600">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -338,19 +342,21 @@ export function InterviewCardList() {
         <div className="flex">
           <button
             onClick={() => setActiveTab("real")}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "real"
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "real"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-600 hover:text-gray-900"
-              }`}
+            }`}
           >
             真人用户 ({realUsers.length}人)
           </button>
           <button
             onClick={() => setActiveTab("simulated")}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "simulated"
+            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "simulated"
                 ? "border-blue-500 text-blue-600"
                 : "border-transparent text-gray-600 hover:text-gray-900"
-              }`}
+            }`}
           >
             模拟用户 ({simulatedUsers.length}人)
           </button>
@@ -366,5 +372,5 @@ export function InterviewCardList() {
         </div>
       </div>
     </div>
-  );
+  )
 }
