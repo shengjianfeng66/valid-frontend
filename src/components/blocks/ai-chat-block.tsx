@@ -579,7 +579,6 @@ export function AiChatBlock() {
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                fdjaklfjdklas
                 {t("startAnalysis")}
               </>
             )}
