@@ -9,5 +9,11 @@
   "i18n-ally.keystyle": "nested",
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "**/*.json": false
   }
 }
