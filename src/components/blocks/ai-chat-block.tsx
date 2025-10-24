@@ -389,12 +389,12 @@ export function AiChatBlock() {
       </div>
 
       {/* 格式图标 */}
-      <div className="flex items-center justify-center gap-6 mb-8">
+      <div className="flex items-center justify-center gap-6 mb-6">
         {formatIcons.map((item, index) => {
           const Icon = item.icon;
           return (
-            <div key={index} className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer">
+            <div key={index} className="flex flex-col items-center" style={{ gap: '2px' }}>
+              <div className="w-10 h-10 flex items-center justify-center">
                 <Icon className="w-5 h-5 text-gray-600" />
               </div>
               <span className="text-xs text-gray-500">
@@ -408,7 +408,7 @@ export function AiChatBlock() {
       {/* 输入区域 */}
       <div className="space-y-4">
         <App>
-          <Flex style={{ height: 220 }} align="end">
+          <Flex style={{ height: 180 }} align="end">
             <Sender
               ref={senderRef}
               header={

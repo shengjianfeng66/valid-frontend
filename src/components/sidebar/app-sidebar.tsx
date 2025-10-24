@@ -157,10 +157,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 项目列表 - 只有登录用户才显示 */}
         {user && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-gray-600">
+            <SidebarGroupLabel className="text-sm font-medium text-gray-600 px-3">
               {t("recentItems.title")}
             </SidebarGroupLabel>
-            <SidebarGroupContent className="p-2">
+            <SidebarGroupContent className="p-0">
               <SidebarMenu>
                 {isLoading ? (
                   <div className="px-3 py-6 text-center text-sm text-gray-500">
