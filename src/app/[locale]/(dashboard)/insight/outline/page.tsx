@@ -263,6 +263,12 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
     </div>
   );
 }
+export interface FileData {
+    name: string;
+    size: number;
+    type: string;
+    path: string; // 文件路径，替代原来的base64 content
+}
 
 export default function CheckPage() {
   const t = useTranslations('outline');
@@ -273,6 +279,8 @@ export default function CheckPage() {
   const [isCreatingInterview, setIsCreatingInterview] = useState(false);
   const { name, nodeName, state, running, setState, start, stop, run } = useCoAgent<{
     count: number;
+    surveyInfo?: any;
+    productSolutionFiles?: FileData[];
     tool_result?: {
       opening_script?: { introduction?: string };
       closing_script?: { conclusion?: string };
@@ -282,6 +290,8 @@ export default function CheckPage() {
     name: "outline_agent",
     initialState: {
       count: 0,
+      surveyInfo: null,
+      productSolutionFiles: [],
     },
   });
 
@@ -298,6 +308,18 @@ export default function CheckPage() {
   // ✅ 检测是否有草稿数据（使用 Zustand）
   const surveyInfo = useSurveyStore((state) => state.surveyInfo);
   const interviewData = useSurveyStore((state) => state.interviewData);
+
+  // 同步数据到 Agent state
+  useEffect(() => {
+    if (surveyInfo) {
+      setState((prevState) => ({
+        ...prevState,
+        count: prevState?.count || 0,
+        // surveyInfo: surveyInfo,
+        productSolutionFiles: surveyInfo.productSolutionFiles || [],
+      }));
+    }
+  }, [surveyInfo]); // 移除 setState 依赖，避免无限循环
 
   useEffect(() => {
     // 如果用户未登录，跳过草稿状态检查
@@ -341,20 +363,27 @@ export default function CheckPage() {
         if (typeof sendMessage === 'function') {
           hasSentInitialRef.current = true;
 
-          // 构建发送给 copilot 的消息
-          const message = `基于以下调研信息，请帮我生成访谈大纲：
+          // 构建基础文本消息 - 文件信息通过 Agent state 传递
+          const textMessage = `基于以下调研信息，请帮我生成访谈大纲：
 
 产品名称：${surveyInfo.product_name}
 业务类型：${surveyInfo.business_type}
 目标用户群体：${surveyInfo.target_users}
 用户关心的方面：${surveyInfo.userConcerns}
 核心功能模块：${surveyInfo.coreFeatures}
-${surveyInfo.hasProductSolution ? `产品方案文件：${surveyInfo.productSolutionName}` : ''}
 
+${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0 
+  ? `\n注意：我已上传了 ${surveyInfo.productSolutionFiles.length} 个产品方案文件` 
+  : ''}
 
 请确保问题设计能够深度发掘用户需求，帮助优化产品。`;
 
-          void sendMessage({ id: `survey-${Date.now()}`, role: 'user', content: message });
+          // 发送消息 - 只使用字符串格式的 content
+          void sendMessage({ 
+            id: `survey-${Date.now()}`, 
+            role: 'user', 
+            content: textMessage
+          });
         } else {
           // 如果还没准备好，继续等待
           setTimeout(checkAndSend, 100);

@@ -14,7 +14,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
-        console.log("🚀 ~ getAuthHeaders ~ session:", session)
+        // console.log("🚀 ~ getAuthHeaders ~ session:", session)
         const token = session?.access_token;
         return token ? { Authorization: `Bearer ${token}` } : {};
     } catch {
@@ -66,7 +66,7 @@ export async function fetchInterviewDetail(interviewId: string): Promise<Intervi
     }
 
     const data = await response.json();
-    console.log('📝 获取到访谈详情:', data);
+    // console.log('📝 获取到访谈详情:', data);
 
     return data;
 }
@@ -92,7 +92,7 @@ export async function fetchInterviewResponses(
     }
 
     const data = await response.json();
-    console.log('📝 获取已访谈用户数据:', data);
+    // console.log('📝 获取已访谈用户数据:', data);
 
     return data;
 }

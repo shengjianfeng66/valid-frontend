@@ -180,22 +180,6 @@ export default function InterviewPage() {
         }
     }, [interviewError]);
 
-    // 监听访谈数据变化
-    useEffect(() => {
-        if (interviewData) {
-            console.log('✅ 访谈数据已加载:', {
-                id: interviewData.id,
-                name: interviewData.name,
-                description: interviewData.description,
-                state: interviewData.state,
-                created_at: interviewData.created_at,
-                recommended_total: interviewData.participants?.recommended_total,
-                fullData: interviewData
-            });
-            console.log('📊 推荐用户数量:', interviewData.participants?.recommended_total || 2);
-        }
-    }, [interviewData]);
-
     // 清除草稿状态（interview 页面不需要草稿提示）
     useEffect(() => {
         setHasDraft(false);

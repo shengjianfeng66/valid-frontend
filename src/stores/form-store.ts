@@ -5,7 +5,12 @@ interface FormData {
     business_type: string;
     target_users: string;
     research_goal: string;
-    product_solution: (File & { _content?: string })[];
+    product_solution: {
+        name: string;
+        size: number;
+        type: string;
+        file_path: string;
+    }[];
 }
 
 interface AttachmentItem {

@@ -29,7 +29,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-
+import getAuthHeaders from "@/services/auth";
 // ==================== 布局组件 ====================
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { NavActions } from "@/components/sidebar/nav-actions";
@@ -49,7 +49,12 @@ interface FormData {
   business_type: string;
   target_users: string;
   research_goal: string;
-  product_solution: (File & { _content?: string })[];
+  product_solution: {
+    name: string;
+    size: number;
+    type: string;
+    file_path: string;
+  }[];
 }
 
 export default function Page() {
@@ -89,13 +94,21 @@ export default function Page() {
     const convertAttachmentsToFiles = async () => {
       const filePromises = attachments.map(async (item: any) => {
         try {
-          let file: File;
+          // 如果附件已经有file_path，直接使用
+          if (item.file_path) {
+            return {
+              name: item.name,
+              size: item.size,
+              type: item.type,
+              file_path: item.file_path
+            };
+          }
 
-          // 优先使用原始文件对象
+          // 否则需要上传到后端
+          let file: File;
           if (item.originFileObj) {
             file = item.originFileObj;
           } else if (item.url) {
-            // 备用方案：从 URL 获取文件
             const response = await fetch(item.url);
             const blob = await response.blob();
             file = new File([blob], item.name, { type: item.type });
@@ -103,16 +116,30 @@ export default function Page() {
             return null;
           }
 
-          // 读取文件内容为 base64
-          return new Promise<File & { _content?: string }>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const content = e.target?.result as string;
-              const fileWithContent = Object.assign(file, { _content: content });
-              resolve(fileWithContent);
-            };
-            reader.readAsDataURL(file);
+          // 上传文件到后端
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/v1/product/attachments/upload', {
+            method: 'POST',
+            body: formData
           });
+
+          if (!response.ok) {
+            throw new Error(`上传失败: ${response.statusText}`);
+          }
+
+          const result = await response.json();
+          if (result.success) {
+            return {
+              name: result.data.filename,
+              size: result.data.file_size,
+              type: result.data.content_type,
+              file_path: result.data.file_path
+            };
+          } else {
+            throw new Error(result.message || '上传失败');
+          }
         } catch (error) {
           console.warn('无法转换附件:', item.name, error);
           return null;
@@ -120,7 +147,7 @@ export default function Page() {
       });
 
       const files = await Promise.all(filePromises);
-      const validFiles = files.filter((f): f is File & { _content?: string } => f !== null);
+      const validFiles = files.filter((f): f is NonNullable<typeof f> => f !== null);
 
       if (validFiles.length > 0) {
         // 只有在成功转换文件后才标记为已同步
@@ -172,6 +199,12 @@ export default function Page() {
       coreFeatures: '',
       hasProductSolution: formData.product_solution && formData.product_solution.length > 0,
       productSolutionName: formData.product_solution?.map(file => file.name).join(', ') || '',
+      productSolutionFiles: formData.product_solution?.map(file => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        path: file.file_path
+      })) || []
     };
 
     useSurveyStore.getState().setSurveyInfo(surveyInfo);
@@ -442,7 +475,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
     updateField(field, value);
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -471,24 +504,51 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
       validFiles.push(file);
     }
 
-    // 批量读取文件内容
+    // 批量上传文件到后端
     if (validFiles.length > 0) {
-      const filePromises = validFiles.map((file) => {
-        return new Promise<File & { _content?: string }>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const content = e.target?.result as string;
-            const fileWithContent = Object.assign(file, { _content: content });
-            resolve(fileWithContent);
-          };
-          reader.readAsDataURL(file);
-        });
+      const uploadPromises = validFiles.map(async (file) => {
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('folder', 'product-solutions');
+          const authHeaders = await getAuthHeaders();
+          const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/api/v1/product/attachments/upload', {
+            method: 'POST',
+            headers: {
+              ...authHeaders,
+            },
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`上传失败: ${response.statusText}`);
+          }
+
+          const result = await response.json();
+          if (result.success) {
+            return {
+              name: result.data.filename,
+              size: result.data.file_size,
+              type: result.data.content_type,
+              file_path: result.data.file_path
+            };
+          } else {
+            throw new Error(result.message || '上传失败');
+          }
+        } catch (error) {
+          console.error('文件上传失败:', file.name, error);
+          alert(`文件 ${file.name} 上传失败: ${error instanceof Error ? error.message : '未知错误'}`);
+          return null;
+        }
       });
 
-      Promise.all(filePromises).then((filesWithContent) => {
+      const uploadResults = await Promise.all(uploadPromises);
+      const successfulUploads = uploadResults.filter((result): result is NonNullable<typeof result> => result !== null);
+
+      if (successfulUploads.length > 0) {
         // 添加到现有文件列表
-        updateField('product_solution', [...currentFiles, ...filesWithContent]);
-      });
+        updateField('product_solution', [...currentFiles, ...successfulUploads]);
+      }
     }
 
     // 清空 input，允许重复上传相同文件
@@ -497,15 +557,39 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
     }
   };
 
-  const handleRemoveFile = (index: number) => {
+  const handleRemoveFile = async (index: number) => {
     console.log('删除文件:', index, '当前文件数:', formData.product_solution?.length);
     const currentFiles = formData.product_solution || [];
-    const newFiles = currentFiles.filter((_, i) => i !== index);
-    console.log('删除后文件数:', newFiles.length);
+    const fileToDelete = currentFiles[index];
+    
+    if (!fileToDelete) return;
 
-    // 删除文件
+    try {
+      // 调用后端API删除文件
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/api/v1/product/attachments/delete?file_path=${encodeURIComponent(fileToDelete.file_path)}`, {
+        method: 'DELETE',
+        headers: {
+          ...(await getAuthHeaders()),
+        },
+      });
 
-    updateField('product_solution', newFiles.length > 0 ? newFiles : []);
+      if (!response.ok) {
+        throw new Error(`删除失败: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        // 从列表中移除文件
+        const newFiles = currentFiles.filter((_, i) => i !== index);
+        console.log('删除后文件数:', newFiles.length);
+        updateField('product_solution', newFiles.length > 0 ? newFiles : []);
+      } else {
+        throw new Error(result.message || '删除失败');
+      }
+    } catch (error) {
+      console.error('文件删除失败:', fileToDelete.name, error);
+      alert(`文件 ${fileToDelete.name} 删除失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
   };
 
   const handleUploadClick = () => {
