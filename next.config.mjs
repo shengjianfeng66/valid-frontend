@@ -28,7 +28,7 @@ const nextConfig = {
     if (process.env.NODE_ENV === "development") {
       return [
         {
-          source: "/api/v1/copilotkit/:path*",
+          source: "/api/copilotkit/:path*",
           destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
         },
         {
