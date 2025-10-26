@@ -1,5 +1,7 @@
 import { INTERVIEW_STATUS_CONFIG, INTERVIEWEE_STATUS_CONFIG } from "@/config";
 import type { PersonaFromAPI } from "@/types/interview";
+import { createAvatar } from "@dicebear/core";
+import { notionists } from "@dicebear/collection";
 
 // 获取状态配置（带默认值）
 export const getStatusConfig = (state: number, isInterviewee?: boolean) => {
@@ -38,10 +40,15 @@ export function transformPersonaToUser(persona: PersonaFromAPI): any {
         });
     }
 
+    // 基于 persona.id 生成唯一头像
+    const avatarSvg = createAvatar(notionists, {
+        seed: `${persona.id}`,
+    }).toDataUri();
+
     return {
         id: `api-${persona.id}`,
         name: persona.name || '未命名用户',
-        avatar: "😊",
+        avatar: avatarSvg,
         status: "等待中",
         isReal: false,
         attributes: attributes,

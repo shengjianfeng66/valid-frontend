@@ -1,23 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import useSWR from "swr"
-import { useRouter } from 'next/navigation'
-import { useSearchParams } from 'next/navigation'
-import { createClient } from "@/lib/supabase/client"
+import * as React from "react";
+import useSWR from "swr";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
-import {
-  Home,
-  Settings,
-  ChevronRight,
-  FileText,
-  User,
-} from "lucide-react"
-import { useAppContext } from "@/contexts/app"
-import { useDraft } from "@/contexts/draft"
-import { NavigationLink } from "@/components/ui/navigation-link"
-import { useTranslations } from "next-intl"
-import { Link } from "@/i18n/navigation"
+import { Home, Settings, ChevronRight, FileText, User } from "lucide-react";
+import { useAppContext } from "@/contexts/app";
+import { useDraft } from "@/contexts/draft";
+import { NavigationLink } from "@/components/ui/navigation-link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 import {
   Sidebar,
@@ -31,8 +25,8 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-} from "@/components/ui/sidebar"
-import { Switch } from "@/components/ui/switch"
+} from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
 
 // 项目类型定义
 interface Interview {
@@ -52,52 +46,59 @@ interface Interview {
 
 // fetcher 函数 - 携带 Supabase 会话 Token
 const fetcher = async (url: string): Promise<Interview[]> => {
-  const supabase = createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  const token = session?.access_token
-  url = process.env.NEXT_PUBLIC_API_URL + url
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const token = session?.access_token;
+  // url = process.env.NEXT_PUBLIC_API_URL + url;
+
   const response = await fetch(url, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  })
+  });
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
-  return response.json()
-}
+  return response.json();
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const t = useTranslations()
-  const { user } = useAppContext()
-  const { hasDraft, clearDraft } = useDraft()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const t = useTranslations();
+  const { user } = useAppContext();
+  const { hasDraft, clearDraft } = useDraft();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // 获取当前 URL 中的 interview ID
-  const currentInterviewId = searchParams.get('id') ? Number(searchParams.get('id')) : null
+  const currentInterviewId = searchParams.get("id")
+    ? Number(searchParams.get("id"))
+    : null;
 
   // 使用 SWR 获取项目列表 - 只有登录用户才发起请求
-  const { data: interviews, error, isLoading } = useSWR(
-    user ? `/api/v1/interview/list` : null,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  const {
+    data: interviews,
+    error,
+    isLoading,
+  } = useSWR(user ? `/api/v1/interview/list` : null, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   // 处理错误
   React.useEffect(() => {
     if (error) {
-      console.error('获取项目列表失败:', error);
+      console.error("获取项目列表失败:", error);
     }
   }, [error]);
 
   // 处理访谈项点击
   const handleInterviewClick = (id: number) => {
     if (hasDraft) {
-      const confirmed = window.confirm('您有未保存的更改，是否继续？');
+      const confirmed = window.confirm("您有未保存的更改，是否继续？");
       if (confirmed) {
         clearDraft();
         router.push(`/insight/interview?id=${id}`);
@@ -119,12 +120,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 onLeave={clearDraft}
                 className="flex items-center gap-2"
               >
-                <img
-                  src="/logo.png"
-                  alt="ValidFlow Logo"
-                  className="w-8"
-                />
-                <span className="text-xl font-bold text-primary">ValidFlow</span>
+                <img src="/logo.png" alt="ValidFlow Logo" className="w-8" />
+                <span className="text-xl font-bold text-primary">
+                  ValidFlow
+                </span>
               </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -135,7 +134,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 首页导航 */}
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="bg-gray-100 text-gray-900 h-12" asChild>
+            <SidebarMenuButton
+              className="bg-gray-100 text-gray-900 h-12"
+              asChild
+            >
               <NavigationLink
                 href="/dashboard"
                 hasDraft={hasDraft}
@@ -143,7 +145,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 className="flex items-center gap-2"
               >
                 <Home className="w-4 h-4" />
-                <span>{t('navigation.home')}</span>
+                <span>{t("navigation.home")}</span>
               </NavigationLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -155,10 +157,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* 项目列表 - 只有登录用户才显示 */}
         {user && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-gray-600">
-              {t('recentItems.title')}
+            <SidebarGroupLabel className="text-sm font-medium text-gray-600 px-3">
+              {t("recentItems.title")}
             </SidebarGroupLabel>
-            <SidebarGroupContent className="p-2">
+            <SidebarGroupContent className="p-0">
               <SidebarMenu>
                 {isLoading ? (
                   <div className="px-3 py-6 text-center text-sm text-gray-500">
@@ -166,35 +168,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </div>
                 ) : interviews && interviews.length > 0 ? (
                   interviews.map((interview) => {
-                    const date = new Date(interview.created_at).toLocaleDateString('zh-CN', {
-                      year: '2-digit',
-                      month: '2-digit',
-                      day: '2-digit'
-                    }).replace(/\//g, '/');
+                    const date = new Date(interview.created_at)
+                      .toLocaleDateString("zh-CN", {
+                        year: "2-digit",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                      .replace(/\//g, "/");
 
                     const isActive = currentInterviewId === interview.id;
 
                     return (
                       <SidebarMenuItem key={interview.id}>
                         <SidebarMenuButton
-                          className={`text-gray-900 ${isActive ? 'bg-primary/10 hover:bg-primary/15' : ''}`}
+                          className={`text-gray-900 ${
+                            isActive ? "bg-primary/10 hover:bg-primary/15" : ""
+                          }`}
                           asChild
                         >
                           <NavigationLink
                             href={`/insight/interview?id=${interview.id}`}
                             hasDraft={hasDraft}
                             onLeave={clearDraft}
-                            className={`flex items-center gap-3 px-3 py-6 ${isActive ? 'relative' : ''}`}
+                            className={`flex items-center gap-3 px-3 py-6 ${
+                              isActive ? "relative" : ""
+                            }`}
                           >
                             {isActive && (
                               <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
                             )}
-                            <FileText className={`w-4 h-4 ${isActive ? 'text-primary' : 'text-gray-500'}`} />
+                            <FileText
+                              className={`w-4 h-4 ${
+                                isActive ? "text-primary" : "text-gray-500"
+                              }`}
+                            />
                             <div className="flex-1 min-w-0">
-                              <div className={`text-sm font-medium truncate leading-5 ${isActive ? 'text-primary font-semibold' : ''}`}>
+                              <div
+                                className={`text-sm font-medium truncate leading-5 ${
+                                  isActive ? "text-primary font-semibold" : ""
+                                }`}
+                              >
                                 {interview.name}
                               </div>
-                              <div className={`flex items-center justify-between text-xs mt-1 leading-4 ${isActive ? 'text-primary/70' : 'text-gray-500'}`}>
+                              <div
+                                className={`flex items-center justify-between text-xs mt-1 leading-4 ${
+                                  isActive ? "text-primary/70" : "text-gray-500"
+                                }`}
+                              >
                                 <span>访谈 #{interview.id}</span>
                                 <span>{date}</span>
                               </div>
@@ -239,15 +259,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {user.name || user.email}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">2300 {t('user.points')}</span>
+            {/* <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">
+                2300 {t("user.points")}
+              </span>
               <Switch />
-            </div>
+            </div> */}
           </div>
         )}
       </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

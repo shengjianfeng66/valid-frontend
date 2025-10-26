@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LoadingAnimation } from "@/components/ui/loading-animation";
 import { Bot, Check, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -105,9 +106,10 @@ export function SimulatedUserPoolModal({
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
-                                                        {user.avatar}
-                                                    </div>
+                                                    <Avatar className="w-10 h-10">
+                                                        <AvatarImage src={user.avatar} alt={user.name} />
+                                                        <AvatarFallback className="text-lg">{user.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
                                                     <h3 className="text-sm font-semibold text-gray-900 pr-8">{user.name}</h3>
                                                 </div>
                                             </div>
