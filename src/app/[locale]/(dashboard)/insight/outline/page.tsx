@@ -187,7 +187,7 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
           <FileText className="w-5 h-5 text-purple-600" />
         </div>
         <h2 className="text-2xl font-semibold text-gray-900">{t('interview.title')}</h2>
-        <TooltipProvider>
+        {/* <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="text-blue-600 hover:text-blue-700 text-sm font-medium underline cursor-pointer">
@@ -202,7 +202,7 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
               </p>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider> */}
       </div>
 
       <div className="space-y-8">

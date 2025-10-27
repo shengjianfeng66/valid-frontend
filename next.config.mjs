@@ -1,6 +1,7 @@
 import bundleAnalyzer from "@next/bundle-analyzer";
-import createNextIntlPlugin from "next-intl/plugin";
 import { createMDX } from "fumadocs-mdx/next";
+import createNextIntlPlugin from "next-intl/plugin";
+import { codeInspectorPlugin } from "code-inspector-plugin";
 
 const withMDX = createMDX();
 
@@ -27,8 +28,12 @@ const nextConfig = {
     if (process.env.NODE_ENV === "development") {
       return [
         {
+          source: "/api/copilotkit/:path*",
+          destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
+        },
+        {
           source: "/api/v1/:path*",
-          destination: "http://validflow.airelief.cn/api/v1/:path*",
+          destination: "https://validflow.airelief.cn/api/v1/:path*",
         },
       ];
     }
@@ -37,12 +42,21 @@ const nextConfig = {
   async redirects() {
     return [];
   },
+  experimental: {
+    turbo: {
+      rules: codeInspectorPlugin({
+        bundler: "turbopack",
+        editor: "cursor",
+      }),
+    },
+  },
 };
 
 // Make sure experimental mdx flag is enabled
 const configWithMDX = {
   ...nextConfig,
   experimental: {
+    ...nextConfig.experimental,
     mdxRs: true,
   },
 };

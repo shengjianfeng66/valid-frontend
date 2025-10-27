@@ -67,7 +67,6 @@
   --sidebar-ring: oklch(0.6 0.2 300);
 }
 
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -119,4 +118,10 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+}
+
+@layer components {
+  .step-trigger {
+    @apply flex flex-col items-center gap-3 !cursor-default;
+  }
 }
