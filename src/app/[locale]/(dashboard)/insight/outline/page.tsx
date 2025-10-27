@@ -452,9 +452,6 @@ ${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
       if (!state?.tool_result) return;
 
       const { tool_result } = state;
-      
-      console.log('🔍 [调试] Agent 返回的完整 tool_result:', tool_result);
-      console.log('🔍 [调试] product_alignment 字段:', tool_result.product_alignment);
 
       // 验证数据完整性
       const hasValidData =
@@ -480,16 +477,12 @@ ${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
         sections: tool_result.sections || []
       };
 
-      console.log('🔍 [调试] 提取后的 newOutline:', newOutline);
-      console.log('🔍 [调试] newOutline.product_alignment:', newOutline.product_alignment);
-
       // 更新表单数据
       setSurveyData((prev: any) => ({
         ...prev,
         interviewOutline: newOutline
       }));
     } catch (error) {
-      console.error('❌ [调试] Agent 数据同步出错:', error);
     }
   }, [state?.tool_result, user]); // 监听 tool_result 变化和用户状态
 
@@ -522,12 +515,6 @@ ${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
         research_goal: currentSurveyInfo.userConcerns || ''
       } : undefined;
 
-      // 调试：查看 surveyData 状态
-      console.log('🔍 [调试] surveyData.interviewOutline:', surveyData.interviewOutline);
-      console.log('🔍 [调试] product_alignment:', surveyData.interviewOutline.product_alignment);
-      console.log('🔍 [调试] sections 数量:', surveyData.interviewOutline.sections.length);
-      console.log('🔍 [调试] opening_script:', surveyData.interviewOutline.opening_script);
-
       // 构建 outline 参数 - 只要有 opening_script 或 sections 就发送
       const hasOutlineData =
         surveyData.interviewOutline.opening_script.introduction?.trim() ||
@@ -548,10 +535,6 @@ ${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
           }))
         }))
       } : undefined;
-
-      console.log('🔍 [调试] 构建的 outline 参数:', outline);
-      console.log('🔍 [调试] outline.product_alignment:', outline?.product_alignment);
-      console.log('🔍 [调试] 完整创建访谈参数:', { name: '产品用户体验访谈', user_id: userId, goal, outline });
 
       // 使用 services/interview.ts 中的 createInterview 函数，包含认证 header
       const data: CreateInterviewResponse = await createInterview({
