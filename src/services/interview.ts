@@ -161,15 +161,21 @@ export async function createInterview(params: {
     goal?: any;
     outline?: any;
 }): Promise<any> {
-    console.log('创建访谈，参数:', params);
+    console.log('🔍 [调试] createInterview 接收到的参数:', params);
+    console.log('🔍 [调试] params.outline:', params.outline);
+    console.log('🔍 [调试] params.outline?.product_alignment:', params.outline?.product_alignment);
+    
     const authHeaders = await getAuthHeaders();
+    const requestBody = JSON.stringify(params);
+    console.log('🔍 [调试] 发送到后端的 JSON 字符串:', requestBody);
+    
     const response = await fetch(`${API_BASE_URL}/api/v1/interview/create`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             ...authHeaders,
         },
-        body: JSON.stringify(params)
+        body: requestBody
     });
 
     if (!response.ok) {
