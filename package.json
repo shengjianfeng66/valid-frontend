@@ -5,8 +5,8 @@
   "author": "idoubi",
   "homepage": "https://shipany.ai",
   "scripts": {
-    "local": "cross-env NODE_NO_WARNINGS=1 NODE_ENV=local next dev --turbopack",
-    "dev": "cross-env NODE_NO_WARNINGS=1 next dev --turbopack",
+    "local": "cross-env NODE_NO_WARNINGS=1 NODE_ENV=test next dev",
+    "dev": "cross-env NODE_NO_WARNINGS=1 next dev",
     "build": "next build",
     "start": "NODE_NO_WARNINGS=1 next start",
     "lint": "next lint",

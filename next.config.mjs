@@ -36,16 +36,12 @@ const nextConfig = {
           destination: "https://validflow.airelief.cn/api/v1/:path*",
         },
       ];
-    } else if (process.env.NODE_ENV === "local") {
+    } else if (process.env.NODE_ENV === "test") {
       return [
-        {
-          source: "/api/copilotkit/:path*",
-          destination: "http://127.0.0.1:8000/api/copilotkit/:path*",
-        },
         {
           source: "/api/v1/:path*",
           destination: "http://127.0.0.1:8000/api/v1/:path*",
-        },
+        }
       ];
     }
     return [];
