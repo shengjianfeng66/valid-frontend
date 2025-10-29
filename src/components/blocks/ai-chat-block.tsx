@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "@/i18n/navigation"
-import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { useTranslations } from "next-intl"
+import { useRouter } from "@/i18n/navigation"
 import { useFormStore } from "@/stores/form-store"
+import { AlignLeft, FileText, Globe, Image, MessageSquare, Sparkles } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { useEffect, useRef, useState } from "react"
+
 // 临时类型定义，直到安装 Ant Design 依赖
 type AttachmentsProps = {
   items: any[]
@@ -169,7 +169,7 @@ const Attachments = ({ ref, items, onChange, beforeUpload, placeholder, getDropC
                   )}
                   {/* 备用图标（当图片加载失败时显示） */}
                   {item.type.startsWith("image/") && (
-                    <div className="w-8 h-8 bg-blue-100 rounded border border-gray-200 flex items-center justify-center hidden">
+                    <div className="w-8 h-8 bg-blue-100 rounded border border-gray-200 flex items-center justify-center">
                       <div className="text-sm">🖼️</div>
                     </div>
                   )}

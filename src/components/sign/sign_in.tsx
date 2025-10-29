@@ -1,20 +1,17 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { useAppContext } from "@/contexts/app";
-import { useTranslations } from "next-intl";
+import { useTranslations } from "next-intl"
+import { Button } from "@/components/ui/button"
+
+import { useAppContext } from "@/contexts/app"
 
 export default function SignIn() {
-  const t = useTranslations();
-  const { setShowSignModal } = useAppContext();
+  const t = useTranslations()
+  const { setShowSignModal } = useAppContext()
 
   return (
-    <Button
-      variant="default"
-      onClick={() => setShowSignModal(true)}
-      className="cursor-pointer"
-    >
+    <Button variant="default" onClick={() => setShowSignModal(true)} className="cursor-pointer">
       {t("user.sign_in")}
     </Button>
-  );
+  )
 }

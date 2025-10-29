@@ -1,7 +1,7 @@
 import bundleAnalyzer from "@next/bundle-analyzer"
+import { codeInspectorPlugin } from "code-inspector-plugin"
 import { createMDX } from "fumadocs-mdx/next"
 import createNextIntlPlugin from "next-intl/plugin"
-import { codeInspectorPlugin } from "code-inspector-plugin"
 
 const withMDX = createMDX()
 
@@ -37,14 +37,7 @@ const nextConfig = {
       return []
     } else {
       return [
-        {
-          source: "/api/copilotkit",
-          destination: `${origin}/copilotkit/`,
-        },
-        {
-          source: "/api/copilotkit/:path*",
-          destination: `${origin}/copilotkit/:path*`,
-        },
+        // /api/copilotkit 现在由 API Route 处理，不需要rewrite
         {
           source: "/api/v1/:path*",
           destination: `${origin}/api/v1/:path*`,
