@@ -42,7 +42,7 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
               <h3 className="text-base font-semibold text-gray-900">{user.name}</h3>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="text-gray-400 hover:text-gray-600">
+                  <button className="text-gray-400 hover:text-gray-600" onClick={(e) => e.stopPropagation()}>
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                     </svg>
@@ -55,7 +55,7 @@ export function UserCard({ user, onViewDetails, onRemoveUser, canRemove = true }
                   {canRemove && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onRemoveUser(user.id)} className="justify-center cursor-pointer">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRemoveUser(user.id); }} className="justify-center cursor-pointer">
                         {t("userCard.actions.remove")}
                       </DropdownMenuItem>
                     </>
