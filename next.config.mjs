@@ -56,6 +56,7 @@ const nextConfig = {
       rules: codeInspectorPlugin({
         bundler: "turbopack",
         editor: "cursor",
+        dev: process.env.NODE_ENV === "local" || process.env.NODE_ENV === "development",
       }),
     },
   },
