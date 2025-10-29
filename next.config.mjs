@@ -38,6 +38,10 @@ const nextConfig = {
     } else {
       return [
         {
+          source: "/api/copilotkit",
+          destination: `${origin}/copilotkit/`,
+        },
+        {
           source: "/api/copilotkit/:path*",
           destination: `${origin}/copilotkit/:path*`,
         },

@@ -17,6 +17,9 @@ export default async function Layout({ children }: { children: ReactNode }) {
   } = await supabase.auth.getSession();
   const token = session?.access_token;
 
+  console.log("🚀 [DEBUG] - token:", token)
+
+
   return (
     <CopilotKit
       runtimeUrl={runtimeUrl}
