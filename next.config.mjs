@@ -39,7 +39,7 @@ const nextConfig = {
       return [
         {
           source: "/api/copilotkit/:path*",
-          destination: `${origin}/api/copilotkit/:path*`,
+          destination: `${origin}/copilotkit/:path*`,
         },
         {
           source: "/api/v1/:path*",
