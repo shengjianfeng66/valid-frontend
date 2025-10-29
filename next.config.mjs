@@ -25,30 +25,28 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    if (process.env.NODE_ENV === "development") {
+    const defaultOrigin = "https://validflow.airelief.cn"
+    const devOrigin = {
+      local: "http://127.0.0.1:8000",
+      development: "https://validflow.airelief.cn",
+    }
+
+    const origin = devOrigin[process.env.NODE_ENV] || defaultOrigin
+
+    if (process.env.NODE_ENV === "production") {
+      return []
+    } else {
       return [
         {
           source: "/api/copilotkit/:path*",
-          destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
+          destination: `${origin}/api/copilotkit/:path*`,
         },
         {
           source: "/api/v1/:path*",
-          destination: "https://validflow.airelief.cn/api/v1/:path*",
-        },
-      ]
-    } else if (process.env.NODE_ENV === "local") {
-      return [
-        {
-          source: "/api/copilotkit/:path*",
-          destination: "http://127.0.0.1:8000/api/copilotkit/:path*",
-        },
-        {
-          source: "/api/v1/:path*",
-          destination: "http://127.0.0.1:8000/api/v1/:path*",
+          destination: `${origin}/api/v1/:path*`,
         },
       ]
     }
-    return []
   },
   async redirects() {
     return []
