@@ -1,17 +1,17 @@
-import bundleAnalyzer from "@next/bundle-analyzer";
-import { createMDX } from "fumadocs-mdx/next";
-import createNextIntlPlugin from "next-intl/plugin";
-import { codeInspectorPlugin } from "code-inspector-plugin";
+import bundleAnalyzer from "@next/bundle-analyzer"
+import { createMDX } from "fumadocs-mdx/next"
+import createNextIntlPlugin from "next-intl/plugin"
+import { codeInspectorPlugin } from "code-inspector-plugin"
 
-const withMDX = createMDX();
+const withMDX = createMDX()
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
-});
+})
 
-const withNextIntl = createNextIntlPlugin();
+const withNextIntl = createNextIntlPlugin()
 
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const nextConfig = {
   output: "standalone",
   reactStrictMode: false,
@@ -28,19 +28,30 @@ const nextConfig = {
     if (process.env.NODE_ENV === "development") {
       return [
         {
-          source: "/api/v1/copilotkit/:path*",
+          source: "/api/copilotkit/:path*",
           destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
         },
         {
           source: "/api/v1/:path*",
           destination: "https://validflow.airelief.cn/api/v1/:path*",
         },
-      ];
+      ]
+    } else if (process.env.NODE_ENV === "local") {
+      return [
+        {
+          source: "/api/copilotkit/:path*",
+          destination: "http://127.0.0.1:8000/api/copilotkit/:path*",
+        },
+        {
+          source: "/api/v1/:path*",
+          destination: "http://127.0.0.1:8000/api/v1/:path*",
+        },
+      ]
     }
-    return [];
+    return []
   },
   async redirects() {
-    return [];
+    return []
   },
   experimental: {
     turbo: {
@@ -50,7 +61,7 @@ const nextConfig = {
       }),
     },
   },
-};
+}
 
 // Make sure experimental mdx flag is enabled
 const configWithMDX = {
@@ -59,6 +70,6 @@ const configWithMDX = {
     ...nextConfig.experimental,
     mdxRs: true,
   },
-};
+}
 
-export default withBundleAnalyzer(withNextIntl(withMDX(configWithMDX)));
+export default withBundleAnalyzer(withNextIntl(withMDX(configWithMDX)))
