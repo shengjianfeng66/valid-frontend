@@ -112,6 +112,7 @@ export default function InterviewPage() {
     interviewData?.id || null,
     1, // 固定第一页
     !!interviewData && !shouldUseRecommend,
+    interviewState === 1 ? 3000 : 0, // 进行中每3秒轮询刷新
   )
 
   // 转换推荐用户数据，并过滤掉已删除的
@@ -185,15 +186,15 @@ export default function InterviewPage() {
     }
   }, [error])
 
-    // 处理访谈详情错误
-    useEffect(() => {
-        if (interviewError) {
-            console.error('❌ 获取访谈详情失败:', interviewError);
-            toast.error('获取访谈详情失败', {
-                description: '请检查后端服务是否正常运行'
-            });
-        }
-    }, [interviewError]);
+  // 处理访谈详情错误
+  useEffect(() => {
+    if (interviewError) {
+      console.error("❌ 获取访谈详情失败:", interviewError)
+      toast.error("获取访谈详情失败", {
+        description: "请检查后端服务是否正常运行",
+      })
+    }
+  }, [interviewError])
 
   // 清除草稿状态（interview 页面不需要草稿提示）
   useEffect(() => {
