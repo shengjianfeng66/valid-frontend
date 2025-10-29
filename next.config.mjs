@@ -39,13 +39,20 @@ const nextConfig = {
       return [
         {
           source: "/api/copilotkit/:path*",
-          destination: `${origin}/api/copilotkit/:path*`,
+          destination: "https://validflow.airelief.cn/api/copilotkit/:path*",
         },
         {
           source: "/api/v1/:path*",
           destination: `${origin}/api/v1/:path*`,
         },
-      ]
+      ];
+    } else if (process.env.NODE_ENV === "test") {
+      return [
+        {
+          source: "/api/v1/:path*",
+          destination: "http://127.0.0.1:8000/api/v1/:path*",
+        }
+      ];
     }
   },
   async redirects() {

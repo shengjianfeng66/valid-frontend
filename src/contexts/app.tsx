@@ -33,7 +33,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
   // 将 Supabase User 转换为应用 User 类型
   const convertSupabaseUserToAppUser = (supabaseUser: SupabaseUser): User => {
-    console.log("🚀 ~ convertSupabaseUserToAppUser ~ supabaseUser:", supabaseUser)
     const metadata = supabaseUser.user_metadata || {};
     const email = supabaseUser.email || '';
 
@@ -57,15 +56,12 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
   // 监听 Supabase Auth 状态变化
   useEffect(() => {
-    console.log("🚀 ~ useEffect ~ isAuthEnabled:", isAuthEnabled())
-
     if (!isAuthEnabled()) return;
 
     // 获取当前用户
     supabase.auth.getUser().then(({ data: { user: supabaseUser } }) => {
       if (supabaseUser) {
         const appUser = convertSupabaseUserToAppUser(supabaseUser);
-        console.log("🚀 ~ supabase.auth.getUser ~ appUser:", appUser)
         setUser(appUser);
       }
     });

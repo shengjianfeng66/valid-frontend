@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// 文件数据接口
+export interface FileData {
+    name: string;
+    size: number;
+    type: string;
+    path: string; // 文件路径，替代原来的base64 content
+}
+
 // 调研信息接口
 export interface SurveyInfo {
     product_name: string;
@@ -10,6 +18,7 @@ export interface SurveyInfo {
     coreFeatures: string;
     hasProductSolution?: boolean;
     productSolutionName?: string;
+    productSolutionFiles?: FileData[]; // 添加文件数据
 }
 
 // 访谈数据接口
