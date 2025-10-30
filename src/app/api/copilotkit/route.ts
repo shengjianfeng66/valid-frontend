@@ -12,6 +12,7 @@ const endpointUrl = process.env.NEXT_PUBLIC_COPILOTKIT_LANGGRAPH_ENDPOINT_URL ||
 
 const runtimeUrl = process.env.NEXT_PUBLIC_COPILOTKIT_ENDPOINT_RUNTIME_URL || "http://127.0.0.1:8000/copilotkit"
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+console.log("🚀 [DEBUG]  - OPENAI_API_KEY:", OPENAI_API_KEY)
 const OPENAI_API_BASE = process.env.OPENAI_API_BASE
 const OPENAI_API_MODEL = process.env.OPENAI_API_MODEL
 
