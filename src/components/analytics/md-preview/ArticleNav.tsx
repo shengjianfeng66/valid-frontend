@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react"
-import { Anchor } from "antd"
+
+interface AnchorItem {
+  key: string;
+  href: string;
+  title: string;
+  level: number;
+  children?: AnchorItem[];
+}
 
 export const ArticleNav: React.FC = () => {
   // 生成锚点列表
-  let [anchorList, setAnchorList] = useState([])
+  const [anchorList, setAnchorList] = useState<AnchorItem[]>([])
+  const [activeId, setActiveId] = useState<string>("")
+
+  console.log("🚀 ~ anchorList:", anchorList)
   const generateAnchorList = (hNodeList: Array<HTMLElement>) => {
     if (hNodeList.length == 0) return []
     // 最终生成的列表
@@ -66,24 +76,90 @@ export const ArticleNav: React.FC = () => {
     return anchorList
   }
 
+  // 监听滚动，更新激活的锚点
   useEffect(() => {
-    let hNodeList: any = document.querySelectorAll(".heading")
-    //@ts-ignore
-    setAnchorList(generateAnchorList(hNodeList))
-    generateAnchorList(hNodeList)
+    const handleScroll = () => {
+      const headings = document.querySelectorAll<HTMLElement>(".heading")
+      const scrollTop = window.scrollY || document.documentElement.scrollTop
+
+      let currentId = ""
+      headings.forEach((heading) => {
+        const rect = heading.getBoundingClientRect()
+        if (rect.top <= 100) {
+          currentId = heading.id
+        }
+      })
+
+      if (currentId) {
+        setActiveId(currentId)
+      }
+    }
+
+    const scrollContainer = document.querySelector('[role="tabpanel"][data-state="active"]')
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll)
+      return () => scrollContainer.removeEventListener("scroll", handleScroll)
+    }
+  }, [anchorList])
+
+  useEffect(() => {
+    // 延迟执行，确保 MdPreview 组件已经渲染完成
+    const timer = setTimeout(() => {
+      const hNodeList = document.querySelectorAll<HTMLElement>(".heading")
+      console.log("🔍 Found heading elements:", hNodeList.length)
+      const anchors = generateAnchorList(Array.from(hNodeList))
+      setAnchorList(anchors)
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [])
 
-  return (
-    <>
-      <Anchor
-        items={anchorList}
-        affix={false}
-        // 这里把滚动的容器的类名改成自己的
+  // 渲染目录项
+  const renderAnchorItem = (item: AnchorItem, depth: number = 0) => {
+    const isActive = activeId === item.href.slice(1) // 移除 # 号
 
-        //@ts-ignore
-        getContainer={() => document.querySelector(".basic_layout_container")}
-      ></Anchor>
-    </>
+    return (
+      <div key={item.key}>
+        <a
+          href={item.href}
+          className={`
+            block py-1.5 text-sm transition-colors
+            ${depth === 0 ? "pl-0" : `pl-${depth * 3}`}
+            ${isActive
+              ? "text-primary font-medium border-l-2 border-primary -ml-0.5 pl-2"
+              : "text-gray-600 hover:text-gray-900 border-l-2 border-transparent -ml-0.5 pl-2"
+            }
+          `}
+          onClick={(e) => {
+            e.preventDefault()
+            const target = document.querySelector(item.href)
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" })
+              setActiveId(item.href.slice(1))
+            }
+          }}
+        >
+          <span className="line-clamp-2">{item.title}</span>
+        </a>
+        {item.children && item.children.length > 0 && (
+          <div className="ml-3">
+            {item.children.map((child) => renderAnchorItem(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <nav className="space-y-1" aria-label="文档目录">
+      {anchorList.length > 0 ? (
+        <>
+          {anchorList.map((item) => renderAnchorItem(item, 0))}
+        </>
+      ) : (
+        <div className="text-sm text-gray-500">正在加载目录...</div>
+      )}
+    </nav>
   )
 }
 

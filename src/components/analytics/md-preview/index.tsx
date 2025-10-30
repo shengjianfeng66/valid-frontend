@@ -65,42 +65,42 @@ const MdPreview: React.FC<Props> = ({ content }) => {
           },
           h1({ children }) {
             return (
-              <h1 id={"heading-" + ++index} className="text-3xl font-semibold mt-6 mb-2">
+              <h1 id={"heading-" + ++index} className="heading text-3xl font-semibold mt-6 mb-2">
                 {children}
               </h1>
             )
           },
           h2({ children }) {
             return (
-              <h2 id={"heading-" + ++index} className="text-2xl font-semibold mt-6 mb-2">
+              <h2 id={"heading-" + ++index} className="heading text-2xl font-semibold mt-6 mb-2">
                 {children}
               </h2>
             )
           },
           h3({ children }) {
             return (
-              <h3 id={"heading-" + ++index} className="text-xl font-semibold mt-5 mb-2">
+              <h3 id={"heading-" + ++index} className="heading text-xl font-semibold mt-5 mb-2">
                 {children}
               </h3>
             )
           },
           h4({ children }) {
             return (
-              <h4 id={"heading-" + ++index} className="text-lg font-semibold mt-4 mb-2">
+              <h4 id={"heading-" + ++index} className="heading text-lg font-semibold mt-4 mb-2">
                 {children}
               </h4>
             )
           },
           h5({ children }) {
             return (
-              <h5 id={"heading-" + ++index} className="text-base font-semibold mt-3 mb-1.5">
+              <h5 id={"heading-" + ++index} className="heading text-base font-semibold mt-3 mb-1.5">
                 {children}
               </h5>
             )
           },
           h6({ children }) {
             return (
-              <h6 id={"heading-" + ++index} className="text-sm font-semibold mt-2 mb-1">
+              <h6 id={"heading-" + ++index} className="heading text-sm font-semibold mt-2 mb-1">
                 {children}
               </h6>
             )

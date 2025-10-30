@@ -61,7 +61,7 @@ const fetcher = async (url: string): Promise<Interview[]> => {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    // throw new Error(`HTTP error! status: ${response.status}`);
   }
   return response.json();
 };
@@ -181,39 +181,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     return (
                       <SidebarMenuItem key={interview.id}>
                         <SidebarMenuButton
-                          className={`text-gray-900 ${
-                            isActive ? "bg-primary/10 hover:bg-primary/15" : ""
-                          }`}
+                          className={`text-gray-900 ${isActive ? "bg-primary/10 hover:bg-primary/15" : ""
+                            }`}
                           asChild
                         >
                           <NavigationLink
                             href={`/insight/interview?id=${interview.id}`}
                             hasDraft={hasDraft}
                             onLeave={clearDraft}
-                            className={`flex items-center gap-3 px-3 py-6 ${
-                              isActive ? "relative" : ""
-                            }`}
+                            className={`flex items-center gap-3 px-3 py-6 ${isActive ? "relative" : ""
+                              }`}
                           >
                             {isActive && (
                               <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
                             )}
                             <FileText
-                              className={`w-4 h-4 ${
-                                isActive ? "text-primary" : "text-gray-500"
-                              }`}
+                              className={`w-4 h-4 ${isActive ? "text-primary" : "text-gray-500"
+                                }`}
                             />
                             <div className="flex-1 min-w-0">
                               <div
-                                className={`text-sm font-medium truncate leading-5 ${
-                                  isActive ? "text-primary font-semibold" : ""
-                                }`}
+                                className={`text-sm font-medium truncate leading-5 ${isActive ? "text-primary font-semibold" : ""
+                                  }`}
                               >
                                 {interview.name}
                               </div>
                               <div
-                                className={`flex items-center justify-between text-xs mt-1 leading-4 ${
-                                  isActive ? "text-primary/70" : "text-gray-500"
-                                }`}
+                                className={`flex items-center justify-between text-xs mt-1 leading-4 ${isActive ? "text-primary/70" : "text-gray-500"
+                                  }`}
                               >
                                 <span>访谈 #{interview.id}</span>
                                 <span>{date}</span>

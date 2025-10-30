@@ -3,6 +3,9 @@
 import { Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from 'react-markdown';
+import MdPreview from "./md-preview";
+import mockMarkdown from "./md-preview/content.js";
+import ArticleNav from "./md-preview/ArticleNav";
 
 interface Report {
     type: number; // 0: 真人用户报告, 1: 模拟用户报告
@@ -22,22 +25,6 @@ export function ReportTab({ isLoading, error, reports }: ReportTabProps) {
                 <div className="flex flex-col items-center gap-3">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     <p className="text-sm text-gray-500">加载报告中...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="bg-white rounded-b-lg shadow-sm flex items-center justify-center py-20">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </div>
-                    <p className="text-sm font-medium text-gray-900">加载失败</p>
-                    <p className="text-xs text-gray-500">请检查后端服务是否正常运行</p>
                 </div>
             </div>
         );
@@ -70,23 +57,44 @@ export function ReportTab({ isLoading, error, reports }: ReportTabProps) {
                             className="data-[state=active]:bg-primary data-[state=active]:text-white"
                             disabled={!reports.some(r => r.type === 1)}
                         >
-                            🤖 模拟用户报告
+                            模拟用户报告
                         </TabsTrigger>
                         <TabsTrigger
                             value="real"
                             className="data-[state=active]:bg-primary data-[state=active]:text-white"
                             disabled={!reports.some(r => r.type === 0)}
                         >
-                            👤 真人用户报告
+                            真人用户报告
                         </TabsTrigger>
                     </TabsList>
                 </div>
 
                 {/* 模拟用户报告 */}
-                <TabsContent value="simulated" className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
+                <TabsContent value="simulated" className="flex-1 overflow-y-auto scrollbar-hide">
                     {reports.find(r => r.type === 1) ? (
-                        <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
-                            <ReactMarkdown>{reports.find(r => r.type === 1)!.report}</ReactMarkdown>
+                        <div className="flex gap-6 px-6 py-6">
+                            {/* 左侧目录导航 */}
+                            <aside className="hidden lg:block w-64 shrink-0">
+                                <div className="sticky top-6">
+                                    <div className="text-sm font-semibold mb-4 text-gray-900 pb-2 border-b border-gray-200">目录</div>
+                                    <div className="max-h-[calc(100vh-12rem)] overflow-y-auto pr-2 
+                                                    [&::-webkit-scrollbar]:w-1.5
+                                                    [&::-webkit-scrollbar-track]:bg-transparent
+                                                    [&::-webkit-scrollbar-thumb]:bg-gray-300
+                                                    [&::-webkit-scrollbar-thumb]:rounded-full
+                                                    hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                                        <ArticleNav />
+                                    </div>
+                                </div>
+                            </aside>
+                            {/* 主内容区 */}
+                            <div className="flex-1 min-w-0 prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
+                                {/* <ReactMarkdown>{reports.find(r => r.type === 1)!.report}</ReactMarkdown> */}
+                                <MdPreview
+                                    // content={mockMarkdown}
+                                    content={reports.find(r => r.type === 1)?.report || ""}
+                                />
+                            </div>
                         </div>
                     ) : (
                         <div className="flex items-center justify-center py-20">
@@ -105,8 +113,29 @@ export function ReportTab({ isLoading, error, reports }: ReportTabProps) {
                 {/* 真人用户报告 */}
                 <TabsContent value="real" className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
                     {reports.find(r => r.type === 0) ? (
-                        <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
-                            <ReactMarkdown>{reports.find(r => r.type === 0)!.report}</ReactMarkdown>
+                        <div className="flex gap-6 px-6 py-6">
+                            {/* 左侧目录导航 */}
+                            <aside className="hidden lg:block w-64 shrink-0">
+                                <div className="sticky top-6">
+                                    <div className="text-sm font-semibold mb-4 text-gray-900 pb-2 border-b border-gray-200">目录</div>
+                                    <div className="max-h-[calc(100vh-12rem)] overflow-y-auto pr-2 
+                                                    [&::-webkit-scrollbar]:w-1.5
+                                                    [&::-webkit-scrollbar-track]:bg-transparent
+                                                    [&::-webkit-scrollbar-thumb]:bg-gray-300
+                                                    [&::-webkit-scrollbar-thumb]:rounded-full
+                                                    hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
+                                        <ArticleNav />
+                                    </div>
+                                </div>
+                            </aside>
+                            {/* 主内容区 */}
+                            <div className="flex-1 min-w-0 prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:text-gray-700">
+                                {/* <ReactMarkdown>{reports.find(r => r.type === 1)!.report}</ReactMarkdown> */}
+                                <MdPreview
+                                    // content={mockMarkdown}
+                                    content={reports.find(r => r.type === 0)?.report || ""}
+                                />
+                            </div>
                         </div>
                     ) : (
                         <div className="flex items-center justify-center py-20">
