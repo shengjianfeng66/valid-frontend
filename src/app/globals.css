@@ -18,11 +18,11 @@
   @apply mx-auto max-w-7xl px-4 md:px-8;
 }
 
-input,
+/* input,
 select,
 textarea {
   @apply border-border outline-ring/50 bg-background;
-}
+} */
 
 button {
   @apply cursor-pointer border-border outline-ring/50;
@@ -33,7 +33,6 @@ pre {
 }
 
 @theme inline {
-
   --color-destructive-foreground: var(--destructive-foreground);
 
   --color-sidebar-ring: var(--sidebar-ring);
@@ -54,7 +53,6 @@ pre {
 }
 
 :root {
-
   --destructive-foreground: oklch(1 0 0);
 
   --sidebar: hsl(0 0% 98%);
@@ -75,7 +73,6 @@ pre {
 }
 
 .dark {
-
   --destructive-foreground: oklch(1 0 0);
 
   --sidebar: hsl(240 5.9% 10%);
@@ -115,12 +112,12 @@ button[title="Thumbs down"] {
 
 /* 隐藏滚动条 */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* NProgress 进度条自定义样式 */
@@ -144,7 +141,9 @@ button[title="Thumbs down"] {
   right: 0px;
   width: 100px;
   height: 100%;
-  box-shadow: 0 0 10px oklch(0.6 0.2 300), 0 0 5px oklch(0.6 0.2 300);
-  opacity: 1.0;
+  box-shadow:
+    0 0 10px oklch(0.6 0.2 300),
+    0 0 5px oklch(0.6 0.2 300);
+  opacity: 1;
   transform: rotate(3deg) translate(0px, -4px);
 }

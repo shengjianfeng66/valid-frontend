@@ -14,7 +14,7 @@ import {
 } from "@/components/stepper"
 
 interface InsightStepperProps {
-  /** 当前步骤 (1: 目标设定, 2: 访谈大纲, 3: 用户访谈) */
+  /** 当前步骤 (1: 目标设定，2: 访谈大纲，3: 用户访谈) */
   currentStep: number
   /** 可选的步骤点击回调（用于导航功能） */
   onStepClick?: (step: number) => void
@@ -31,7 +31,7 @@ export function InsightStepper({ currentStep, onStepClick, translationNamespace 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm px-6 py-6">
+    <div className="bg-background rounded-lg shadow-sm px-6 py-6">
       <Stepper value={currentStep} className="w-full">
         <StepperNav className="flex justify-between items-center">
           {/* 步骤 1: 目标设定 */}

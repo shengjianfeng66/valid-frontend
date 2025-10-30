@@ -18,7 +18,10 @@
     "editor.codeActionsOnSave": {
       "source.addMissingImports.ts": "always",
       "source.fixAll.ts": "always",
-      "source.organizeImports": "never"
+      "source.organizeImports": "never",
+      "source.biome": "always",
+      "source.fixAll.biome": "always",
+      "source.organizeImports.biome": "always"
     }
   }
 }

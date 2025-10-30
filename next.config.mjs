@@ -1,7 +1,7 @@
 import bundleAnalyzer from "@next/bundle-analyzer"
+import { codeInspectorPlugin } from "code-inspector-plugin"
 import { createMDX } from "fumadocs-mdx/next"
 import createNextIntlPlugin from "next-intl/plugin"
-import { codeInspectorPlugin } from "code-inspector-plugin"
 
 const withMDX = createMDX()
 
@@ -44,7 +44,7 @@ const nextConfig = {
     turbo: {
       rules: codeInspectorPlugin({
         bundler: "turbopack",
-        editor: "cursor",
+        editor: "code",
         dev: process.env.NODE_ENV !== "production",
       }),
     },

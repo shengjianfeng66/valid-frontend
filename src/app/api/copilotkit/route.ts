@@ -1,12 +1,13 @@
-import { createServerClient } from "@/lib/supabase"
 import {
   CopilotRuntime,
   copilotRuntimeNextJSAppRouterEndpoint,
-  GraphQLContext,
+  type GraphQLContext,
   OpenAIAdapter,
 } from "@copilotkit/runtime"
-import { NextRequest } from "next/server"
+import type { NextRequest } from "next/server"
 import OpenAI from "openai"
+import { createServerClient } from "@/lib/supabase"
+
 const endpointUrl = process.env.NEXT_PUBLIC_COPILOTKIT_LANGGRAPH_ENDPOINT_URL || "/copilotkit"
 
 const runtimeUrl = process.env.NEXT_PUBLIC_COPILOTKIT_ENDPOINT_RUNTIME_URL || "http://127.0.0.1:8000/copilotkit"
