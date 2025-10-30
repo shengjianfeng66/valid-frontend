@@ -44,7 +44,12 @@ interface FormData {
   }[]
 }
 
-function useFrontendTools(fileInputRef: React.RefObject<HTMLInputElement>) {
+/**
+ * 智能操作按钮
+ *
+ * @param fileInputRef
+ */
+function useFrontendTools(fileInputRef: React.RefObject<HTMLInputElement | null>) {
   const t = useTranslations("goal")
 
   const { formData, updateField, setFormData, clearForm } = useFormStore()
@@ -226,7 +231,6 @@ export default function Page() {
             throw new Error(result.message || "上传失败")
           }
         } catch (error) {
-          console.warn("无法转换附件：", item.name, error)
           return null
         }
       })
@@ -460,7 +464,7 @@ export default function Page() {
 }
 
 interface SurveyFormProps {
-  fileInputRef: React.RefObject<HTMLInputElement>
+  fileInputRef: React.RefObject<HTMLInputElement | null>
 }
 
 function SurveyForm({ fileInputRef }: SurveyFormProps) {
@@ -532,7 +536,6 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             throw new Error(result.message || "上传失败")
           }
         } catch (error) {
-          console.error("文件上传失败：", file.name, error)
           alert(`文件 ${file.name} 上传失败：${error instanceof Error ? error.message : "未知错误"}`)
           return null
         }
@@ -554,7 +557,6 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
   }
 
   const handleRemoveFile = async (index: number) => {
-    console.log("删除文件：", index, "当前文件数：", formData.product_solution?.length)
     const currentFiles = formData.product_solution || []
     const fileToDelete = currentFiles[index]
 
@@ -581,13 +583,11 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
       if (result.success) {
         // 从列表中移除文件
         const newFiles = currentFiles.filter((_, i) => i !== index)
-        console.log("删除后文件数：", newFiles.length)
         updateField("product_solution", newFiles.length > 0 ? newFiles : [])
       } else {
         throw new Error(result.message || "删除失败")
       }
     } catch (error) {
-      console.error("文件删除失败：", fileToDelete.name, error)
       alert(`文件 ${fileToDelete.name} 删除失败：${error instanceof Error ? error.message : "未知错误"}`)
     }
   }

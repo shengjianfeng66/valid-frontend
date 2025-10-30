@@ -23,5 +23,16 @@
       "source.fixAll.biome": "always",
       "source.organizeImports.biome": "always"
     }
-  }
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "i18n-ally.localesPaths": [
+    "src/i18n",
+    "src/i18n/pages"
+  ],
+  "i18n-ally.dirStructure": "file",
+  "i18n-ally.namespace": true,
+  "i18n-ally.pathMatcher": "{namespace}/{locale}.{ext}",
+  "i18n-ally.keystyle": "nested",
 }
