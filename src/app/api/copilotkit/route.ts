@@ -7,8 +7,6 @@ import {
 } from "@copilotkit/runtime"
 import { NextRequest } from "next/server"
 import OpenAI from "openai"
-const deploymentUrl = process.env.NEXT_PUBLIC_COPILOTKIT_LANGGRAPH_DEPLOYMENT_URL || "http://127.0.0.1:8000/copilotkit";
-
 const endpointUrl = process.env.NEXT_PUBLIC_COPILOTKIT_LANGGRAPH_ENDPOINT_URL || "/copilotkit";
 
 
@@ -24,7 +22,7 @@ const llmAdapter = new OpenAIAdapter({
 } as any)
 
 export const POST = async (req: NextRequest) => {
-  
+
   try {
     const supabase = await createServerClient()
     const {
