@@ -1,40 +1,32 @@
-"use client";
+"use client"
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "@/i18n/navigation";
-import {
-  MessageSquare,
-  FileText,
-  AlignLeft,
-  Globe,
-  Youtube,
-  Image,
-  Sparkles,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useTranslations } from "next-intl";
-import { useFormStore } from "@/stores/form-store";
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "@/i18n/navigation"
+import { MessageSquare, FileText, AlignLeft, Globe, Youtube, Image, Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { useTranslations } from "next-intl"
+import { useFormStore } from "@/stores/form-store"
 // 临时类型定义，直到安装 Ant Design 依赖
 type AttachmentsProps = {
-  items: any[];
-  onChange: (params: { fileList: any[] }) => void;
-  beforeUpload: () => boolean;
-  placeholder: (type: string) => any;
-  getDropContainer: () => HTMLElement | null;
-};
+  items: any[]
+  onChange: (params: { fileList: any[] }) => void
+  beforeUpload: () => boolean
+  placeholder: (type: string) => any
+  getDropContainer: () => HTMLElement | null
+}
 
 type SenderProps = {
-  ref: any;
-  header: React.ReactNode;
-  prefix: React.ReactNode;
-  value: string;
-  onChange: (value: string) => void;
-  onPasteFile: (e: any, files: File[]) => void;
-  onSubmit: () => void;
-  loading: boolean;
-  placeholder: string;
-};
+  ref: any
+  header: React.ReactNode
+  prefix: React.ReactNode
+  value: string
+  onChange: (value: string) => void
+  onPasteFile: (e: any, files: File[]) => void
+  onSubmit: () => void
+  loading: boolean
+  placeholder: string
+}
 
 // 允许的文件类型
 const ALLOWED_FILE_TYPES = [
@@ -47,34 +39,28 @@ const ALLOWED_FILE_TYPES = [
   "image/svg+xml",
   "image/bmp",
   "image/tiff",
-];
+]
 
 // 检查文件类型是否允许
 const isFileTypeAllowed = (file: File): boolean => {
-  return ALLOWED_FILE_TYPES.includes(file.type.toLowerCase());
-};
+  return ALLOWED_FILE_TYPES.includes(file.type.toLowerCase())
+}
 
 // 获取文件类型错误信息
 const getFileTypeError = (file: File): string => {
   if (file.type.startsWith("image/")) {
-    return `图片格式不支持，请使用 JPG、PNG、GIF、WebP、SVG、BMP、TIFF 格式`;
+    return `图片格式不支持，请使用 JPG、PNG、GIF、WebP、SVG、BMP、TIFF 格式`
   } else if (file.type === "application/pdf") {
-    return `文件类型不支持，请使用 PDF 或图片格式`;
+    return `文件类型不支持，请使用 PDF 或图片格式`
   } else {
-    return `文件类型不支持，请使用 PDF 或图片格式`;
+    return `文件类型不支持，请使用 PDF 或图片格式`
   }
-};
+}
 
 // 临时组件定义
-const CloudUploadOutlined = () => <span>📁</span>;
+const CloudUploadOutlined = () => <span>📁</span>
 const LinkOutlined = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 24 24">
     <path
       fill="currentColor"
       fillRule="evenodd"
@@ -82,10 +68,8 @@ const LinkOutlined = () => (
       clipRule="evenodd"
     ></path>
   </svg>
-);
-const App = ({ children }: { children: React.ReactNode }) => (
-  <div>{children}</div>
-);
+)
+const App = ({ children }: { children: React.ReactNode }) => <div>{children}</div>
 const AntButton = ({ type, icon, onClick }: any) => (
   <button
     onClick={onClick}
@@ -94,78 +78,69 @@ const AntButton = ({ type, icon, onClick }: any) => (
   >
     {icon}
   </button>
-);
+)
 const Flex = ({ children, style, align }: any) => (
   <div style={style} className={`flex items-${align}`}>
     {children}
   </div>
-);
+)
 
 // 临时 Attachments 组件
-const Attachments = ({
-  ref,
-  items,
-  onChange,
-  beforeUpload,
-  placeholder,
-  getDropContainer,
-}: any) => {
+const Attachments = ({ ref, items, onChange, beforeUpload, placeholder, getDropContainer }: any) => {
   const removeItem = (uid: string) => {
-    const newItems = items.filter((item: any) => item.uid !== uid);
-    onChange({ fileList: newItems });
-  };
+    const newItems = items.filter((item: any) => item.uid !== uid)
+    onChange({ fileList: newItems })
+  }
 
   // 获取文件图标
   const getFileIcon = (type: string) => {
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.includes("pdf")) return "📄";
-    if (type.includes("word") || type.includes("document")) return "📝";
-    if (type.includes("excel") || type.includes("spreadsheet")) return "📊";
-    if (type.includes("powerpoint") || type.includes("presentation"))
-      return "📽️";
-    if (type.includes("text")) return "📃";
-    if (type.includes("video")) return "🎥";
-    if (type.includes("audio")) return "🎵";
-    if (type.includes("zip") || type.includes("rar")) return "📦";
-    return "📄";
-  };
+    if (type.startsWith("image/")) return "🖼️"
+    if (type.includes("pdf")) return "📄"
+    if (type.includes("word") || type.includes("document")) return "📝"
+    if (type.includes("excel") || type.includes("spreadsheet")) return "📊"
+    if (type.includes("powerpoint") || type.includes("presentation")) return "📽️"
+    if (type.includes("text")) return "📃"
+    if (type.includes("video")) return "🎥"
+    if (type.includes("audio")) return "🎵"
+    if (type.includes("zip") || type.includes("rar")) return "📦"
+    return "📄"
+  }
 
   // 格式化文件大小
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-  };
+    if (bytes === 0) return "0 B"
+    const k = 1024
+    const sizes = ["B", "KB", "MB", "GB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i]
+  }
 
   // 获取文件类型显示名称
   const getFileTypeName = (type: string) => {
-    if (type.startsWith("image/")) return "Image";
-    if (type.includes("pdf")) return "PDF";
-    if (type.includes("word") || type.includes("document")) return "Word";
-    if (type.includes("excel") || type.includes("spreadsheet")) return "Excel";
-    if (type.includes("powerpoint") || type.includes("presentation"))
-      return "PowerPoint";
-    if (type.includes("text")) return "Text";
-    if (type.includes("video")) return "Video";
-    if (type.includes("audio")) return "Audio";
-    if (type.includes("zip") || type.includes("rar")) return "Archive";
-    return "File";
-  };
+    if (type.startsWith("image/")) return "Image"
+    if (type.includes("pdf")) return "PDF"
+    if (type.includes("word") || type.includes("document")) return "Word"
+    if (type.includes("excel") || type.includes("spreadsheet")) return "Excel"
+    if (type.includes("powerpoint") || type.includes("presentation")) return "PowerPoint"
+    if (type.includes("text")) return "Text"
+    if (type.includes("video")) return "Video"
+    if (type.includes("audio")) return "Audio"
+    if (type.includes("zip") || type.includes("rar")) return "Archive"
+    return "File"
+  }
 
   // 估算文本文件字数（仅对文本文件）
   const estimateWordCount = (size: number, type: string) => {
-    if (!type.includes("text") && !type.includes("txt")) return null;
+    if (!type.includes("text") && !type.includes("txt")) return null
     // 粗略估算：1KB ≈ 500-1000个中文字符
-    const estimatedChars = Math.round(size * 0.5);
+    const estimatedChars = Math.round(size * 0.5)
     if (estimatedChars > 1000) {
-      return `约 ${Math.round(estimatedChars / 1000)} 万字`;
+      return `约 ${Math.round(estimatedChars / 1000)} 万字`
     } else if (estimatedChars > 100) {
-      return `约 ${Math.round(estimatedChars / 100) * 100} 字`;
+      return `约 ${Math.round(estimatedChars / 100) * 100} 字`
     }
-    return `约 ${estimatedChars} 字`;
-  };
+    return `约 ${estimatedChars} 字`
+  }
 
   return (
     <div className="space-y-2">
@@ -174,10 +149,7 @@ const Attachments = ({
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
             {items.map((item: any) => (
-              <div
-                key={item.uid}
-                className="bg-gray-100 rounded-lg px-3 py-2 flex items-center gap-2 max-w-xs"
-              >
+              <div key={item.uid} className="bg-gray-100 rounded-lg px-3 py-2 flex items-center gap-2 max-w-xs">
                 {/* 图片缩略图或文件图标 */}
                 <div className="flex-shrink-0">
                   {item.type.startsWith("image/") ? (
@@ -186,10 +158,8 @@ const Attachments = ({
                       alt={item.name}
                       className="w-8 h-8 object-cover rounded border border-gray-200"
                       onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        e.currentTarget.nextElementSibling?.classList.remove(
-                          "hidden"
-                        );
+                        e.currentTarget.style.display = "none"
+                        e.currentTarget.nextElementSibling?.classList.remove("hidden")
                       }}
                     />
                   ) : (
@@ -207,17 +177,12 @@ const Attachments = ({
 
                 {/* 文件信息 */}
                 <div className="flex-1 min-w-0">
-                  <div
-                    className="text-sm font-medium text-gray-900 truncate"
-                    title={item.name}
-                  >
+                  <div className="text-sm font-medium text-gray-900 truncate" title={item.name}>
                     {item.name}
                   </div>
                   <div className="text-xs text-gray-500">
                     {getFileTypeName(item.type)} · {formatFileSize(item.size)}
-                    {item.type.includes("text") && (
-                      <span> · {estimateWordCount(item.size, item.type)}</span>
-                    )}
+                    {item.type.includes("text") && <span> · {estimateWordCount(item.size, item.type)}</span>}
                   </div>
                 </div>
 
@@ -235,53 +200,42 @@ const Attachments = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // 临时 Sender 组件
-const Sender = ({
-  ref,
-  header,
-  prefix,
-  value,
-  onChange,
-  onPasteFile,
-  onSubmit,
-  loading,
-  placeholder,
-}: SenderProps) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+const Sender = ({ ref, header, prefix, value, onChange, onPasteFile, onSubmit, loading, placeholder }: SenderProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // 自动调整高度
   const adjustHeight = () => {
-    const textarea = textareaRef.current;
+    const textarea = textareaRef.current
     if (textarea) {
-      textarea.style.height = "auto";
-      const scrollHeight = textarea.scrollHeight;
-      const maxHeight = 120; // 最大高度 120px
-      const minHeight = 40; // 最小高度 40px
-      textarea.style.height =
-        Math.min(Math.max(scrollHeight, minHeight), maxHeight) + "px";
+      textarea.style.height = "auto"
+      const scrollHeight = textarea.scrollHeight
+      const maxHeight = 120 // 最大高度 120px
+      const minHeight = 40 // 最小高度 40px
+      textarea.style.height = Math.min(Math.max(scrollHeight, minHeight), maxHeight) + "px"
     }
-  };
+  }
 
   // 当值变化时调整高度
   useEffect(() => {
-    adjustHeight();
-  }, [value]);
+    adjustHeight()
+  }, [value])
 
   return (
     <div className="w-full">
       {header}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="rounded-xl shadow-sm border border-gray-200 p-4">
         <div className="flex flex-col gap-3">
           <div className="flex-1 relative">
             <textarea
               ref={textareaRef}
               value={value}
               onChange={(e) => {
-                onChange(e.target.value);
-                adjustHeight();
+                onChange(e.target.value)
+                adjustHeight()
               }}
               placeholder={placeholder}
               className="w-full min-h-[40px] max-h-[120px] resize-none border-0 outline-none text-gray-900 placeholder-gray-500 overflow-hidden"
@@ -291,23 +245,21 @@ const Sender = ({
                 height: "40px",
               }}
               onPaste={(e) => {
-                const files = Array.from(e.clipboardData.files);
+                const files = Array.from(e.clipboardData.files)
                 if (files.length > 0) {
-                  onPasteFile(e, files);
+                  onPasteFile(e, files)
                 } else {
                   // 处理粘贴的图片（从剪贴板）
-                  const items = Array.from(e.clipboardData.items);
-                  const imageItems = items.filter((item) =>
-                    item.type.startsWith("image/")
-                  );
+                  const items = Array.from(e.clipboardData.items)
+                  const imageItems = items.filter((item) => item.type.startsWith("image/"))
 
                   if (imageItems.length > 0) {
                     // 检查是否超过最大数量限制
                     if (onPasteFile) {
                       const files = imageItems
                         .map((item) => item.getAsFile())
-                        .filter((file): file is File => file !== null);
-                      onPasteFile(e, files);
+                        .filter((file): file is File => file !== null)
+                      onPasteFile(e, files)
                     }
                   }
                 }
@@ -318,12 +270,12 @@ const Sender = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 Sender.Header = ({ title, children, open, onOpenChange }: any) => (
   <div className={`mb-2 ${open ? "block" : "hidden"}`}>{children}</div>
-);
+)
 
 const formatIcons = [
   { icon: MessageSquare, label: "sentence" },
@@ -331,29 +283,29 @@ const formatIcons = [
   { icon: AlignLeft, label: "longText" },
   { icon: Globe, label: "website" },
   { icon: Image, label: "image" },
-];
+]
 
 export function AiChatBlock() {
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
-  const router = useRouter();
-  const t = useTranslations("aiChat");
-  const { setAttachments, setInitialMessage } = useFormStore();
+  const [input, setInput] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [items, setItems] = useState<any[]>([])
+  const router = useRouter()
+  const t = useTranslations("aiChat")
+  const { setAttachments, setInitialMessage } = useFormStore()
 
-  const attachmentsRef = useRef<any>(null);
-  const senderRef = useRef<any>(null);
+  const attachmentsRef = useRef<any>(null)
+  const senderRef = useRef<any>(null)
 
   const handleSubmit = async (text?: string) => {
-    const messageToSend = text || input.trim();
-    if (!messageToSend) return;
+    const messageToSend = text || input.trim()
+    if (!messageToSend) return
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     // 使用 Zustand store 存储数据
-    const value = messageToSend.trim();
-    setInitialMessage(value);
+    const value = messageToSend.trim()
+    setInitialMessage(value)
 
     // 存储附件信息到 store（包括原始文件对象）
     if (items.length > 0) {
@@ -363,17 +315,17 @@ export function AiChatBlock() {
         type: item.type,
         url: item.url,
         originFileObj: item.originFileObj || item, // 保存原始文件对象
-      }));
-      setAttachments(attachmentInfo);
+      }))
+      setAttachments(attachmentInfo)
     } else {
-      setAttachments([]);
+      setAttachments([])
     }
 
     setTimeout(() => {
-      setIsLoading(false);
-      router.push(`/insight/goal`);
-    }, 1000);
-  };
+      setIsLoading(false)
+      router.push(`/insight/goal`)
+    }, 1000)
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8">
@@ -383,25 +335,21 @@ export function AiChatBlock() {
           <h1 className="text-3xl font-bold text-primary">{t("title")}</h1>
         </div>
         <h2 className="text-xl text-gray-600 mb-4">{t("subtitle")}</h2>
-        <p className="text-gray-500 text-sm max-w-2xl mx-auto">
-          {t("description")}
-        </p>
+        <p className="text-gray-500 text-sm max-w-2xl mx-auto">{t("description")}</p>
       </div>
 
       {/* 格式图标 */}
       <div className="flex items-center justify-center gap-6 mb-6">
         {formatIcons.map((item, index) => {
-          const Icon = item.icon;
+          const Icon = item.icon
           return (
-            <div key={index} className="flex flex-col items-center" style={{ gap: '2px' }}>
+            <div key={index} className="flex flex-col items-center" style={{ gap: "2px" }}>
               <div className="w-10 h-10 flex items-center justify-center">
                 <Icon className="w-5 h-5 text-gray-600" />
               </div>
-              <span className="text-xs text-gray-500">
-                {t(`formatIcons.${item.label}`)}
-              </span>
+              <span className="text-xs text-gray-500">{t(`formatIcons.${item.label}`)}</span>
             </div>
-          );
+          )
         })}
       </div>
 
@@ -449,42 +397,35 @@ export function AiChatBlock() {
                   onClick={() => {
                     // 检查是否超过最大数量限制
                     if (items.length >= 3) {
-                      alert("最多只能上传3个文件");
-                      return;
+                      alert("最多只能上传3个文件")
+                      return
                     }
 
                     // 直接触发文件选择对话框
-                    const fileInput = document.createElement("input");
-                    fileInput.type = "file";
-                    fileInput.multiple = true;
-                    fileInput.accept =
-                      ".pdf,.jpg,.jpeg,.png,.gif,.webp,.svg,.bmp,.tiff";
+                    const fileInput = document.createElement("input")
+                    fileInput.type = "file"
+                    fileInput.multiple = true
+                    fileInput.accept = ".pdf,.jpg,.jpeg,.png,.gif,.webp,.svg,.bmp,.tiff"
                     fileInput.onchange = (e: any) => {
-                      const files = Array.from(e.target.files || []) as File[];
+                      const files = Array.from(e.target.files || []) as File[]
                       if (files.length > 0) {
                         // 检查文件类型
-                        const invalidFiles = files.filter(
-                          (file) => !isFileTypeAllowed(file)
-                        );
+                        const invalidFiles = files.filter((file) => !isFileTypeAllowed(file))
                         if (invalidFiles.length > 0) {
                           alert(
                             `以下文件类型不支持：\n${invalidFiles
                               .map((f) => f.name)
-                              .join(
-                                "\n"
-                              )}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`
-                          );
-                          return;
+                              .join("\n")}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`,
+                          )
+                          return
                         }
 
                         // 计算还能添加多少个文件
-                        const remainingSlots = 3 - items.length;
-                        const filesToAdd = files.slice(0, remainingSlots);
+                        const remainingSlots = 3 - items.length
+                        const filesToAdd = files.slice(0, remainingSlots)
 
                         if (files.length > remainingSlots) {
-                          alert(
-                            `最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`
-                          );
+                          alert(`最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`)
                         }
 
                         const newItems = filesToAdd.map((file: File) => ({
@@ -495,12 +436,12 @@ export function AiChatBlock() {
                           url: URL.createObjectURL(file),
                           status: "done",
                           originFileObj: file, // ✅ 保存原始文件对象
-                        }));
-                        setItems((prev) => [...prev, ...newItems]);
-                        setOpen(true); // 显示附件区域
+                        }))
+                        setItems((prev) => [...prev, ...newItems])
+                        setOpen(true) // 显示附件区域
                       }
-                    };
-                    fileInput.click();
+                    }
+                    fileInput.click()
                   }}
                 />
               }
@@ -509,54 +450,46 @@ export function AiChatBlock() {
               onPasteFile={(_, files) => {
                 // 检查是否超过最大数量限制
                 if (items.length >= 3) {
-                  alert("最多只能上传3个文件");
-                  return;
+                  alert("最多只能上传3个文件")
+                  return
                 }
 
                 // 检查文件类型
-                const invalidFiles = files.filter(
-                  (file) => !isFileTypeAllowed(file)
-                );
+                const invalidFiles = files.filter((file) => !isFileTypeAllowed(file))
                 if (invalidFiles.length > 0) {
                   alert(
                     `以下文件类型不支持：\n${invalidFiles
                       .map((f) => f.name || "未知文件")
-                      .join(
-                        "\n"
-                      )}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`
-                  );
-                  return;
+                      .join("\n")}\n\n请使用 PDF 或图片格式（JPG、PNG、GIF、WebP、SVG、BMP、TIFF）`,
+                  )
+                  return
                 }
 
                 // 计算还能添加多少个文件
-                const remainingSlots = 3 - items.length;
-                const filesToAdd = files.slice(0, remainingSlots);
+                const remainingSlots = 3 - items.length
+                const filesToAdd = files.slice(0, remainingSlots)
 
                 if (files.length > remainingSlots) {
-                  alert(
-                    `最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`
-                  );
+                  alert(`最多只能上传3个文件，已选择${files.length}个文件，只能添加前${remainingSlots}个`)
                 }
 
                 // 处理粘贴的文件（包括图片）
                 const newItems = filesToAdd.map((file: File) => ({
                   uid: Math.random().toString(36).substr(2, 9),
-                  name:
-                    file.name ||
-                    `粘贴文件_${Date.now()}.${file.type.split("/")[1]}`,
+                  name: file.name || `粘贴文件_${Date.now()}.${file.type.split("/")[1]}`,
                   size: file.size,
                   type: file.type,
                   url: URL.createObjectURL(file),
                   status: "done",
                   originFileObj: file, // ✅ 保存原始文件对象
-                }));
-                setItems((prev) => [...prev, ...newItems]);
-                setOpen(true);
+                }))
+                setItems((prev) => [...prev, ...newItems])
+                setOpen(true)
               }}
               onSubmit={() => {
-                handleSubmit(input);
-                setItems([]);
-                setInput("");
+                handleSubmit(input)
+                setItems([])
+                setInput("")
               }}
               loading={isLoading}
               placeholder={t("placeholder")}
@@ -586,5 +519,5 @@ export function AiChatBlock() {
         </div>
       </div>
     </div>
-  );
+  )
 }
