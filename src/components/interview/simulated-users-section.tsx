@@ -33,9 +33,9 @@ export function SimulatedUsersSection({
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
-            {t("users.simulatedUsers.title")} {simulatedUsers.length}
+            {t("users.simulatedUsers.title")}
             {!shouldUseRecommend && responsesTotal && (
-              <span className="text-sm text-gray-500 font-normal">/ {responsesTotal} 个</span>
+              <span> {responsesTotal} 个</span>
             )}
           </h3>
           <span className="text-sm text-gray-600">
