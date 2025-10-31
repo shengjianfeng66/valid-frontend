@@ -367,21 +367,21 @@ export default function Page() {
       productSolutionFiles:
         formData.product_solution && formData.product_solution.length > 0
           ? formData.product_solution.map((file) => ({
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              sizeInKB: (file.size / 1024).toFixed(2),
-            }))
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            sizeInKB: (file.size / 1024).toFixed(2),
+          }))
           : null,
       productSolutionCount: formData.product_solution?.length || 0,
       attachments:
         attachments.length > 0
           ? attachments.map((item: any) => ({
-              name: item.name,
-              size: item.size,
-              type: item.type,
-              sizeInKB: (item.size / 1024).toFixed(2),
-            }))
+            name: item.name,
+            size: item.size,
+            type: item.type,
+            sizeInKB: (item.size / 1024).toFixed(2),
+          }))
           : null,
       hasAttachments: attachments.length > 0,
       attachmentCount: attachments.length,
@@ -434,11 +434,10 @@ export default function Page() {
                     <Button
                       onClick={handleNext}
                       disabled={!isFormValid()}
-                      className={`flex items-center gap-2 transition-all duration-200 ${
-                        isFormValid()
-                          ? "bg-primary hover:bg-primary/90 text-white"
-                          : "bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70"
-                      }`}
+                      className={`flex items-center gap-2 transition-all duration-200 ${isFormValid()
+                        ? "bg-primary hover:bg-primary/90 text-white"
+                        : "bg-primary/80 text-white cursor-not-allowed hover:bg-primary/70"
+                        }`}
                     >
                       {t("next")}
                       <ArrowRight className="w-4 h-4" />
@@ -566,7 +565,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
       // 调用后端 API 删除文件
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL +
-          `/api/v1/product/attachments/delete?file_path=${encodeURIComponent(fileToDelete.file_path)}`,
+        `/api/v1/product/attachments/delete?file_path=${encodeURIComponent(fileToDelete.file_path)}`,
         {
           method: "DELETE",
           headers: {
@@ -715,6 +714,7 @@ function SurveyForm({ fileInputRef }: SurveyFormProps) {
             className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer"
           >
             <input
+              // @ts-ignore
               ref={fileInputRef}
               type="file"
               accept=".pdf,.png,.jpg,.jpeg"

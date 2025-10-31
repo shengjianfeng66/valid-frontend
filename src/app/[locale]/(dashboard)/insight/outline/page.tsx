@@ -68,11 +68,11 @@ interface InterviewOutline {
   product_alignment?: {
     intro_paragraph: string
   }
-  closing_script: {
-    conclusion: string
+  closing_script?: {
+    thank_you: string
   }
   opening_script: {
-    introduction: string
+    greeting: string
   }
   sections: InterviewSection[]
 }
@@ -105,14 +105,25 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
     return surveyData.interviewOutline.sections.reduce((total, section) => total + section.questions.length, 0)
   }
 
-  const handleIntroductionChange = (value: string) => {
+  const handleIntroParagraphChange = (value: string) => {
+    setSurveyData((prev) => ({
+      ...prev,
+      interviewOutline: {
+        ...prev.interviewOutline,
+        product_alignment: {
+          intro_paragraph: value,
+        },
+      },
+    }))
+  }
+
+  const handleGreetingChange = (value: string) => {
     setSurveyData((prev) => ({
       ...prev,
       interviewOutline: {
         ...prev.interviewOutline,
         opening_script: {
-          ...prev.interviewOutline.opening_script,
-          introduction: value,
+          greeting: value,
         },
       },
     }))
@@ -124,6 +135,48 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
       const newSections = [...newData.interviewOutline.sections]
       const newQuestions = [...newSections[sectionIndex].questions]
       newQuestions[questionIndex] = { ...newQuestions[questionIndex], main: value }
+      newSections[sectionIndex] = { ...newSections[sectionIndex], questions: newQuestions }
+      newData.interviewOutline = { ...newData.interviewOutline, sections: newSections }
+      return newData
+    })
+  }
+
+  const handleProbeChange = (sectionIndex: number, questionIndex: number, probeIndex: number, value: string) => {
+    setSurveyData((prev) => {
+      const newData = { ...prev }
+      const newSections = [...newData.interviewOutline.sections]
+      const newQuestions = [...newSections[sectionIndex].questions]
+      const newProbes = [...newQuestions[questionIndex].probes]
+      newProbes[probeIndex] = value
+      newQuestions[questionIndex] = { ...newQuestions[questionIndex], probes: newProbes }
+      newSections[sectionIndex] = { ...newSections[sectionIndex], questions: newQuestions }
+      newData.interviewOutline = { ...newData.interviewOutline, sections: newSections }
+      return newData
+    })
+  }
+
+  const addProbe = (sectionIndex: number, questionIndex: number) => {
+    setSurveyData((prev) => {
+      const newData = { ...prev }
+      const newSections = [...newData.interviewOutline.sections]
+      const newQuestions = [...newSections[sectionIndex].questions]
+      const newProbes = [...newQuestions[questionIndex].probes]
+      newProbes.push("")
+      newQuestions[questionIndex] = { ...newQuestions[questionIndex], probes: newProbes }
+      newSections[sectionIndex] = { ...newSections[sectionIndex], questions: newQuestions }
+      newData.interviewOutline = { ...newData.interviewOutline, sections: newSections }
+      return newData
+    })
+  }
+
+  const removeProbe = (sectionIndex: number, questionIndex: number, probeIndex: number) => {
+    setSurveyData((prev) => {
+      const newData = { ...prev }
+      const newSections = [...newData.interviewOutline.sections]
+      const newQuestions = [...newSections[sectionIndex].questions]
+      const newProbes = [...newQuestions[questionIndex].probes]
+      newProbes.splice(probeIndex, 1)
+      newQuestions[questionIndex] = { ...newQuestions[questionIndex], probes: newProbes }
       newSections[sectionIndex] = { ...newSections[sectionIndex], questions: newQuestions }
       newData.interviewOutline = { ...newData.interviewOutline, sections: newSections }
       return newData
@@ -168,80 +221,136 @@ function InterviewForm({ surveyData, setSurveyData, syncToAgent }: SurveyFormPro
           <FileText className="w-5 h-5 text-purple-600" />
         </div>
         <h2 className="text-2xl font-semibold text-gray-900">{t("interview.title")}</h2>
-        {/* <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="text-blue-600 hover:text-blue-700 text-sm font-medium underline cursor-pointer">
-                个性化追问
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs">
-                AI 用户研究专家会基于用户的回答进行个性化追问，<br />
-                发掘用户行为背后的真实需求，<br />
-                提供更深入的洞察分析
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider> */}
       </div>
 
       <div className="space-y-8">
-        {/* 引言 */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            引言
+        {/* 引言 - intro_paragraph */}
+        {surveyData.interviewOutline.product_alignment?.intro_paragraph && (
+          <div>
+            <label className="block text-base font-medium text-gray-700 mb-2">
+              引言
+            </label>
             <textarea
-              value={surveyData.interviewOutline.opening_script.introduction}
-              onChange={(e) => handleIntroductionChange(e.target.value)}
+              value={surveyData.interviewOutline.product_alignment.intro_paragraph}
+              onChange={(e) => handleIntroParagraphChange(e.target.value)}
               onBlur={syncToAgent}
-              rows={6}
+              rows={4}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
-              placeholder="欢迎您参加 Dreamoo 用户访谈。本次访谈的目的是了解您使用 Dreamoo 记录梦境的体验，包括使用习惯、满意的地方以及希望改进的地方，以帮助我们优化产品。访谈预计需要约 10 分钟，您的信息将被严格保密，仅用于产品优化。没有标准答案，您的真实感受最有价值。如果您准备好了，我们将开始访谈。"
+              placeholder="介绍产品和访谈目的..."
             />
+          </div>
+        )}
+
+        {/* 欢迎语 - greeting */}
+        <div>
+          <label className="block text-base font-medium text-gray-700 mb-2">
+            欢迎语
           </label>
+          <textarea
+            value={surveyData.interviewOutline.opening_script.greeting}
+            onChange={(e) => handleGreetingChange(e.target.value)}
+            onBlur={syncToAgent}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
+            placeholder="欢迎您参加本次访谈..."
+          />
         </div>
 
         {/* 动态渲染访谈大纲的各个部分 */}
         {surveyData.interviewOutline.sections.map((section, sectionIndex) => (
           <div key={sectionIndex} className="border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
               {sectionIndex + 1}、{section.name}
             </h3>
-            <p className="text-sm text-gray-600 mb-4">{section.reason}</p>
-            <div className="space-y-4">
+            <p className="text-sm text-gray-600 mb-6">{section.reason}</p>
+            <div className="space-y-6">
               {section.questions.map((question, questionIndex) => (
-                <div key={questionIndex} className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    value={question.main}
-                    onChange={(e) => handleQuestionChange(sectionIndex, questionIndex, e.target.value)}
-                    onBlur={syncToAgent}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                    placeholder="请输入问题..."
-                  />
-                  <button
-                    onClick={() => removeQuestion(sectionIndex, questionIndex)}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
+                <div key={questionIndex} className="space-y-3">
+                  {/* 主问题 */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      value={question.main}
+                      onChange={(e) => handleQuestionChange(sectionIndex, questionIndex, e.target.value)}
+                      onBlur={syncToAgent}
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                      placeholder="请输入主问题..."
+                    />
+                    <button
+                      onClick={() => removeQuestion(sectionIndex, questionIndex)}
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* 追问列表 - probes */}
+                  {question.probes && question.probes.length > 0 && (
+                    <div className="ml-8 space-y-2">
+                      <div className="text-base font-medium text-gray-500 mb-2">追问：</div>
+                      {question.probes.map((probe, probeIndex) => (
+                        <div key={probeIndex} className="flex items-center gap-2">
+                          <span className="text-gray-400">•</span>
+                          <input
+                            type="text"
+                            value={probe}
+                            onChange={(e) => handleProbeChange(sectionIndex, questionIndex, probeIndex, e.target.value)}
+                            onBlur={syncToAgent}
+                            className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            placeholder="请输入追问..."
+                          />
+                          <button
+                            onClick={() => removeProbe(sectionIndex, questionIndex, probeIndex)}
+                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => addProbe(sectionIndex, questionIndex)}
+                        className="ml-4 text-base text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                      >
+                        <Plus className="w-4 h-4" />
+                        添加追问
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 如果没有追问，显示添加追问按钮 */}
+                  {(!question.probes || question.probes.length === 0) && (
+                    <div className="ml-8">
+                      <button
+                        onClick={() => addProbe(sectionIndex, questionIndex)}
+                        className="text-base text-gray-500 hover:text-primary transition-colors flex items-center gap-1"
+                      >
+                        <Plus className="w-4 h-4" />
+                        添加追问
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
               <button
                 onClick={() => addQuestion(sectionIndex)}
-                className={`w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                  getTotalQuestionCount() >= 20
-                    ? "border-gray-200 text-gray-400 cursor-pointer"
-                    : "border-gray-300 text-gray-500 hover:border-primary hover:text-primary"
-                }`}
+                className={`w-full py-3 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${getTotalQuestionCount() >= 20
+                  ? "border-gray-200 text-gray-400 cursor-pointer"
+                  : "border-gray-300 text-gray-500 hover:border-primary hover:text-primary"
+                  }`}
               >
                 <Plus className="w-4 h-4" />
                 添加问题
@@ -273,8 +382,8 @@ export default function CheckPage() {
     productSolutionFiles?: FileData[]
     tool_result?: {
       product_alignment?: { intro_paragraph?: string }
-      opening_script?: { introduction?: string }
-      closing_script?: { conclusion?: string }
+      opening_script?: { greeting?: string }
+      closing_script?: { thank_you?: string }
       sections?: any[]
     }
   }>({
@@ -360,11 +469,10 @@ export default function CheckPage() {
 用户关心的方面：${surveyInfo.userConcerns}
 核心功能模块：${surveyInfo.coreFeatures}
 
-${
-  surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
-    ? `\n注意：我已上传了 ${surveyInfo.productSolutionFiles.length} 个产品方案文件`
-    : ""
-}
+${surveyInfo.productSolutionFiles && surveyInfo.productSolutionFiles.length > 0
+              ? `\n注意：我已上传了 ${surveyInfo.productSolutionFiles.length} 个产品方案文件`
+              : ""
+            }
 
 请确保问题设计能够深度发掘用户需求，帮助优化产品。`
 
@@ -416,10 +524,10 @@ ${
         intro_paragraph: "",
       },
       opening_script: {
-        introduction: "",
+        greeting: "",
       },
       closing_script: {
-        conclusion: "",
+        thank_you: "",
       },
       sections: [],
     },
@@ -437,10 +545,89 @@ ${
       if (!state?.tool_result) return
 
       const { tool_result } = state
+      // const tool_result = {
+      //   "product_alignment": {
+      //     "intro_paragraph": "Note-Taking App是一款专为年轻专业人士和学生设计的笔记应用。本次访谈旨在深入了解用户的使用习惯，并验证产品功能需求，以帮助优化产品体验。"
+      //   },
+      //   "opening_script": {
+      //     "greeting": "您好，感谢您参加我们的访谈。本次访谈将帮助我们更好地理解您对Note-Taking App的使用体验和需求。访谈内容将被录音，仅用于研究分析，您的隐私将得到严格保护。您可以随时选择退出。"
+      //   },
+      //   "sections": [
+      //     {
+      //       "name": "热身与背景",
+      //       "reason": "了解用户的基本背景和使用场景，以便后续问题更具针对性。",
+      //       "questions": [
+      //         {
+      //           "main": "请您介绍一下自己在学习或工作中通常如何使用Note-Taking App？",
+      //           "probes": [
+      //             "您通常在哪些场景下使用这款笔记应用？",
+      //             "您使用Note-Taking App的频率如何？"
+      //           ]
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       "name": "现状与痛点",
+      //       "reason": "识别用户在使用过程中遇到的困难和未被满足的需求。",
+      //       "questions": [
+      //         {
+      //           "main": "在使用Note-Taking App记录笔记时，您遇到过哪些困难或不便？",
+      //           "probes": [
+      //             "能否分享一次因为功能限制而影响使用的经历？",
+      //             "哪些功能或环节让您觉得最费力或容易出错？"
+      //           ]
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       "name": "动机与优先级",
+      //       "reason": "理解用户使用产品的动机及其优先考虑的功能需求。",
+      //       "questions": [
+      //         {
+      //           "main": "如果Note-Taking App只能解决一个问题，您希望是哪一个？为什么？",
+      //           "probes": [
+      //             "您认为哪些功能对您的学习或工作最重要？",
+      //             "在选择笔记应用时，您最看重哪些方面？"
+      //           ]
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       "name": "期望与理想",
+      //       "reason": "探索用户对产品的理想状态和期望的功能表现。",
+      //       "questions": [
+      //         {
+      //           "main": "在理想情况下，您希望Note-Taking App如何帮助您更好地记录和管理笔记？",
+      //           "probes": [
+      //             "您认为怎样的功能或体验能让您更满意？",
+      //             "如果可以添加一个新功能，您希望是什么？"
+      //           ]
+      //         }
+      //       ]
+      //     },
+      //     {
+      //       "name": "收束与补充",
+      //       "reason": "总结访谈内容并提供补充机会。",
+      //       "questions": [
+      //         {
+      //           "main": "您还有什么关于Note-Taking App的使用体验或建议希望补充的？",
+      //           "probes": [
+      //             "您认为还有哪些方面可以进一步优化？",
+      //             "您是否有其他笔记应用的使用经验可以分享？"
+      //           ]
+      //         }
+      //       ]
+      //     }
+      //   ],
+      //   "closing_script": {
+      //     "thank_you": "感谢您的参与和分享。您的反馈对我们非常重要，将帮助我们优化Note-Taking App。后续如有任何问题或补充，欢迎随时联系。祝您生活愉快！"
+      //   }
+      // }
 
+      console.log("tool_result", tool_result)
       // 验证数据完整性
       const hasValidData =
-        tool_result.opening_script?.introduction || (tool_result.sections && tool_result.sections.length > 0)
+        tool_result.opening_script?.greeting || (tool_result.sections && tool_result.sections.length > 0)
 
       if (!hasValidData) {
         console.warn("⚠️ Agent 返回数据不完整")
@@ -449,15 +636,19 @@ ${
 
       // 提取数据
       const newOutline = {
-        product_alignment: {
-          intro_paragraph: tool_result.product_alignment?.intro_paragraph || "",
-        },
+        product_alignment: tool_result.product_alignment?.intro_paragraph
+          ? {
+            intro_paragraph: tool_result.product_alignment.intro_paragraph,
+          }
+          : undefined,
         opening_script: {
-          introduction: tool_result.opening_script?.introduction || "",
+          greeting: tool_result.opening_script?.greeting || "",
         },
-        closing_script: {
-          conclusion: tool_result.closing_script?.conclusion || "",
-        },
+        closing_script: tool_result.closing_script?.thank_you
+          ? {
+            thank_you: tool_result.closing_script.thank_you,
+          }
+          : undefined,
         sections: tool_result.sections || [],
       }
 
@@ -466,7 +657,7 @@ ${
         ...prev,
         interviewOutline: newOutline,
       }))
-    } catch (error) {}
+    } catch (error) { }
   }, [state?.tool_result, user]) // 监听 tool_result 变化和用户状态
 
   // ✅ 失焦时同步：前端 → Agent
@@ -493,36 +684,42 @@ ${
       // 构建 goal 参数
       const goal = currentSurveyInfo
         ? {
-            product_name: currentSurveyInfo.product_name || "",
-            business_type: currentSurveyInfo.business_type || "",
-            target_users: currentSurveyInfo.target_users || "",
-            research_goal: currentSurveyInfo.userConcerns || "",
-          }
+          product_name: currentSurveyInfo.product_name || "",
+          business_type: currentSurveyInfo.business_type || "",
+          target_users: currentSurveyInfo.target_users || "",
+          research_goal: currentSurveyInfo.userConcerns || "",
+        }
         : undefined
 
       // 构建 outline 参数 - 只要有 opening_script 或 sections 就发送
       const hasOutlineData =
-        surveyData.interviewOutline.opening_script.introduction?.trim() ||
+        surveyData.interviewOutline.opening_script.greeting?.trim() ||
         surveyData.interviewOutline.sections.length > 0
 
       const outline = hasOutlineData
         ? {
-            product_alignment: surveyData.interviewOutline.product_alignment?.intro_paragraph
-              ? {
-                  intro_paragraph: surveyData.interviewOutline.product_alignment.intro_paragraph,
-                }
-              : undefined,
-            opening_script: {
-              introduction: surveyData.interviewOutline.opening_script.introduction || "",
-            },
-            sections: surveyData.interviewOutline.sections.map((section) => ({
-              name: section.name,
-              questions: section.questions.map((q) => ({
-                main: q.main,
-                probes: q.probes,
-              })),
+          product_alignment: surveyData.interviewOutline.product_alignment?.intro_paragraph
+            ? {
+              intro_paragraph: surveyData.interviewOutline.product_alignment.intro_paragraph,
+            }
+            : undefined,
+          opening_script: {
+            greeting: surveyData.interviewOutline.opening_script.greeting || "",
+          },
+          closing_script: surveyData.interviewOutline.closing_script?.thank_you
+            ? {
+              thank_you: surveyData.interviewOutline.closing_script.thank_you,
+            }
+            : undefined,
+          sections: surveyData.interviewOutline.sections.map((section) => ({
+            name: section.name,
+            reason: section.reason,
+            questions: section.questions.map((q) => ({
+              main: q.main,
+              probes: q.probes,
             })),
-          }
+          })),
+        }
         : undefined
 
       // 使用 services/interview.ts 中的 createInterview 函数，包含认证 header
