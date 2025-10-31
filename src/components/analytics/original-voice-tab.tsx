@@ -1,15 +1,14 @@
 "use client"
 
 import type { ColumnDef } from "@tanstack/react-table"
-import { Loader2, Eye, User, Bot } from "lucide-react"
-import React, { useMemo } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Bot, Eye, Loader2, User } from "lucide-react"
+import { useMemo } from "react"
 import { DataTable } from "@/components/data-table/data-table"
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar"
+import { Button } from "@/components/ui/button"
 import { useDataTable } from "@/hooks/use-data-table"
-import { getStatusConfig, formatDurationMinutes, formatDate } from "@/utils/interview"
 import type { InterviewResponseWithInterviewee } from "@/types/interview"
+import { formatDate, formatDurationMinutes, getStatusConfig } from "@/utils/interview"
 
 interface OriginalVoiceTabProps {
   loading: boolean
@@ -261,13 +260,15 @@ export function OriginalVoiceTab({ loading, error, data, onViewDetail }: Origina
       {
         id: "questions",
         accessorFn: (row) =>
-          row.response?.details?.answers.reduce((total: number, section: any) => total + section.questions.length, 0),
+          row.response.details.answers.reduce((total: number, section: any) => total + section.questions.length, 0),
         header: () => <div className="font-semibold text-sm">问答数</div>,
         cell: ({ row }) => {
-          const count = row.original.response?.details?.answers.reduce(
-            (total: number, section: any) => total + section.questions.length,
-            0,
-          )
+          const count =
+            row.original.response?.details?.answers?.reduce(
+              (total: number, section: any) => total + section.questions.length,
+              0
+            ) ?? 0
+
           return <span className="text-sm text-gray-900">{count}</span>
         },
         enableSorting: true,
@@ -302,7 +303,7 @@ export function OriginalVoiceTab({ loading, error, data, onViewDetail }: Origina
         enableHiding: false,
       },
     ],
-    [onViewDetail],
+    [onViewDetail]
   )
 
   const { table } = useDataTable({

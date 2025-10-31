@@ -3,7 +3,9 @@
     "allow": [
       "Bash(pnpm add:*)",
       "WebSearch",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm list:*)"
     ],
     "deny": [],
     "ask": []
