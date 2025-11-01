@@ -3,9 +3,9 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
-    ...defaultMdxComponents,
+    ...(defaultMdxComponents as any),
     ...components,
-  };
+  } as MDXComponents;
 }
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {

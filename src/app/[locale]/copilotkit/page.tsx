@@ -161,8 +161,8 @@ export default function CopilotKitPage() {
 
   return (
     <main style={{ "--copilot-kit-primary-color": "#8b5cf6" } as CopilotKitCSSProperties}>
-      <SurveyForm 
-        formData={formData} 
+      <SurveyForm
+        formData={formData}
         setFormData={setFormData}
         fileInputRef={fileInputRef}
       />
@@ -181,7 +181,7 @@ export default function CopilotKitPage() {
 interface SurveyFormProps {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
@@ -305,7 +305,7 @@ function SurveyForm({ formData, setFormData, fileInputRef }: SurveyFormProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 您的产品方案
               </label>
-              <div 
+              <div
                 onClick={handleUploadClick}
                 className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-purple-300 hover:bg-purple-50 transition-all cursor-pointer"
               >
